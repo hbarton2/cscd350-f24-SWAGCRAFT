@@ -1,0 +1,1 @@
+'''Define root class'''

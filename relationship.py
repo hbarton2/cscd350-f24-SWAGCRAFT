@@ -1,0 +1,1 @@
+'''Define inter-class relations'''
