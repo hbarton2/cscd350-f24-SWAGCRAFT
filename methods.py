@@ -1,1 +1,0 @@
-'''Define class methods'''

@@ -1,1 +1,0 @@
-'''Dsiplay menu in main, direct traffic'''
