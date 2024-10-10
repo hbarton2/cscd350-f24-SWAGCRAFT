@@ -10,7 +10,24 @@ from relationship import *
 from saveLoad import *
 
 def main():
-    print("hello, world")
+    '''Main function that contains while loop'''
+    diagram = {}
+    running = True
+    '''
+    while (running):
+        choice = displayMenu()
+        if (choice == 1):
+            
+
+        elif (choice == 2):
+            
+
+        elif (choice == 3):
+
+        
+        else:
+            print("Try Again")
+    '''
 
 if __name__=="__main__":
     main()
