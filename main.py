@@ -1,13 +1,13 @@
 '''Main project file'''
 
 # Import all other python files
-from classes.py import *
-from fields.py import *
-from interface.py import *
-from menu.py import *
-from methods.py import *
-from relationship.py import *
-from saveLoad.py import *
+from classes import *
+from fields import *
+from interface import *
+from menu import *
+from methods import *
+from relationship import *
+from saveLoad import *
 
 def main():
     print("hello, world")
