@@ -2,6 +2,7 @@ from main import *
 from classes import *
 
 def renameMethod(class_name, old_method_name, new_method_name):
+    global diagram
     if class_name not in diagram:
         print("Class name not found.")
         return
@@ -58,3 +59,40 @@ def renameMethod(class_name, old_method_name, new_method_name):
         del methods[old_method_name]
 
     print(f"Method{'s' if len(methods_to_rename) > 1 else ''} renamed successfully.")
+
+def removeMethod(class_name, method_name):
+    global diagram
+    if class_name not in diagram:
+        print("Class name not found.")
+        return
+
+    class_info = diagram[class_name]
+    if 'Methods' not in class_info or method_name not in class_info['Methods']:
+        print("Method name not found.")
+        return
+
+    methods = class_info['Methods']
+    overloaded_methods = methods[method_name]
+
+    if len(overloaded_methods) > 1:
+        print(f"The method '{method_name}' is overloaded. Which one do you want to remove?")
+        for i, params in enumerate(overloaded_methods):
+            print(f"{i + 1}. {method_name}({', '.join(params)})")
+        
+        choice = input("Enter the number of the method to remove, or 'all' to remove all overloads: ")
+        
+        if choice.lower() == 'all':
+            del methods[method_name]
+            print("All overloads of the method have been removed.")
+        else:
+            try:
+                index = int(choice) - 1
+                del methods[method_name][index]
+                if not methods[method_name]:
+                    del methods[method_name]
+                print("Method removed successfully.")
+            except (ValueError, IndexError):
+                print("Invalid choice. Aborting.")
+    else:
+        del methods[method_name]
+        print("Method removed successfully.")
