@@ -1,8 +1,8 @@
-from main import *
 from classes import *
+#from diagram import diagram
+from main import diagram
 
 def addMethod(class_name, method_name, parameters=None):
-    global diagram
     if class_name not in diagram:
         print("Class name not found.")
         return
@@ -30,7 +30,6 @@ def addMethod(class_name, method_name, parameters=None):
 
 
 def renameMethod(class_name, old_method_name, new_method_name):
-    global diagram
     if class_name not in diagram:
         print("Class name not found.")
         return
@@ -80,7 +79,9 @@ def renameMethod(class_name, old_method_name, new_method_name):
 
     for params in methods_to_rename:
         methods[new_method_name].append(params)
-        methods[old_method_name].remove(params)
+
+    # Now remove the old method names
+    methods[old_method_name] = [x for x in methods[old_method_name] if x not in methods_to_rename]
 
     # Remove the old method name if all overloads were renamed
     if not methods[old_method_name]:
@@ -91,7 +92,6 @@ def renameMethod(class_name, old_method_name, new_method_name):
 
 
 def removeMethod(class_name, method_name):
-    global diagram
     if class_name not in diagram:
         print("Class name not found.")
         return
@@ -131,7 +131,6 @@ def removeMethod(class_name, method_name):
 
 
 def addParameter(class_name, method_name, new_param_name, new_param_type):
-    global diagram
     if class_name not in diagram:
         print("Class name not found.")
         return
@@ -176,7 +175,6 @@ def addParameter(class_name, method_name, new_param_name, new_param_type):
 
 
 def removeParameter(class_name, method_name, param_name):
-    global diagram
     if class_name not in diagram:
         print("Class name not found.")
         return
@@ -217,7 +215,6 @@ def removeParameter(class_name, method_name, param_name):
 
 
 def changeParameter(class_name, method_name, new_params):
-    global diagram
     if class_name not in diagram:
         print("Class name not found.")
         return
