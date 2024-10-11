@@ -213,3 +213,41 @@ def removeParameter(class_name, method_name, param_name):
             return
 
     print("Parameter not found in the method.")
+
+
+
+def changeParameter(class_name, method_name, new_params):
+    global diagram
+    if class_name not in diagram:
+        print("Class name not found.")
+        return
+
+    class_info = diagram[class_name]
+    if 'Methods' not in class_info or method_name not in class_info['Methods']:
+        print("Method name not found.")
+        return
+
+    methods = class_info['Methods']
+    overloaded_methods = methods[method_name]
+
+    # Check if the method is overloaded
+    if len(overloaded_methods) > 1:
+        print(f"The method '{method_name}' is overloaded. Which one do you want to modify?")
+        for i, params in enumerate(overloaded_methods):
+            print(f"{i + 1}. {method_name}({', '.join(params)})")
+        
+        choice = input("Enter the number of the method to modify, or 'all' to modify all overloads: ")
+        
+        if choice.lower() == 'all':
+            methods[method_name] = [new_params]
+            print("Parameters changed for all overloads.")
+        else:
+            try:
+                index = int(choice) - 1
+                methods[method_name][index] = new_params
+                print("Parameters changed successfully.")
+            except (ValueError, IndexError):
+                print("Invalid choice. Aborting.")
+    else:
+        methods[method_name] = [new_params]
+        print("Parameters changed successfully.")
