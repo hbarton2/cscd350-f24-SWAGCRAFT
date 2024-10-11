@@ -12,9 +12,3 @@ def load():
     global diagram
     with open("data.json", "r") as file:
         diagram = json.load(file)
-    
-def main():
-    save()
-
-if __name__ == "__main__":
-    main()
