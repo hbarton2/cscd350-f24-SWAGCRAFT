@@ -26,6 +26,7 @@ def main():
     '''Main function that contains while loop'''
 
     # Create the dictionary that everything works with 
+    global diagram
     diagram = {}
 
     # Main menu loop
