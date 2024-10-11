@@ -27,6 +27,8 @@ def addMethod(class_name, method_name, parameters=None):
             methods[method_name].append(parameters)
             print(f"Overloaded method '{method_name}' added successfully.")
 
+
+
 def renameMethod(class_name, old_method_name, new_method_name):
     global diagram
     if class_name not in diagram:
@@ -86,6 +88,8 @@ def renameMethod(class_name, old_method_name, new_method_name):
 
     print(f"Method{'s' if len(methods_to_rename) > 1 else ''} renamed successfully.")
 
+
+
 def removeMethod(class_name, method_name):
     global diagram
     if class_name not in diagram:
@@ -100,6 +104,7 @@ def removeMethod(class_name, method_name):
     methods = class_info['Methods']
     overloaded_methods = methods[method_name]
 
+    # Check if the method is overloaded
     if len(overloaded_methods) > 1:
         print(f"The method '{method_name}' is overloaded. Which one do you want to remove?")
         for i, params in enumerate(overloaded_methods):
@@ -122,3 +127,48 @@ def removeMethod(class_name, method_name):
     else:
         del methods[method_name]
         print("Method removed successfully.")
+
+
+
+def addParameter(class_name, method_name, new_param_name, new_param_type):
+    global diagram
+    if class_name not in diagram:
+        print("Class name not found.")
+        return
+
+    class_info = diagram[class_name]
+    if 'Methods' not in class_info or method_name not in class_info['Methods']:
+        print("Method name not found.")
+        return
+
+    methods = class_info['Methods']
+    overloaded_methods = methods[method_name]
+
+    # Check if the method is overloaded
+    if len(overloaded_methods) > 1:
+        print(f"The method '{method_name}' is overloaded. Which one do you want to modify?")
+        for i, params in enumerate(overloaded_methods):
+            print(f"{i + 1}. {method_name}({', '.join(params)})")
+        
+        choice = input("Enter the number of the method to modify, or 'all' to modify all overloads: ")
+        
+        if choice.lower() == 'all':
+            methods_to_modify = overloaded_methods
+        else:
+            try:
+                index = int(choice) - 1
+                methods_to_modify = [overloaded_methods[index]]
+            except (ValueError, IndexError):
+                print("Invalid choice. Aborting.")
+                return
+    else:
+        methods_to_modify = overloaded_methods
+
+    # Add the params to the method(s)
+    for params in methods_to_modify:
+        if new_param_name in params:
+            print(f"Parameter '{new_param_name}' already exists in method.")
+            return
+        params.append(f"{new_param_name}: {new_param_type}")
+
+    print("Parameter added successfully.")
