@@ -1,6 +1,32 @@
 from main import *
 from classes import *
 
+def addMethod(class_name, method_name, parameters=None):
+    global diagram
+    if class_name not in diagram:
+        print("Class name not found.")
+        return
+
+    class_info = diagram[class_name]
+    if 'Methods' not in class_info:
+        class_info['Methods'] = {}
+
+    methods = class_info['Methods']
+    
+    if parameters is None:
+        parameters = []
+
+    # Check if method is overloaded
+    if method_name not in methods:
+        methods[method_name] = [parameters]
+        print(f"Method '{method_name}' added successfully.")
+    else:
+        if parameters in methods[method_name]:
+            print(f"Method '{method_name}' with the same parameter list already exists.")
+        else:
+            methods[method_name].append(parameters)
+            print(f"Overloaded method '{method_name}' added successfully.")
+
 def renameMethod(class_name, old_method_name, new_method_name):
     global diagram
     if class_name not in diagram:
