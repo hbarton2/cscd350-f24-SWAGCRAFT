@@ -8,6 +8,7 @@ Early referential for team members in the sprint reading. Referral to global dia
 fields.diagram = diagram being the diagram to alter, in which that can be scoped into your own script, of diagram = fields.diagram
 Sidenote I referred to Robert's methods.py structure in referencing, as well as the discord template for the dictionary. Using a test script on my end
 '''
+
 def addField(class_name, field_name, field_type):
     '''
     Adds a new field to a specified class
