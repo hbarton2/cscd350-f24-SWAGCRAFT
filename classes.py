@@ -1,21 +1,32 @@
 '''Define root class'''
+
+#This imports the global dictionary from main
 from main import diagram
 
 def addClass(name):
+    #checks if name is already in the diagram to avoid repeats
     if name in diagram:
         print(f"'{name}' already found in the diagram.")
+    
+    #adds the class if it is not in the class already
     else:
         diagram.update({name: {}})
 
 def renameClass(oldName, newName):
+    #checks if the old name is in the diagram then updates the name if it is
     if oldName in diagram:
         diagram[newName] = diagram.pop(oldName)
+    
+    #if old name is not in the diagram it gives an error message
     else:
         print(f"'{oldName}' not found in the diagram.")
         
 def deleteClass(name):
+    #checks if name is in the diagram then deletes it if it is
     if name in diagram:
         del diagram[name]
+    
+    #if name is not in the diagram it returns an error message
     else:
         print(f"'{name}' not found in the diagram.")
     
