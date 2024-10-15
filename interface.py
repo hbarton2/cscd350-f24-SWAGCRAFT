@@ -14,29 +14,37 @@ def print_header():
     print(Fore.MAGENTA + "     TYPE 'help' FOR INSTRUCTIONS  ")
     print(Fore.CYAN + "="*40)
 
+#--------------------------------------------------------------------------------------------------------------------------------------------------
+
+# This will print the footer
 def print_footer():
     print(Fore.CYAN + "="*40)
 
+#--------------------------------------------------------------------------------------------------------------------------------------------------
+
+# The main function whille contain the while loop which handles the user command line input 
 def main():
-    '''Main function that contains the while loop.'''
+    
 
     # These are example classes for testing purposes 
     classes = {
         'ClassA': {'fields': ['field1', 'field2'], 'methods': ['method1', 'method2']},
         'ClassB': {'fields': ['field3', 'field4'], 'methods': ['method3', 'method4']}
     }
+
+    # This shows the relationships for each of the classes useing ascii 
     relationships = [{'source': 'ClassA', 'destination': 'ClassB'}]
 
     print_header()
     print(Fore.MAGENTA + """
-Choose One Of 
-The Following Commands
-          
-list
-show
-relationships
-help
-exit
+        Choose One Of 
+        The Following Commands
+                
+        list
+        show
+        relationships
+        help
+        exit
      """)
 
     while True:
