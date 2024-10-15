@@ -1,6 +1,6 @@
 from classes import *
-#from diagram import diagram
-from main import diagram
+from diagram import diagram
+#from main import diagram
 
 def addMethod(class_name, method_name, parameters=None):
     # Check if class_name is already in the diagram

@@ -1,8 +1,8 @@
 '''Import and Export diagram'''
 
 import json
-from main import *
-#from tester import diagram
+#from main import *
+from diagram import diagram
 def save():
     with open("data.json", "w") as file:
         json.dump(diagram, file, indent=4)
