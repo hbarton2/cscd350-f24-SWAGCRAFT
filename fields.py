@@ -1,13 +1,7 @@
 from main import *
 from classes import *
+from diagram import diagram
 
-
-
-'''
-Early referential for team members in the sprint reading. Referral to global diagram can be done importing with
-fields.diagram = diagram being the diagram to alter, in which that can be scoped into your own script, of diagram = fields.diagram
-Sidenote I referred to Robert's methods.py structure in referencing, as well as the discord template for the dictionary. Using a test script on my end
-'''
 
 def addField(class_name, field_name, field_type):
     '''
@@ -17,7 +11,7 @@ def addField(class_name, field_name, field_type):
     If field name already exists in the class the function nothing will happen and error is printed
     '''
 
-    global diagram
+
 
     if class_name not in diagram:
         print("Class name not found...")
@@ -51,7 +45,7 @@ def removeField(class_name, field_name):
     If the field does not exist in the class no action is taken and error is printed
     '''
 
-    global diagram
+
     if class_name not in diagram:
         print("Class name not found...")
         return
@@ -76,8 +70,6 @@ def renameField(class_name, old_field_name, new_field_name):
     If old field name does not exist in class, function won't do any renaming
     If new field name already exists within the class, the function will not rename and display an error
     '''
-
-    global diagram
 
     if class_name not in diagram:
         print("Class name not found...")
