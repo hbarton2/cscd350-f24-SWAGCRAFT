@@ -12,7 +12,6 @@ def addField(class_name, field_name, field_type):
     '''
 
 
-
     if class_name not in diagram:
         print("Class name not found...")
         return
