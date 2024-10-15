@@ -11,6 +11,7 @@ def print_header():
     print(Fore.CYAN + "="*40)
     print(Fore.MAGENTA + "                WELCOME!          ")
     print(Fore.MAGENTA + "     BROUGHT TO YOU BY SWAG CRAFT   ")
+    print(Fore.MAGENTA + "     TYPE 'help' FOR INSTRUCTIONS  ")
     print(Fore.CYAN + "="*40)
 
 def print_footer():
@@ -31,11 +32,11 @@ def main():
 Choose One Of 
 The Following Commands
           
-LIST
-SHOW
-RELATIONSHIPS
-HELP
-EXIT
+list
+show
+relationships
+help
+exit
      """)
 
     while True:
@@ -43,16 +44,16 @@ EXIT
         command_parts = user_input.split()
         command = command_parts[0]
 
-        if command == 'LIST':
+        if command == 'list':
             list_classes(classes)
-        elif command == 'SHOW':
+        elif command == 'show':
             class_name = input(Fore.YELLOW + "Please enter the class name: ").strip()
             show_class(classes, class_name) 
-        elif command == 'RELATIONSHIPS':
+        elif command == 'relationships':
             list_relationships(relationships)
-        elif command == 'HELP':
+        elif command == 'help':
             help_command()
-        elif command == 'EXIT':
+        elif command == 'exit':
             print(Fore.CYAN + "Exiting... Goodbye!")
             break
         else:
@@ -109,11 +110,11 @@ def help_command():
     print(Fore.CYAN + "="*40)
     print(Fore.MAGENTA + """
     Commands:
-    - LIST: Lists all classes
-    - SHOW: Shows the details of a specified class
-    - RELATIONSHIPS: List all relationships between classes 
-    - HELP: Shows command help 
-    - EXIT: Exits the program
+    - list: Lists all classes
+    - show: Shows the details of a specified class
+    - relationships: List all relationships between classes 
+    - help: Shows command help 
+    - exit: Exits the program
     """)
     print(Fore.CYAN + "="*40)
 
