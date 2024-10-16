@@ -165,5 +165,5 @@ def help_command():
     """)
     print(Fore.CYAN + "=" * 40)
 
-if __name__ == "__main__":
-    interface_main()
+#if __name__ == "__main__":
+   # interface_main()

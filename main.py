@@ -8,6 +8,7 @@ from menu import *
 from methods import *
 from relationship import *
 from saveLoad import *
+from diagram import diagram
 
 def menu():
     '''Menu Function, returns corresponding choice's integer value'''
@@ -80,7 +81,25 @@ def main():
                 class1 = str(input())
                 print("Input the method name: ")
                 method1 = str(input())
-                addMethod(class1, method1)
+
+                parameterList = []
+
+                x = 0
+
+                while(x == 0):
+                    print("\nPress 0 to exit parameters\nInput parameter 1: ")
+                    parameter1 = str(input())
+                    if(parameter1 == str(0)):
+                        x = 1
+                        break
+                    print("Input parameter 1's type: ")
+                    parameter1 = str(input())
+                    if(parameter1 == str(0)):
+                        x = 1
+                        break
+                    parameterList.append(parameter1)
+
+                addMethod(class1, method1, parameterList)
 
             elif(subchoice == 2):
                 print("Input the class name: ")

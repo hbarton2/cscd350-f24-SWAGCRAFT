@@ -1,4 +1,4 @@
-from main import *
+#from main import *
 from classes import *
 from diagram import diagram
 
