@@ -70,29 +70,32 @@ def list_classes():
     if not diagram:
         print(Fore.RED + "No Classes to Display")
     else:
-
         for class_name, details in diagram.items():
-
             print(f"Class: {Fore.MAGENTA + class_name}")
 
-            # Extract and display fields
 
-            fields = ', '.join(f"{name}: {type_}" for name, type_ in details['Fields'].items())
-
+            #Extract and display fields yeeebooooiii
+            fields_dict = details.get('Fields', {})
+            if fields_dict:
+                fields = ', '.join(f"{name}: {type_}" for name, type_ in fields_dict.items())
+            else:
+                fields = "None"
             print(f"  Fields: {fields}")
 
-            # Extract and display methods
+            methods_dict = details.get('Methods', {}) #this was not fun
+            if methods_dict:
+                methods = []
+                for method_name, method_signatures in methods_dict.items():
+                    signatures = [", ".join(signature) for signature in method_signatures]
+                    methods.append(f"{method_name}({'; '.join(signatures)})")
+                methods_display = ', '.join(methods)
 
-            methods = []
-
-            for method_name, method_signatures in details['Methods'].items():
-                signatures = [", ".join(signature) for signature in method_signatures]
-
-                methods.append(f"{method_name}({'; '.join(signatures)})")
-
-            print(f"  Methods: {', '.join(methods)}")
+            else:
+                methods_display = "None"
+            print(f"  Methods: {methods_display}")
 
     print(Fore.CYAN + "=" * 40)
+
 
 def show_class(class_name):
     '''Shows details of a specified class.'''
@@ -105,18 +108,27 @@ def show_class(class_name):
         details = diagram[class_name]
         print(f"Class: {Fore.MAGENTA + class_name}")
 
-        # Extract and display fields
-        fields = ', '.join(f"{name}: {type_}" for name, type_ in details['Fields'].items())
+        #Extract and display fields default to empty
+        fields_dict = details.get('Fields', {})
+        if fields_dict:
+            fields = ', '.join(f"{name}: {type_}" for name, type_ in fields_dict.items())
+        else:
+            fields = "None"
         print(f"  Fields: {fields}")
 
-        # Extract and display methods
-        methods = []
-        for method_name, method_signatures in details['Methods'].items():
-            signatures = [", ".join(signature) for signature in method_signatures]
-            methods.append(f"{method_name}({'; '.join(signatures)})")
-        print(f"  Methods: {', '.join(methods)}")
+        #Extract and display methods defaulting to empty dictionary if not present
+        methods_dict = details.get('Methods', {})
+        if methods_dict:
+            methods = []
+            for method_name, method_signatures in methods_dict.items():
+                signatures = [", ".join(signature) for signature in method_signatures]
+                methods.append(f"{method_name}({'; '.join(signatures)})")
+            methods_display = ', '.join(methods)
+        else:
+            methods_display = "None"
+        print(f"  Methods: {methods_display}")
 
-        # Display relationships
+        #Display relationships
         relations = details.get("Relations", {})
         connections = relations.get("associations", [])
         if connections:
@@ -127,6 +139,7 @@ def show_class(class_name):
     else:
         print(Fore.RED + f"Class '{class_name}' does not exist")
     print(Fore.CYAN + "=" * 40)
+
 
 
 def list_relationships():
