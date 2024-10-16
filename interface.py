@@ -137,8 +137,9 @@ def list_relationships():
 
     relationships_exist = False
     for class_name, details in diagram.items():
-        relations = details.get("Relations", {})
-        connections = relations.get("associations", [])
+        # Access the 'relationships' key if it exists
+        relationships = details.get("relationships", {})
+        connections = relationships.get("connections", [])
         if connections:
             relationships_exist = True
             for associated_class in connections:
