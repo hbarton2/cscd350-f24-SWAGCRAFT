@@ -70,10 +70,28 @@ def list_classes():
     if not diagram:
         print(Fore.RED + "No Classes to Display")
     else:
-        for class_name, details in diagram.items():  # Fixed here to use .items()
+
+        for class_name, details in diagram.items():
+
             print(f"Class: {Fore.MAGENTA + class_name}")
-            print(f"  Fields: {', '.join(details['fields'])}")
-            print(f"  Methods: {', '.join(details['methods'])}")
+
+            # Extract and display fields
+
+            fields = ', '.join(f"{name}: {type_}" for name, type_ in details['Fields'].items())
+
+            print(f"  Fields: {fields}")
+
+            # Extract and display methods
+
+            methods = []
+
+            for method_name, method_signatures in details['Methods'].items():
+                signatures = [", ".join(signature) for signature in method_signatures]
+
+                methods.append(f"{method_name}({'; '.join(signatures)})")
+
+            print(f"  Methods: {', '.join(methods)}")
+
     print(Fore.CYAN + "=" * 40)
 
 def show_class(class_name):
@@ -86,11 +104,30 @@ def show_class(class_name):
     if class_name in diagram:
         details = diagram[class_name]
         print(f"Class: {Fore.MAGENTA + class_name}")
-        print(f"  Fields: {', '.join(details['fields'])}")
-        print(f"  Methods: {', '.join(details['methods'])}")
+
+        # Extract and display fields
+        fields = ', '.join(f"{name}: {type_}" for name, type_ in details['Fields'].items())
+        print(f"  Fields: {fields}")
+
+        # Extract and display methods
+        methods = []
+        for method_name, method_signatures in details['Methods'].items():
+            signatures = [", ".join(signature) for signature in method_signatures]
+            methods.append(f"{method_name}({'; '.join(signatures)})")
+        print(f"  Methods: {', '.join(methods)}")
+
+        # Display relationships
+        relations = details.get("Relations", {})
+        connections = relations.get("associations", [])
+        if connections:
+            print(f"  Associations: {', '.join(connections)}")
+        else:
+            print("  Associations: None")
+
     else:
         print(Fore.RED + f"Class '{class_name}' does not exist")
     print(Fore.CYAN + "=" * 40)
+
 
 def list_relationships():
     '''Lists relationships between classes.'''
@@ -98,12 +135,20 @@ def list_relationships():
     print(Fore.GREEN + "    Class Relationships")
     print(Fore.CYAN + "=" * 40)
 
-    if 'relationships' not in diagram or not diagram['relationships']:
+    relationships_exist = False
+    for class_name, details in diagram.items():
+        relations = details.get("Relations", {})
+        connections = relations.get("associations", [])
+        if connections:
+            relationships_exist = True
+            for associated_class in connections:
+                print(f"Relationship: {Fore.MAGENTA + class_name} -> {Fore.MAGENTA + associated_class}")
+
+    if not relationships_exist:
         print(Fore.RED + "No relationships available.")
-    else:
-        for rel in diagram['relationships']:
-            print(f"Relationship: {Fore.MAGENTA + rel['source']} -> {Fore.MAGENTA + rel['destination']}")
+
     print(Fore.CYAN + "=" * 40)
+
 
 def help_command():
     '''Displays available commands.'''
