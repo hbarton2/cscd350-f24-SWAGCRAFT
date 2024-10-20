@@ -8,5 +8,7 @@ def save():
         json.dump(diagram, file, indent=4)
 
 def load():
+    global diagram
     with open("data.json", "r") as file:
-        diagram = json.load(file)
+        diagram.clear()  # Clear the existing diagram
+        diagram.update(json.load(file))  # Update it with loaded data
