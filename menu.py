@@ -8,6 +8,11 @@ from diagram import diagram
 
 init(autoreset=True)
 
+def clean(string):
+    """Sanitize input for use in menus to all lowercase no whitespace"""
+    newString = string.lower().strip().replace(" ", "")
+    return newString
+
 class Menu:
 
     #-------Initalizing the diagram and relationships-------
