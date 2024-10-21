@@ -12,6 +12,7 @@ class TestRelationships(unittest.TestCase):
     instead of 'Relations'. This seems to differ from what Aiden constructed on discord as the template.
     '''
 
+
     def setUp(self):
         #setup a diagram before each test
         self.original_stdout = sys.stdout  # Backup original stdout
