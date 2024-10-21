@@ -13,6 +13,31 @@ def clean(string):
     newString = string.lower().strip().replace(" ", "")
     return newString
 
+def start_menu(self):
+
+    # Displays the menu in ascii and uses colorama
+    # Menu is meant to stand out and look organized
+    self.print_header()
+    print(Fore.MAGENTA + "                  Available Commands             ")
+    print(Fore.CYAN + "=" * 55)
+    print(Fore.MAGENTA + " |     Class Commands    |  Method & Field Commands  |")
+    print(Fore.CYAN + "-+-----------------------+---------------------------+")
+    print(Fore.MAGENTA + " | Add class             | Add Method                |")
+    print(Fore.MAGENTA + " | Rename Class          | Rename Method             |")
+    print(Fore.MAGENTA + " | Delete Class          | Delete Method             |")
+    print(Fore.MAGENTA + " |                       | Add Field                 |")
+    print(Fore.MAGENTA + " |                       | Rename Field              |")
+    print(Fore.MAGENTA + " |                       | Delete Field              |")
+    print(Fore.CYAN + "-+-----------------------+---------------------------+")
+    print(Fore.MAGENTA + " | Relationship Commands |       Other Commands      |")
+    print(Fore.CYAN + " +-----------------------+---------------------------+")
+    print(Fore.MAGENTA + " | Add Relationship      | List Classes              |")
+    print(Fore.MAGENTA + " | Delete Relationship   | Show Classes              |")
+    print(Fore.MAGENTA + " | Show Relationships    | Help                      |")
+    print(Fore.MAGENTA + " |                       | Exit                      |")
+    print(Fore.CYAN + " +-----------------------+---------------------------+")
+    self.print_footer()
+
 class Menu:
 
     #-------Initalizing the diagram and relationships-------
@@ -41,31 +66,7 @@ class Menu:
 
     #-------------print full command menu-----------------
 
-    def start_menu(self):
-
-        # Displays the menu in ascii and uses colorama
-        # Menu is meant to stand out and look organized
-
-        self.print_header()
-        print(Fore.MAGENTA + "                  Available Commands             ")
-        print(Fore.CYAN + "=" * 55)
-        print(Fore.MAGENTA + " |     Class Commands    |  Method & Field Commands  |")
-        print(Fore.CYAN + "-+-----------------------+---------------------------+")
-        print(Fore.MAGENTA + " | addclass              | addmethod                 |")
-        print(Fore.MAGENTA + " | renameclass           | renamemethod              |")
-        print(Fore.MAGENTA + " | deleteclass           | deletemethod              |")
-        print(Fore.MAGENTA + " |                       | addfield                  |")
-        print(Fore.MAGENTA + " |                       | renamefield               |")
-        print(Fore.MAGENTA + " |                       | deletefield               |")
-        print(Fore.CYAN + "-+-----------------------+---------------------------+")
-        print(Fore.MAGENTA + " | Relationship Commands |       Other Commands      |")
-        print(Fore.CYAN + " +-----------------------+---------------------------+")
-        print(Fore.MAGENTA + " | addrelationship       | listclasses               |")
-        print(Fore.MAGENTA + " | deleterelationship    | showclasses               |")
-        print(Fore.MAGENTA + " | showrelationships     | help                      |")
-        print(Fore.MAGENTA + " |                       | exit                      |")
-        print(Fore.CYAN + " +-----------------------+---------------------------+")
-        self.print_footer()
+    
 
     #---------Class Management-----------------------------
 
