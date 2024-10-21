@@ -30,6 +30,7 @@ class TestFields(unittest.TestCase):
 
 
 
+
     def test_add_field_success(self): #check if actually add a new field to existing class
         addField("Class1", "field2", "String")
         self.assertIn("field2", diagram["Class1"]["Fields"])
