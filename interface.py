@@ -19,21 +19,21 @@ COMMAND HELP MENU""")
 How to Use the CLI Application:""") 
     print(Fore.CYAN + """
 ---------------------------------------------------------------------------------------------
-- list               |   : Display all available classes.
-- show               |   : Show details of a specific class. Usage: 'show [class_name]'
-- addclass           |   : Add a new class. Usage: 'addclass [class_name]'
-- renameclass        |   : Rename the current class. Usage: 'renameclass [new_name]'
-- deleteclass        |   : Delete the current class.
-- addmethod          |   : Add a method to the current class. Usage: 'addmethod [method_name]'
-- renamemethod       |   : Rename a method. Usage: 'renamemethod [old_name] [new_name]'
-- deletemethod       |   : Delete a method from the current class.
-- addfield           |   : Add a field to the current class. Usage: 'addfield [field_name]'
-- renamefield        |   : Rename a field. Usage: 'renamefield [old_name] [new_name]'
-- deletefield        |   : Delete a field from the current class.
-- addrelationship    |   : Create a relationship between classes.
-- deleterelationship |   : Remove a relationship between classes.
-- help               |   : Display this help menu.
-- exit               |   : Exit the program gracefully.
+- List                |   : Display all available classes.
+- Show                |   : Show details of a specific class. Usage: 'show [class_name]'
+- Add Class           |   : Add a new class. Usage: 'addclass [class_name]'
+- Rename Class        |   : Rename the current class. Usage: 'renameclass [new_name]'
+- Delete Class        |   : Delete the current class.
+- Add Method          |   : Add a method to the current class. Usage: 'addmethod [method_name]'
+- Rename Method       |   : Rename a method. Usage: 'renamemethod [old_name] [new_name]'
+- Delete Method       |   : Delete a method from the current class.
+- Add Field           |   : Add a field to the current class. Usage: 'addfield [field_name]'
+- Rename Field        |   : Rename a field. Usage: 'renamefield [old_name] [new_name]'
+- Delete Field        |   : Delete a field from the current class.
+- Add Relationship    |   : Create a relationship between classes.
+- Delete Relationship |   : Remove a relationship between classes.
+- Help                |   : Display this help menu.
+- Exit                |   : Exit the program gracefully.
 ----------------------------------------------------------------------------------------------
     """)
     
