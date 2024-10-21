@@ -44,6 +44,9 @@ def main():
             x = 0
             print(Fore.YELLOW + "Input the class name: ")
             class1 = str(input())
+            if (className not in diagram):
+                print(Fore.RED + "Class isn't in diagram")
+                continue
             print(Fore.YELLOW + "Input the method name: ")
             method1 = str(input())
 
@@ -67,6 +70,9 @@ def main():
         elif (choice == "renamemethod"):
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
+            if (className not in diagram):
+                print(Fore.RED + "Class isn't in diagram")
+                continue
             print(Fore.YELLOW + "Input the old method name: ")
             oldMethodName = str(input()).strip()
             print(Fore.YELLOW + "Input the new method name: ")
@@ -77,6 +83,9 @@ def main():
         elif (choice == "deletemethod"):
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
+            if (className not in diagram):
+                print(Fore.RED + "Class isn't in diagram")
+                continue
             print(Fore.YELLOW + "Input the method name: ")
             methodName = str(input()).strip()
             removeMethod(className, methodName)
@@ -85,8 +94,14 @@ def main():
         elif (choice == "addparameter"):
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
+            if (className not in diagram):
+                print(Fore.RED + "Class isn't in diagram")
+                continue
             print(Fore.YELLOW + "Input the method name: ")
             methodName = str(input()).strip()
+            if(not methodExists(className, methodName)):
+                print(Fore.RED + "Method isn't in diagram")
+                continue
             print(Fore.YELLOW + "Input the name of the new parameter: ")
             parameterName = str(input()).strip()
             print(Fore.YELLOW + "Input the parameter datatype: ")
@@ -97,6 +112,9 @@ def main():
         elif (choice == "removeparameter"):
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
+            if (className not in diagram):
+                print(Fore.RED + "Class isn't in diagram")
+                continue
             print(Fore.YELLOW + "Input the method name: ")
             methodName = str(input()).strip()
             print(Fore.YELLOW + "Input the parameter name: ")
@@ -107,6 +125,9 @@ def main():
         elif (choice == "renameparameter"):
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
+            if (className not in diagram):
+                print(Fore.RED + "Class isn't in diagram")
+                continue
             print(Fore.YELLOW + "Input the method name: ")
             methodName = str(input()).strip()
             print(Fore.YELLOW + "Input the parameter name: ")
@@ -117,16 +138,22 @@ def main():
         elif (choice == "addfield"):
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
+            if (className not in diagram):
+                print(Fore.RED + "Class isn't in diagram")
+                continue
             print(Fore.YELLOW + "Input the new field's name: ")
             fieldName = str(input()).strip()
             print(Fore.YELLOW + "Input the field datatype: ")
-            fieldType = str(input()).strip
+            fieldType = str(input()).strip()
             addField(className, fieldName, fieldType)
 
         # Rename a Field
         elif (choice == "renamefield"):
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
+            if (className not in diagram):
+                print(Fore.RED + "Class isn't in diagram")
+                continue
             print(Fore.YELLOW + "Input the old field name: ")
             oldFieldName = str(input()).strip()
             print(Fore.YELLOW + "Input the new field name: ")
@@ -137,6 +164,9 @@ def main():
         elif (choice == "deletefield"):
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
+            if (className not in diagram):
+                print(Fore.RED + "Class isn't in diagram")
+                continue
             print(Fore.YELLOW + "Input the name of the field to be removed: ")
             fieldName = str(input()).strip()
             removeField(className, fieldName)
@@ -145,16 +175,28 @@ def main():
         elif (choice == "addrelationship"):
             print(Fore.YELLOW + "Input the first class name: ")
             class1 = str(input()).strip()
+            if (class1 not in diagram):
+                print(Fore.RED + "Class isn't in diagram")
+                continue
             print(Fore.YELLOW + "Input the second class name: ")
             class2 = str(input()).strip()
+            if (class2 not in diagram):
+                print(Fore.RED + "Class isn't in diagram")
+                continue
             addRelationship(class1, class2)
 
         # Delete an existing relationship
         elif (choice == "deleterelationship"):
             print(Fore.YELLOW + "Input the first class name: ")
             class1 = str(input()).strip()
+            if (class1 not in diagram):
+                print(Fore.RED + "Class isn't in diagram")
+                continue
             print(Fore.YELLOW + "Input the second class name: ")
             class2 = str(input()).strip()
+            if (class2 not in diagram):
+                print(Fore.RED + "Class isn't in diagram")
+                continue
             deleteRelationship(class1, class2)
 
         # Display a Relationship
@@ -212,14 +254,19 @@ def main():
                     print(f"  Methods: {methods_display}")
 
         # Show the details of just one class
-        elif (choice == "showclasses"):
+        elif (choice == "showclass"):
             '''Shows details of a specified class.'''
-            print(Fore.CYAN + "\n" + "=" * 40)
-            print(Fore.MAGENTA + "         Details for Class")
-            print("               " + Fore.MAGENTA + class_name)
-            print(Fore.CYAN + "=" * 40)
+
+            print(Fore.YELLOW + "Please enter the name of the class you want to display:")
+
+            class_name = str(input().strip())
 
             if class_name in diagram:
+                print(Fore.CYAN + "\n" + "=" * 40)
+                print(Fore.MAGENTA + "         Details for Class")
+                print("               " + Fore.MAGENTA + class_name)
+                print(Fore.CYAN + "=" * 40)
+                
                 details = diagram[class_name]
                 print(f"Class: {Fore.MAGENTA + class_name}")
 
@@ -253,6 +300,15 @@ def main():
 
             else:
                 print(Fore.RED + f"Class '{class_name}' does not exist")
+
+        
+        # Save the diagram to json
+        elif (choice == "save"):
+            save()
+
+        # Load a diagram 
+        elif (choice == "load"):
+            load()
 
         # Print the Help menu
         elif (choice == "help"):

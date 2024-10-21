@@ -17,7 +17,7 @@ def renameClass(oldName, newName):
     #checks if the old name is in the diagram then updates the name if it is
     if oldName in diagram:
         diagram[newName] = diagram.pop(oldName)
-        print(f"'{oldName} had been renamed to '{newName}")
+        print(f"'{oldName} has been renamed to '{newName}")
     
     #if old name is not in the diagram it gives an error message
     else:
