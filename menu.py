@@ -33,6 +33,8 @@ def printCommands():
     print(Fore.MAGENTA + " | Delete Relationship   | Show Class                |")
     print(Fore.MAGENTA + " | Show Relationships    | Help                      |")
     print(Fore.MAGENTA + " |                       | Quit                      |")
+    print(Fore.MAGENTA + " |                       | Save                      |")
+    print(Fore.MAGENTA + " |                       | Load                      |")
     print(Fore.CYAN + " +-----------------------+---------------------------+")
 
 def printHelpMenu():

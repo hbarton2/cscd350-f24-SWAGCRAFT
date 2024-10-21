@@ -64,7 +64,7 @@ def main():
                 continue
             print(Fore.YELLOW + "Input the old method name: ")
             oldMethodName = str(input()).strip()
-            if(not methodExists(className, methodName)):
+            if(not methodExists(className, oldMethodName)):
                 print(Fore.RED + "Method isn't in diagram")
                 continue
             print(Fore.YELLOW + "Input the new method name: ")
@@ -159,7 +159,7 @@ def main():
             print(Fore.YELLOW + "Input the old field name: ")
             oldFieldName = str(input()).strip()
             if(not fieldExists(className, oldFieldName)):
-                print(Fore.RED + "Method isn't in diagram")
+                print(Fore.RED + "Field isn't in diagram")
                 continue
             print(Fore.YELLOW + "Input the new field name: ")
             newFieldName = str(input()).strip()
@@ -175,7 +175,7 @@ def main():
             print(Fore.YELLOW + "Input the name of the field to be removed: ")
             fieldName = str(input()).strip()
             if(not fieldExists(className, fieldName)):
-                print(Fore.RED + "Method isn't in diagram")
+                print(Fore.RED + "Field isn't in diagram")
                 continue
             removeField(className, fieldName)
 
