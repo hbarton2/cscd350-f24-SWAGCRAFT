@@ -27,6 +27,9 @@ def printCommands():
     print(Fore.MAGENTA + " | Add class             | Add Method                |")
     print(Fore.MAGENTA + " | Rename Class          | Rename Method             |")
     print(Fore.MAGENTA + " | Delete Class          | Delete Method             |")
+    print(Fore.MAGENTA + " |                       | Add Parameter             |")
+    print(Fore.MAGENTA + " |                       | Remove Parameter          |")
+    print(Fore.MAGENTA + " |                       | Rename Parameter          |")
     print(Fore.MAGENTA + " |                       | Add Field                 |")
     print(Fore.MAGENTA + " |                       | Rename Field              |")
     print(Fore.MAGENTA + " |                       | Delete Field              |")
@@ -46,41 +49,41 @@ def menu():
     # Create main while loop
     running = True
     while (running):
-        # Add class mechanic
+        # Add class 
         if (choice == "addclass"):
-            print("Input the class name: ")
+            print(Fore.YELLOW + "Input the class name: ")
             className = str(input())
             addClass(className)
 
-        # Rename class mechanic
+        # Rename class 
         elif (choice == "renameclass"):
-            print("Input the old class name: ")
+            print(Fore.YELLOW + "Input the old class name: ")
             originalClassName = str(input())
-            print("Input the new class name: ")
+            print(Fore.YELLOW + "Input the new class name: ")
             newClassName = str(input())
             renameClass(originalClassName, newClassName)
 
-        # Delete a class mechanic
+        # Delete a class 
         elif (choice == "deleteclass"):
-            print("Input the class name: ")
+            print(Fore.YELLOW + "Input the class name: ")
             unwantedClass = str(input())
             deleteClass(unwantedClass)
 
-        # Add a Method mechanic
+        # Add a Method 
         elif (choice == "addmethod"):
-            print("Input the class name: ")
+            print(Fore.YELLOW + "Input the class name: ")
             class1 = str(input())
-            print("Input the method name: ")
+            print(Fore.YELLOW + "Input the method name: ")
             method1 = str(input())
 
             parameterList = []
             while(x == 0):
-                print("\nPress 0 to exit parameters\nInput parameter 1: ")
+                print(Fore.YELLOW + "\nPress 0 to exit parameters\nInput parameter 1: ")
                 parameter1 = str(input())
                 if(parameter1 == str(0)):
                     x = 1
                     break
-                print("Input parameter 1's type: ")
+                print(Fore.YELLOW + "Input parameter 1's type: ")
                 parameter1 = str(input())
                 if(parameter1 == str(0)):
                     x = 1
@@ -89,34 +92,124 @@ def menu():
 
                 addMethod(class1, method1, parameterList)
 
-        
+        # Rename a Method 
         elif (choice == "renamemethod"):
-            pass
+            print(Fore.YELLOW + "Input the class name: ")
+            className = str(input()).strip()
+            print(Fore.YELLOW + "Input the old method name: ")
+            oldMethodName = str(input()).strip()
+            print(Fore.YELLOW + "Input the new method name: ")
+            newMethodName = str(input()).strip()
+            renameMethod(className, oldMethodName, newMethodName)
+
+        # Remove Method 
         elif (choice == "deletemethod"):
-            pass
+            print(Fore.YELLOW + "Input the class name: ")
+            className = str(input()).strip()
+            print(Fore.YELLOW + "Input the method name: ")
+            methodName = str(input()).strip()
+            removeMethod(className, methodName)
+
+        # Add a parameter 
+        elif (choice == "addparameter"):
+            print(Fore.YELLOW + "Input the class name: ")
+            className = str(input()).strip()
+            print(Fore.YELLOW + "Input the method name: ")
+            methodName = str(input()).strip()
+            print(Fore.YELLOW + "Input the name of the new parameter: ")
+            parameterName = str(input()).strip()
+            print(Fore.YELLOW + "Input the parameter datatype: ")
+            parameterType = str(input()).strip()
+            addParameter(className, methodName, parameterName, parameterType)
+
+        # Remove parameter 
+        elif (choice == "removeparameter"):
+            print(Fore.YELLOW + "Input the class name: ")
+            className = str(input()).strip()
+            print(Fore.YELLOW + "Input the method name: ")
+            methodName = str(input()).strip()
+            print(Fore.YELLOW + "Input the parameter name: ")
+            parameterName = str(input()).strip()
+            removeParameter(className, methodName, parameterName)
+
+        # Rename a Parameter 
+        elif (choice == "renameparameter"):
+            print(Fore.YELLOW + "Input the class name: ")
+            className = str(input()).strip()
+            print(Fore.YELLOW + "Input the method name: ")
+            methodName = str(input()).strip()
+            print(Fore.YELLOW + "Input the parameter name: ")
+            parameterName = str(input()).strip()
+            changeParameter(className, methodName, parameterName)
+        
+        # Add a Field 
         elif (choice == "addfield"):
-            pass
+            print(Fore.YELLOW + "Input the class name: ")
+            className = str(input()).strip()
+            print(Fore.YELLOW + "Input the new field's name: ")
+            fieldName = str(input()).strip()
+            print(Fore.YELLOW + "Input the field datatype: ")
+            fieldType = str(input()).strip
+            addField(className, fieldName, fieldType)
+
+        # Rename a Field
         elif (choice == "renamefield"):
-            pass
+            print(Fore.YELLOW + "Input the class name: ")
+            className = str(input()).strip()
+            print(Fore.YELLOW + "Input the old field name: ")
+            oldFieldName = str(input()).strip()
+            print(Fore.YELLOW + "Input the new field name: ")
+            newFieldName = str(input()).strip()
+            renameField(class1, oldFieldName, newFieldName)
+
+        # Delete a Field
         elif (choice == "deletefield"):
-            pass
+            print(Fore.YELLOW + "Input the class name: ")
+            className = str(input()).strip()
+            print(Fore.YELLOW + "Input the name of the field to be removed: ")
+            fieldName = str(input()).strip()
+            removeField(className, fieldName)
+
+        # Add a reltionship between classes
         elif (choice == "addrelationship"):
-            pass
+            print(Fore.YELLOW + "Input the first class name: ")
+            class1 = str(input()).strip()
+            print(Fore.YELLOW + "Input the second class name: ")
+            class2 = str(input()).strip()
+            addRelationship(class1, class2)
+
+        # Delete an existing relationship
         elif (choice == "deleterelationship"):
-            pass
+            print(Fore.YELLOW + "Input the first class name: ")
+            class1 = str(input()).strip()
+            print(Fore.YELLOW + "Input the second class name: ")
+            class2 = str(input()).strip()
+            deleteRelationship(class1, class2)
+
+        # Display a Relationship
         elif (choice == "showrelationship"):
             pass
+
+        # Display a List of classes
         elif (choice == "listclasses"):
             pass
+
+        # Show the details of just one class
         elif (choice == "showclasses"):
             pass
+
+        # Print the Help menu
         elif (choice == "help"):
             pass
+
+        # Quit the program 
         elif (choice == "quit"):
-            print("Have a nice day!")
+            print(Fore.YELLOW + "Have a nice day!")
             running = False
+
+        # If input isn't a command, reprompt
         else:
-            print("Invalid Input, try again!")
+            print(Fore.RED + "Invalid Input, try again!")
 
 
 

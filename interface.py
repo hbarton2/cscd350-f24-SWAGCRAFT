@@ -38,7 +38,7 @@ How to Use the CLI Application:""")
     """)
     
 
-def interface_main():
+def display_main():
     """Main loop for user interaction."""
     # Create a Menu instance and pass the help_menu function
     menu = Menu(help_function=help_menu)
@@ -51,7 +51,7 @@ def interface_main():
     while True:
         try:
             # Get user input
-            command = input(Fore.YELLOW + "\nEnter a command: ").strip().lower()
+            command = clean(input(Fore.YELLOW + "\nEnter a command: "))
 
             if command == "listclasses":
                 menu.list_classes()
