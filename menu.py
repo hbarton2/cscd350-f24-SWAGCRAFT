@@ -44,22 +44,23 @@ COMMAND HELP MENU""")
 How to Use the CLI Application:""") 
     print(Fore.CYAN + """
 ---------------------------------------------------------------------------------------------
-- List                |   : Display all available classes.
-- Show                |   : Show details of a specific class. Usage: 'show [class_name]'
-- Add Class           |   : Add a new class. Usage: 'addclass [class_name]'
-- Rename Class        |   : Rename the current class. Usage: 'renameclass [new_name]'
+- List Classes        |   : Display all available classes and their details.
+- Show Class          |   : Show details of a specific class.
+- Add Class           |   : Add a new class. 
+- Rename Class        |   : Rename the current class.
 - Delete Class        |   : Delete the current class.
-- Add Method          |   : Add a method to the current class. Usage: 'addmethod [method_name]'
-- Rename Method       |   : Rename a method. Usage: 'renamemethod [old_name] [new_name]'
+- Add Method          |   : Add a method to the current class. 
+- Rename Method       |   : Rename a method. 
 - Delete Method       |   : Delete a method from the current class.
 - Add a Parameter     |   : Add a parameter to a method.
 - Remove a Parameter  |   : Remove a parameter from a method.
 - Rename a Parameter  |   : Rename a parameter belonging to an existing method.
-- Add Field           |   : Add a field to the current class. Usage: 'addfield [field_name]'
-- Rename Field        |   : Rename a field. Usage: 'renamefield [old_name] [new_name]'
+- Add Field           |   : Add a field to the current class.
+- Rename Field        |   : Rename a field. 
 - Delete Field        |   : Delete a field from the current class.
 - Add Relationship    |   : Create a relationship between classes.
 - Delete Relationship |   : Remove a relationship between classes.
+- Show Relationships  |   : Show the relationships between all classes.
 - Save                |   : Save the diagram.
 - Load                |   : Load the diagram.
 - Help                |   : Display this help menu.
@@ -77,6 +78,20 @@ def methodExists(class_name, method_name):
 
     # Check if the method exists in the class's methods
     if method_name not in methods:
+        return False
+    else:
+        return True
+
+def fieldExists(class_name, field_name):
+    """Returns True if the field exists in the class, otherwise False."""
+    # Get the class information
+    class_info = diagram.get(class_name, {})
+
+    # Check if 'Fields' key exists in the class information
+    fields = class_info.get('Fields', {})
+
+    # Check if the field exists in the class's fields
+    if field_name not in fields:
         return False
     else:
         return True

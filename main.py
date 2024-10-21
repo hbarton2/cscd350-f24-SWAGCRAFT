@@ -4,7 +4,6 @@
 from colorama import init, Fore, Style
 from classes import *
 from fields import *
-#from interface import *
 from menu import *
 from methods import *
 from relationship import *
@@ -29,6 +28,9 @@ def main():
         elif (choice == "renameclass"):
             print(Fore.YELLOW + "Input the old class name: ")
             originalClassName = str(input())
+            if (originalClassName not in diagram):
+                print(Fore.RED + "Class isn't in diagram")
+                continue
             print(Fore.YELLOW + "Input the new class name: ")
             newClassName = str(input())
             renameClass(originalClassName, newClassName)
@@ -41,30 +43,17 @@ def main():
 
         # Add a Method 
         elif (choice == "addmethod"):
-            x = 0
             print(Fore.YELLOW + "Input the class name: ")
-            class1 = str(input())
-            if (className not in diagram):
+            class1 = str(input()).strip()
+
+            if class1 not in diagram:
                 print(Fore.RED + "Class isn't in diagram")
                 continue
+
             print(Fore.YELLOW + "Input the method name: ")
-            method1 = str(input())
+            method1 = str(input()).strip()
+            addMethod(class1, method1)
 
-            parameterList = []
-            while(x == 0):
-                print(Fore.YELLOW + "\nPress 0 to exit parameters\nInput parameter 1: ")
-                parameter1 = str(input())
-                if(parameter1 == str(0)):
-                    x = 1
-                    break
-                print(Fore.YELLOW + "Input parameter 1's type: ")
-                parameter1 = str(input())
-                if(parameter1 == str(0)):
-                    x = 1
-                    break
-                parameterList.append(parameter1)
-
-                addMethod(class1, method1, parameterList)
 
         # Rename a Method 
         elif (choice == "renamemethod"):
@@ -75,6 +64,9 @@ def main():
                 continue
             print(Fore.YELLOW + "Input the old method name: ")
             oldMethodName = str(input()).strip()
+            if(not methodExists(className, methodName)):
+                print(Fore.RED + "Method isn't in diagram")
+                continue
             print(Fore.YELLOW + "Input the new method name: ")
             newMethodName = str(input()).strip()
             renameMethod(className, oldMethodName, newMethodName)
@@ -88,9 +80,13 @@ def main():
                 continue
             print(Fore.YELLOW + "Input the method name: ")
             methodName = str(input()).strip()
+            if(not methodExists(className, methodName)):
+                print(Fore.RED + "Method isn't in diagram")
+                continue
             removeMethod(className, methodName)
 
-        # Add a parameter 
+        # Add a parameter quit
+
         elif (choice == "addparameter"):
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
@@ -117,6 +113,9 @@ def main():
                 continue
             print(Fore.YELLOW + "Input the method name: ")
             methodName = str(input()).strip()
+            if(not methodExists(className, methodName)):
+                print(Fore.RED + "Method isn't in diagram")
+                continue
             print(Fore.YELLOW + "Input the parameter name: ")
             parameterName = str(input()).strip()
             removeParameter(className, methodName, parameterName)
@@ -130,6 +129,9 @@ def main():
                 continue
             print(Fore.YELLOW + "Input the method name: ")
             methodName = str(input()).strip()
+            if(not methodExists(className, methodName)):
+                print(Fore.RED + "Method isn't in diagram")
+                continue
             print(Fore.YELLOW + "Input the parameter name: ")
             parameterName = str(input()).strip()
             changeParameter(className, methodName, parameterName)
@@ -156,6 +158,9 @@ def main():
                 continue
             print(Fore.YELLOW + "Input the old field name: ")
             oldFieldName = str(input()).strip()
+            if(not fieldExists(className, oldFieldName)):
+                print(Fore.RED + "Method isn't in diagram")
+                continue
             print(Fore.YELLOW + "Input the new field name: ")
             newFieldName = str(input()).strip()
             renameField(class1, oldFieldName, newFieldName)
@@ -169,6 +174,9 @@ def main():
                 continue
             print(Fore.YELLOW + "Input the name of the field to be removed: ")
             fieldName = str(input()).strip()
+            if(not fieldExists(className, fieldName)):
+                print(Fore.RED + "Method isn't in diagram")
+                continue
             removeField(className, fieldName)
 
         # Add a reltionship between classes
@@ -200,7 +208,7 @@ def main():
             deleteRelationship(class1, class2)
 
         # Display a Relationship
-        elif (choice == "showrelationship"):
+        elif (choice == "showrelationships"):
             '''Lists relationships between classes.'''
             print(Fore.CYAN + "\n" + "=" * 40)
             print(Fore.GREEN + "    Class Relationships")
