@@ -132,9 +132,9 @@ def main():
             if(not methodExists(className, methodName)):
                 print(Fore.RED + "Method isn't in diagram")
                 continue
-            print(Fore.YELLOW + "Input the parameter name: ")
-            parameterName = str(input()).strip()
-            changeParameter(className, methodName, parameterName)
+            #print(Fore.YELLOW + "Input the parameter name: ")
+            #parameterName = str(input()).strip()
+            changeParameter(className, methodName)
         
         # Add a Field 
         elif (choice == "addfield"):

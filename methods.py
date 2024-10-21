@@ -1,5 +1,7 @@
 from classes import *
 from diagram import diagram
+from colorama import init, Fore, Style
+
 #from main import diagram
 
 def addMethod(class_name, method_name, parameters=None):
@@ -235,6 +237,7 @@ def removeParameter(class_name, method_name, param_name):
     # Remove the parameter
     for i, param in enumerate(params):
         if param.split(':')[0].strip() == param_name:
+            params[i] = None
             del params[i]
             print("Parameter removed successfully.")
             return
@@ -243,46 +246,91 @@ def removeParameter(class_name, method_name, param_name):
 
 
 
-def changeParameter(class_name, method_name, new_params):
-    # Check if class_name not in diagram
+def changeParameter(class_name, method_name):
     if class_name not in diagram:
         print("Class name not found.")
         return
-
-    # Get class_info
+    
     class_info = diagram[class_name]
     if 'Methods' not in class_info or method_name not in class_info['Methods']:
         print("Method name not found.")
         return
-
-    # Get methods
-    methods = class_info['Methods']
     
-    # Get overloaded methods
+    methods = class_info['Methods']
     overloaded_methods = methods[method_name]
-
-    # Check if the method is overloaded
+    
+    # Handle method overloading
     if len(overloaded_methods) > 1:
         print(f"The method '{method_name}' is overloaded. Which one do you want to modify?")
-        for i, params in enumerate(overloaded_methods):
-            print(f"{i + 1}. {method_name}({', '.join(params)})")
+        for i, params in enumerate(overloaded_methods, 1):
+            param_str = ', '.join(params) if params else '()'
+            print(f"{i}. {method_name}({param_str})")
         
-        choice = input("Enter the number of the method to modify, or 'all' to modify all overloads: ")
-        
-        # Check if user input is all
-        if choice.lower() == 'all':
-            methods[method_name] = [new_params]
-            print("Parameters changed for all overloads.")
-        else:
-            try:
-                index = int(choice) - 1
-
-                # Change parameters
-                methods[method_name][index] = new_params
-                print("Parameters changed successfully.")
-            except (ValueError, IndexError):
+        choice = input("Enter the number of the method to modify: ")
+        try:
+            index = int(choice) - 1
+            if 0 <= index < len(overloaded_methods):
+                current_params = overloaded_methods[index]
+            else:
                 print("Invalid choice. Aborting.")
+                return
+        except ValueError:
+            print("Invalid input. Aborting.")
+            return
     else:
-        # Change Parameters
-        methods[method_name] = [new_params]
-        print("Parameters changed successfully.")
+        current_params = overloaded_methods[0]
+    
+    # List current parameters and ask which one to rename
+    #print(f"\nCurrent method: {method_name}({', '.join(current_params) if current_params else '()'})")
+    print("Current parameters:")
+    if not current_params:
+        print("1. ()")
+    else:
+        for i, param in enumerate(current_params, 1):
+            print(f"{i}. ({param})")
+    
+    param_choice = input("\nEnter the number of the parameter to rename (or 'q' to quit): ")
+    
+    if param_choice.lower() == 'q':
+        print("No changes made.")
+        return
+    
+    try:
+        param_index = int(param_choice) - 1
+        if 0 <= param_index <= len(current_params):  # Note: we use <= to allow renaming ()
+            run = 0
+            while(True):
+                new_name = input("Press q to exit Parameter Renaming.\nEnter new parameter name: ")
+                if new_name.lower() == 'q':
+                    print("Exiting Parameter Renaming")
+                    return
+                new_type = input("Enter new parameter type: ")
+                if new_type.lower() == 'q':
+                    print("Exiting Parameter Renaming")
+                    return
+                if not current_params:  # Adding a parameter to ()
+                    current_params.append(f"{new_name}: {new_type}")
+                else:
+                    if(run == 0):
+                        current_params[param_index] = f"{new_name}: {new_type}"
+                    else:
+                        current_params[param_index] += f", {new_name}: {new_type}"
+                print("Parameter renamed successfully.")
+                run += 1
+        else:
+            print("Invalid parameter number. No changes made.")
+            return
+    except ValueError:
+        print("Invalid input. No changes made.")
+        return
+    
+
+    
+    # Update the method parameters
+    if len(overloaded_methods) > 1:
+        methods[method_name][index] = current_params
+    else:
+        methods[method_name] = [current_params]
+    
+    print(f"\nUpdated method: {method_name}({', '.join(current_params) if current_params else '()'})")
+    print("Changes saved successfully.")
