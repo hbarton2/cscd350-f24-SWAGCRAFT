@@ -42,6 +42,36 @@ def printCommands():
     print(Fore.MAGENTA + " |                       | Quit                      |")
     print(Fore.CYAN + " +-----------------------+---------------------------+")
 
+def printHelpMenu():
+    """Display a detailed help message."""
+
+    print(Fore.MAGENTA + """
+COMMAND HELP MENU""")
+    print(Fore.MAGENTA + """
+How to Use the CLI Application:""") 
+    print(Fore.CYAN + """
+---------------------------------------------------------------------------------------------
+- List                |   : Display all available classes.
+- Show                |   : Show details of a specific class. Usage: 'show [class_name]'
+- Add Class           |   : Add a new class. Usage: 'addclass [class_name]'
+- Rename Class        |   : Rename the current class. Usage: 'renameclass [new_name]'
+- Delete Class        |   : Delete the current class.
+- Add Method          |   : Add a method to the current class. Usage: 'addmethod [method_name]'
+- Rename Method       |   : Rename a method. Usage: 'renamemethod [old_name] [new_name]'
+- Delete Method       |   : Delete a method from the current class.
+- Add a Parameter     |   : Add a parameter to a method.
+- Remove a Parameter  |   : Remove a parameter from a method.
+- Rename a Parameter  |   : Rename a parameter belonging to an existing method.
+- Add Field           |   : Add a field to the current class. Usage: 'addfield [field_name]'
+- Rename Field        |   : Rename a field. Usage: 'renamefield [old_name] [new_name]'
+- Delete Field        |   : Delete a field from the current class.
+- Add Relationship    |   : Create a relationship between classes.
+- Delete Relationship |   : Remove a relationship between classes.
+- Help                |   : Display this help menu.
+- Exit                |   : Exit the program gracefully.
+----------------------------------------------------------------------------------------------
+    """)
+
 def menu():
     
     printCommands()
@@ -188,19 +218,104 @@ def menu():
 
         # Display a Relationship
         elif (choice == "showrelationship"):
-            pass
+            '''Lists relationships between classes.'''
+            print(Fore.CYAN + "\n" + "=" * 40)
+            print(Fore.GREEN + "    Class Relationships")
+            print(Fore.CYAN + "=" * 40)
+
+            relationships_exist = False
+            for class_name, details in diagram.items():
+                # Access the 'relationships' key if it exists
+                relationships = details.get("relationships", {})
+                connections = relationships.get("connections", [])
+                if connections:
+                    relationships_exist = True
+                    for associated_class in connections:
+                        print(f"Relationship: {Fore.MAGENTA + class_name} -> {Fore.MAGENTA + associated_class}")
+
+            if not relationships_exist:
+                print(Fore.RED + "No relationships available.")
 
         # Display a List of classes
         elif (choice == "listclasses"):
-            pass
+            '''Lists all classes and their details.'''
+            print(Fore.CYAN + "\n" + "=" * 40)
+            print(Fore.GREEN + "            List of Classes")
+            print(Fore.CYAN + "=" * 40)
+
+            if not diagram:
+                print(Fore.RED + "No Classes to Display")
+            else:
+                for class_name, details in diagram.items():
+                    print(f"Class: {Fore.MAGENTA + class_name}")
+
+
+                    #Extract and display fields yeeebooooiii
+                    fields_dict = details.get('Fields', {})
+                    if fields_dict:
+                        fields = ', '.join(f"{name}: {type_}" for name, type_ in fields_dict.items())
+                    else:
+                        fields = "None"
+                    print(f"  Fields: {fields}")
+
+                    methods_dict = details.get('Methods', {}) #this was not fun
+                    if methods_dict:
+                        methods = []
+                        for method_name, method_signatures in methods_dict.items():
+                            signatures = [", ".join(signature) for signature in method_signatures]
+                            methods.append(f"{method_name}({'; '.join(signatures)})")
+                        methods_display = ', '.join(methods)
+
+                    else:
+                        methods_display = "None"
+                    print(f"  Methods: {methods_display}")
 
         # Show the details of just one class
         elif (choice == "showclasses"):
-            pass
+            '''Shows details of a specified class.'''
+            print(Fore.CYAN + "\n" + "=" * 40)
+            print(Fore.MAGENTA + "         Details for Class")
+            print("               " + Fore.MAGENTA + class_name)
+            print(Fore.CYAN + "=" * 40)
+
+            if class_name in diagram:
+                details = diagram[class_name]
+                print(f"Class: {Fore.MAGENTA + class_name}")
+
+                #Extract and display fields default to empty
+                fields_dict = details.get('Fields', {})
+                if fields_dict:
+                    fields = ', '.join(f"{name}: {type_}" for name, type_ in fields_dict.items())
+                else:
+                    fields = "None"
+                print(f"  Fields: {fields}")
+
+                #Extract and display methods defaulting to empty dictionary if not present
+                methods_dict = details.get('Methods', {})
+                if methods_dict:
+                    methods = []
+                    for method_name, method_signatures in methods_dict.items():
+                        signatures = [", ".join(signature) for signature in method_signatures]
+                        methods.append(f"{method_name}({'; '.join(signatures)})")
+                    methods_display = ', '.join(methods)
+                else:
+                    methods_display = "None"
+                print(f"  Methods: {methods_display}")
+
+                #Display relationships
+                relations = details.get("Relations", {})
+                connections = relations.get("associations", [])
+                if connections:
+                    print(f"  Associations: {', '.join(connections)}")
+                else:
+                    print("  Associations: None")
+
+            else:
+                print(Fore.RED + f"Class '{class_name}' does not exist")
 
         # Print the Help menu
         elif (choice == "help"):
-            pass
+            printHelpMenu()
 
         # Quit the program 
         elif (choice == "quit"):
