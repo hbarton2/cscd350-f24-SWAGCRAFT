@@ -8,6 +8,6 @@ The project uses colorama to enhance the CLI user experience by added a multi-co
 
 1) navigate to the github (https://github.com/hbarton2/cscd350-f24-SWAGCRAFT) and use the git clone feature by selecting the green "Code" tab and selecting the HTTPS option then selecting "Copy URL to Clipboard"
 
-2) once the URL is copied you will go to your command line on your machine or in a VM, if issues occur installing Colorama dependency in step (??) using a VM is recommended. Navigate to the place you want to install the git clone. Once in the correct directory run the command `git clone https://github.com/hbarton2/cscd350-f24-SWAGCRAFT.git`
+2) once the URL is copied you will go to your command line on your machine or in a VM, if issues occur installing Colorama dependency, using a VM is recommended instead of your base machine. Navigate to the place you want to install the git clone. Once in the correct directory run the command `git clone https://github.com/hbarton2/cscd350-f24-SWAGCRAFT.git`
 3) After the git clone is completed navigate to the folder then the application can be ran using the command `python3 main.py`.
 4) the application is a CLI interface using text commands, each command will be listed when the program starts and additional information can be found by typing `help`
