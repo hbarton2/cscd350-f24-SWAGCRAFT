@@ -3,7 +3,13 @@
 # import colorama so the menu colors show up 
 from colorama import init, Fore, Style
 
-# import the diagram dictionary 
+from classes import *
+from fields import *
+from interface import *
+from menu import *
+from methods import *
+from relationship import *
+from saveLoad import *
 from diagram import diagram
 
 init(autoreset=True)
@@ -12,6 +18,106 @@ def clean(string):
     """Sanitize input for use in menus to all lowercase no whitespace"""
     newString = string.lower().strip().replace(" ", "")
     return newString
+
+def printCommands():
+    print(Fore.MAGENTA + "                  Available Commands             ")
+    print(Fore.CYAN + "=" * 55)
+    print(Fore.MAGENTA + " |     Class Commands    |  Method & Field Commands  |")
+    print(Fore.CYAN + "-+-----------------------+---------------------------+")
+    print(Fore.MAGENTA + " | Add class             | Add Method                |")
+    print(Fore.MAGENTA + " | Rename Class          | Rename Method             |")
+    print(Fore.MAGENTA + " | Delete Class          | Delete Method             |")
+    print(Fore.MAGENTA + " |                       | Add Field                 |")
+    print(Fore.MAGENTA + " |                       | Rename Field              |")
+    print(Fore.MAGENTA + " |                       | Delete Field              |")
+    print(Fore.CYAN + "-+-----------------------+---------------------------+")
+    print(Fore.MAGENTA + " | Relationship Commands |       Other Commands      |")
+    print(Fore.CYAN + " +-----------------------+---------------------------+")
+    print(Fore.MAGENTA + " | Add Relationship      | List Classes              |")
+    print(Fore.MAGENTA + " | Delete Relationship   | Show Classes              |")
+    print(Fore.MAGENTA + " | Show Relationships    | Help                      |")
+    print(Fore.MAGENTA + " |                       | Quit                      |")
+    print(Fore.CYAN + " +-----------------------+---------------------------+")
+
+def menu():
+    
+    printCommands()
+    choice = ""
+    # Create main while loop
+    running = True
+    while (running):
+        # Add class mechanic
+        if (choice == "addclass"):
+            print("Input the class name: ")
+            className = str(input())
+            addClass(className)
+
+        # Rename class mechanic
+        elif (choice == "renameclass"):
+            print("Input the old class name: ")
+            originalClassName = str(input())
+            print("Input the new class name: ")
+            newClassName = str(input())
+            renameClass(originalClassName, newClassName)
+
+        # Delete a class mechanic
+        elif (choice == "deleteclass"):
+            print("Input the class name: ")
+            unwantedClass = str(input())
+            deleteClass(unwantedClass)
+
+        # Add a Method mechanic
+        elif (choice == "addmethod"):
+            print("Input the class name: ")
+            class1 = str(input())
+            print("Input the method name: ")
+            method1 = str(input())
+
+            parameterList = []
+            while(x == 0):
+                print("\nPress 0 to exit parameters\nInput parameter 1: ")
+                parameter1 = str(input())
+                if(parameter1 == str(0)):
+                    x = 1
+                    break
+                print("Input parameter 1's type: ")
+                parameter1 = str(input())
+                if(parameter1 == str(0)):
+                    x = 1
+                    break
+                parameterList.append(parameter1)
+
+                addMethod(class1, method1, parameterList)
+
+        
+        elif (choice == "renamemethod"):
+            pass
+        elif (choice == "deletemethod"):
+            pass
+        elif (choice == "addfield"):
+            pass
+        elif (choice == "renamefield"):
+            pass
+        elif (choice == "deletefield"):
+            pass
+        elif (choice == "addrelationship"):
+            pass
+        elif (choice == "deleterelationship"):
+            pass
+        elif (choice == "showrelationship"):
+            pass
+        elif (choice == "listclasses"):
+            pass
+        elif (choice == "showclasses"):
+            pass
+        elif (choice == "help"):
+            pass
+        elif (choice == "quit"):
+            print("Have a nice day!")
+            running = False
+        else:
+            print("Invalid Input, try again!")
+
 
 
 
