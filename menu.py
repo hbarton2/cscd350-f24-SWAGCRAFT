@@ -199,7 +199,10 @@ def menuCLI():
             else:
                 print(Fore.RED + "Method " + methodName + " isn't in diagram") 
 
+        #ADD TYPE (METHOD)
         
+        #CHANGE TYPE (METHOD)
+
         #PARAMETERS
 
         #ADD PARAMETER
@@ -369,6 +372,10 @@ def menuCLI():
                 print(Fore.GREEN + "Successfully deleted a field " + fieldName)
             else:
                 print(Fore.RED + "An error has occured")
+            
+        #ADD TYPE (FIELD)
+
+        #CHANGE TYPE (FIELD)
 
         #RELATIONSHIPS
         # WILL NEED TO ADD TYPES HERE ONCE THAT IS UPDATED!!!
@@ -429,16 +436,16 @@ def menuCLI():
         #LIST CLASSES
         #Lists all classes and their details.
         elif (choice == "listclasses"):
+            copyDiagram = controllerCopyData()
+
             print(Fore.CYAN + "\n" + "=" * 40)
             print(Fore.GREEN + "            List of Classes")
             print(Fore.CYAN + "=" * 40)
 
-            if(controllerListClasses == False):
+            if not copyDiagram:
                 print(Fore.RED + "No Classes to Display")
-
-            #THIS IS GOING TO GET REALLY MESSY WITH MVC - THOMAS ( I CHANGED STUFF ABOVE THIS)
             else:
-                for class_name, details in diagram.items():
+                for class_name, details in copyDiagram.items():
                     print(f"Class: {Fore.MAGENTA + class_name}")
 
 
@@ -473,12 +480,14 @@ def menuCLI():
                 print(Fore.RED + "Class " + className + " isn't in diagram")
                 continue
 
+            copyDiagram = controllerCopyData()
+
             print(Fore.CYAN + "\n" + "=" * 40)
             print(Fore.MAGENTA + "         Details for Class")
             print("               " + Fore.MAGENTA + className)
             print(Fore.CYAN + "=" * 40)
                 
-            details = diagram[className]
+            details = copyDiagram[className]
             print(f"Class: {Fore.MAGENTA + className}")
 
             #Extract and display fields default to empty
@@ -513,13 +522,13 @@ def menuCLI():
         #DISPLAY RELATIONSHIPS
         #Lists relationships between all classes
         elif (choice == "showrelationships"):
-        
+            copyDiagram = controllerCopyData()
             print(Fore.CYAN + "\n" + "=" * 40)
             print(Fore.GREEN + "    Class Relationships")
             print(Fore.CYAN + "=" * 40)
 
             relationships_exist = False
-            for class_name, details in diagram.items():
+            for class_name, details in copyDiagram.items():
                 # Access the 'relationships' key if it exists
                 relationships = details.get("relationships", {})
                 connections = relationships.get("connections", [])

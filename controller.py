@@ -8,7 +8,7 @@ from methods import *
 from relationship import *
 from saveLoad import *
 from exists import *
-from display import *
+from copyDiagram import *
 
 #Controller takes input from view (menu) and preforms calls that modify data to adhere to MVC
 
@@ -92,16 +92,10 @@ def controllerAddRelationship(className1, className2):
 def controllerDeleteRelationship(className1, className2):
     return deleteRelationship(className1, className2)
 
-#DISPLAY DATA (THESE DO NOT WORK RIGHT NOW) - THOMAS
+#COPY DATA (FOR DISPLAY) (THESE DO NOT WORK RIGHT NOW) - THOMAS
 
-def controllerListClasses():
-    listClasses()
-
-def controllerShowClasses():
-    showClass
-    
-def controllerShowRelationships():
-    showRelationships()
+def controllerCopyData():
+    return copyData
 
 
 
