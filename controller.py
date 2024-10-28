@@ -95,7 +95,7 @@ def controllerDeleteRelationship(className1, className2):
 #COPY DATA (FOR DISPLAY) (THESE DO NOT WORK RIGHT NOW) - THOMAS
 
 def controllerCopyData():
-    return copyData
+    return copyData()
 
 
 

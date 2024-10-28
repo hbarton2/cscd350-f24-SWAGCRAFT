@@ -436,16 +436,16 @@ def menuCLI():
         #LIST CLASSES
         #Lists all classes and their details.
         elif (choice == "listclasses"):
-            copyDiagram = controllerCopyData()
+            diagramCopy = controllerCopyData()
 
             print(Fore.CYAN + "\n" + "=" * 40)
             print(Fore.GREEN + "            List of Classes")
             print(Fore.CYAN + "=" * 40)
 
-            if not copyDiagram:
+            if not diagramCopy:
                 print(Fore.RED + "No Classes to Display")
             else:
-                for class_name, details in copyDiagram.items():
+                for class_name, details in diagramCopy.items():
                     print(f"Class: {Fore.MAGENTA + class_name}")
 
 
@@ -480,14 +480,14 @@ def menuCLI():
                 print(Fore.RED + "Class " + className + " isn't in diagram")
                 continue
 
-            copyDiagram = controllerCopyData()
+            diagramCopy = controllerCopyData()
 
             print(Fore.CYAN + "\n" + "=" * 40)
             print(Fore.MAGENTA + "         Details for Class")
             print("               " + Fore.MAGENTA + className)
             print(Fore.CYAN + "=" * 40)
                 
-            details = copyDiagram[className]
+            details = diagramCopy[className]
             print(f"Class: {Fore.MAGENTA + className}")
 
             #Extract and display fields default to empty
@@ -522,13 +522,13 @@ def menuCLI():
         #DISPLAY RELATIONSHIPS
         #Lists relationships between all classes
         elif (choice == "showrelationships"):
-            copyDiagram = controllerCopyData()
+            diagramCopy = controllerCopyData()
             print(Fore.CYAN + "\n" + "=" * 40)
             print(Fore.GREEN + "    Class Relationships")
             print(Fore.CYAN + "=" * 40)
 
             relationships_exist = False
-            for class_name, details in copyDiagram.items():
+            for class_name, details in diagramCopy.items():
                 # Access the 'relationships' key if it exists
                 relationships = details.get("relationships", {})
                 connections = relationships.get("connections", [])
