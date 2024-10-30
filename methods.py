@@ -2,7 +2,7 @@ from classes import *
 from diagram import diagram
 from colorama import init, Fore, Style
 
-def add_method(class_name, method_name, parameters):
+def addMethod(class_name, method_name, parameters):
     """
     Add a new method to a class in the diagram.
 
@@ -38,7 +38,7 @@ def add_method(class_name, method_name, parameters):
             return True
 
 
-def rename_method(class_name, old_method_name, new_method_name, overload_index=None):
+def renameMethod(class_name, old_method_name, new_method_name, overload_index=None):
     """
     Rename a method in a class in the diagram.
 
