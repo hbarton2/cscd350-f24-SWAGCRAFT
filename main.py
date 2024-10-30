@@ -11,12 +11,20 @@ from methods import *
 from relationship import *
 from saveLoad import *
 from diagram import diagram
+from GUI import startGUI
+import sys
 
 
 def main():
 #GUI or CLI Mode?
 #Takes user input on initial run command and starts respective mode (eventually)
-    menuCLI()
+    mode = str(sys.argv[1])
+    if(mode == "GUI" or mode == "Gui" or mode == "gui"):
+        startGUI()
+    elif (mode == "CLI" or mode == "Cli" or mode == "cli"):
+        menuCLI()
+    else:
+        print("Usage: python3 main.py 'CLI' or 'GUI'")
 
 if __name__=="__main__":
     main()
