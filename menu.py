@@ -336,7 +336,7 @@ def menuCLI():
             oldFieldName = str(input()).strip()
 
             #Checks user input for field exists
-            if(controllerFieldExists(oldFieldName)== False):
+            if(controllerFieldExists(className, oldFieldName)== False):
                 print(Fore.RED + "Filed " + oldFieldName + " isn't in diagram")
                 continue
 
@@ -364,7 +364,7 @@ def menuCLI():
             fieldName = str(input()).strip()
 
             #Checks user input for field exists
-            if(controllerFieldExists(fieldName)== False):
+            if(controllerFieldExists(className,fieldName)== False):
                 print(Fore.RED + "Filed " + fieldName + " isn't in diagram")
                 continue
 
