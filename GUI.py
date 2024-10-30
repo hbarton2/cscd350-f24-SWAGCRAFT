@@ -43,6 +43,10 @@ class UMLApp(ctk.CTk):
         addClassBTN = ctk.CTkButton(tboxFRAME, text="Add Class", command=self.addClass)
         addClassBTN.pack(padx=10, pady=5)
 
+        #rename class button
+        renameClassBTN = ctk.CTkButton(tboxFRAME, text="Rename Class", command=self.renameClass)
+        renameClassBTN.pack(padx=10, pady=5)
+
         #list all classes button
         listClassesBTN = ctk.CTkButton(tboxFRAME, text="List Classes", command=self.listClasses)
         listClassesBTN.pack(padx=10, pady=5)
@@ -187,6 +191,19 @@ class UMLApp(ctk.CTk):
             self.drawDiagram()
             self.statLabel.configure(text=f"Status: Class '{className}' added")
 
+    def renameClass(self):
+        #first prompt
+        dialog = ctk.CTkInputDialog(text="Enter the existing class name:", title="Rename Class")
+        existingClassName = dialog.get_input()
+        if existingClassName:
+            #prompt once more
+            dialog = ctk.CTkInputDialog(text="Enter the new class name:", title="Rename Class")
+            newClassName = dialog.get_input()
+
+            if newClassName:
+                renameClass(existingClassName, newClassName)
+                self.drawDiagram()
+                self.statLabel.configure(text=f"Status: Class '{existingClassName}' renamed to '{newClassName}'")
 
     def promptClassNM(self):
         dialog = ctk.CTkInputDialog(text="Enter new class name:", title="Add Class")
@@ -226,7 +243,7 @@ class UMLApp(ctk.CTk):
     def editClass(self, className):
         editWin = tk.Toplevel(self)
         editWin.title(f"Edit Class '{className}'")
-        editWin.geometry("400x650")
+        editWin.geometry("500x1000")
 
 
         def addFieldHandler():
@@ -273,6 +290,24 @@ class UMLApp(ctk.CTk):
                 self.drawDiagram()
                 self.statLabel.configure(text=f"Status: Method '{methodName}' removed from class '{className}'")
 
+        def addParameterHandler():
+            methodName = addParamMethodEntry.get().strip() #same old same old. get and strip
+            paramName = addParamNameEntry.get().strip()
+            paramType = addParamTypeENT.get().strip()
+
+            if methodName and paramName and paramType:
+                addParameter(className, methodName, paramName, paramType)
+                self.drawDiagram()
+                self.statLabel.configure(text=f"Status: Parameter '{paramName}' added to method '{methodName}' in class '{className}'")
+
+        def removeParameterHandler():
+            methodName = removeParamMethodEntry.get().strip()
+            paramName = removeParamNameEntry.get().strip()
+            if methodName and paramName:
+                removeParameter(className, methodName, paramName)
+                self.drawDiagram()
+                self.statLabel.configure(text=f"Status: Parameter '{paramName}' removed from method '{methodName}' in class '{className}'")
+
         #fields section
         tk.Label(editWin, text="Add Field: (name and type)").pack(pady=5)
         fieldEntry = tk.Entry(editWin)
@@ -318,6 +353,31 @@ class UMLApp(ctk.CTk):
         methodRemoveEntry.insert(0, "method_name")
         removeMethodBTN = tk.Button(editWin, text="Remove Method", command=removeMethodHandler)
         removeMethodBTN.pack(pady=5)
+
+        #parameters section...scuffed but will do
+        tk.Label(editWin, text="Add Parameter to Method: (method, parameter name, type)").pack(pady=5)
+        addParamMethodEntry = tk.Entry(editWin)
+        addParamMethodEntry.pack(pady=5)
+        addParamMethodEntry.insert(0, "method_name") #more placeholder text to autofill.
+        addParamNameEntry = tk.Entry(editWin)
+        addParamNameEntry.pack(pady=5)
+        addParamNameEntry.insert(0, "param_name")
+        addParamTypeENT = tk.Entry(editWin)
+        addParamTypeENT.pack(pady=5)
+        addParamTypeENT.insert(0, "param_type")
+        addParamBTN = tk.Button(editWin, text="Add Parameter", command=addParameterHandler) #call my new handler
+        addParamBTN.pack(pady=5)
+
+        #new addition. actually being able to remove parameters
+        tk.Label(editWin, text="Remove Parameter from Method: (method, parameter name)").pack(pady=5) #labels
+        removeParamMethodEntry = tk.Entry(editWin)
+        removeParamMethodEntry.pack(pady=5)
+        removeParamMethodEntry.insert(0, "method_name")
+        removeParamNameEntry = tk.Entry(editWin)
+        removeParamNameEntry.pack(pady=5)
+        removeParamNameEntry.insert(0, "param_name")
+        removeParamBTN = tk.Button(editWin, text="Remove Parameter", command=removeParameterHandler)
+        removeParamBTN.pack(pady=5)
 
     def listClasses(self):
         classListWin = tk.Toplevel(self)
