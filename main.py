@@ -24,7 +24,7 @@ def main():
     elif (mode == "CLI" or mode == "Cli" or mode == "cli"):
         menuCLI()
     else:
-        print("Usage: python3 main.py 'CLI' or 'GUI'")
+        print("Usage: python3 main.py [('CLI' or 'GUI')]")
 
 if __name__=="__main__":
     main()
