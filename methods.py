@@ -2,51 +2,6 @@ from classes import *
 from diagram import diagram
 from colorama import init, Fore, Style
 
-def addMethod(class_name, method_name, parameters):
-    """
-    Add a new method to a class in the diagram.
-
-    Parameters:
-    class_name (str): The name of the class to add the method to.
-    method_name (str): The name of the new method.
-    parameters (list): A list of parameter definitions in the format "param_name: param_type".
-
-    Returns:
-    bool: True if the method was added successfully, False otherwise.
-    """
-    # Check if class_name is already in the diagram
-    if class_name not in diagram:
-        return False
-    
-    # Get the class info and create 'Methods' if not found
-    class_info = diagram[class_name]
-    if 'Methods' not in class_info:
-        class_info['Methods'] = {}
-
-    # Get the Methods
-    methods = class_info['Methods']
-    
-    # Check if method is overloaded
-    if method_name not in methods:
-        methods[method_name] = [parameters]
-        return True
-    else:
-        if parameters in methods[method_name]:
-            return False
-        else:
-            methods[method_name].append(parameters)
-            return True
-
-
-def renameMethod(class_name, old_method_name, new_method_name, overload_index=None):
-    """
-This module provides functions for managing methods in a class-based diagram.
-"""
-
-from classes import *
-from diagram import diagram
-from colorama import init, Fore, Style
-
 def add_method(class_name, method_name, parameters):
     """
     Add a new method to a class in the diagram.
