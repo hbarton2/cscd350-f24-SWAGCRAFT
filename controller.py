@@ -92,6 +92,10 @@ def controllerAddRelationship(className1, className2, relationshipType):
 def controllerDeleteRelationship(className1, className2):
     return deleteRelationship(className1, className2)
 
+#Receives input from menu and calls method to change a type relationship then returns True or False
+def controllerChangeRelationType(className1, className2, newRelationType):
+    return changeRelationType(className1, className2, newRelationType)
+
 #COPY DATA (FOR DISPLAY) (THESE DO NOT WORK RIGHT NOW) - THOMAS
 
 def controllerCopyData():
