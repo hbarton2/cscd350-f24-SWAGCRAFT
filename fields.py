@@ -41,7 +41,10 @@ def addField(class_name, field_name, field_type):
     # Check if the fields already exists in the class 
     if field_name in fields:
         return False
-
+    
+    # Add the new field to the class 
+    fields[field_name] = field_type
+    return True 
 
 def removeField(class_name, field_name):
     '''
