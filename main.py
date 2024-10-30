@@ -18,7 +18,11 @@ import sys
 def main():
 #GUI or CLI Mode?
 #Takes user input on initial run command and starts respective mode (eventually)
-    mode = str(sys.argv[1])
+    mode = ""
+    
+    if(sys.argv[1].exists()):
+       mode = str(sys.argv[1])
+
     if(mode == "GUI" or mode == "Gui" or mode == "gui"):
         startGUI()
     elif (mode == "CLI" or mode == "Cli" or mode == "cli"):
