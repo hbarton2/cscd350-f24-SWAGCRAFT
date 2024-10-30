@@ -17,18 +17,18 @@ import sys
 
 def main():
 #GUI or CLI Mode?
-#Takes user input on initial run command and starts respective mode (eventually)
-    mode = ""
-    
-    if(sys.argv[1].exists()):
-       mode = str(sys.argv[1])
-
-    if(mode == "GUI" or mode == "Gui" or mode == "gui"):
-        startGUI()
-    elif (mode == "CLI" or mode == "Cli" or mode == "cli"):
-        menuCLI()
+#Takes user input on initial run command and starts respective mode
+    if len(sys.argv) > 1:
+        mode = str(sys.argv[1])
+        if mode.lower() == "gui":
+            startGUI()
+        elif mode.lower() == "cli":
+            menuCLI()
+        else:
+            print("Usage: python3 main.py [CLI or GUI]")
     else:
-        print("Usage: python3 main.py [('CLI' or 'GUI')]")
+        # Print usage message if no argument is provided
+        print("Usage: python3 main.py [CLI or GUI]")
 
 if __name__=="__main__":
     main()
