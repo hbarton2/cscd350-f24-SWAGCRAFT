@@ -85,12 +85,16 @@ def controllerRemoveField(className, fieldName):
 #RELATIONSHIPS #Will have to add method to change type and update to include types
 
 #Receives input from menu and calls method to add a relationship then returns True or False
-def controllerAddRelationship(className1, className2):
-    return addRelationship(className1, className2)
+def controllerAddRelationship(className1, className2, relationshipType):
+    return addRelationship(className1, className2, relationshipType)
 
 #Receives input from menu and calls method to delete a relationship then returns True or False
 def controllerDeleteRelationship(className1, className2):
     return deleteRelationship(className1, className2)
+
+#Receives input from menu and calls method to change a type relationship then returns True or False
+def controllerChangeRelationType(className1, className2, newRelationType):
+    return changeRelationType(className1, className2, newRelationType)
 
 #COPY DATA (FOR DISPLAY) (THESE DO NOT WORK RIGHT NOW) - THOMAS
 
