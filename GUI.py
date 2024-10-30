@@ -434,5 +434,6 @@ class UMLApp(ctk.CTk):
         diagramText.config(state=tk.DISABLED)
 
 
-GUI = UMLApp()
-GUI.mainloop()
+def startGUI():
+    GUI = UMLApp()
+    GUI.mainloop()
