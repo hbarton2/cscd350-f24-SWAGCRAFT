@@ -1,6 +1,6 @@
 from diagram import diagram
 
-def addRelationship(className1, className2, relationType='Aggregation'):
+def addRelationship(className1, className2, relationType):
     """
     Use this function to add a new relationship between two classes.
 
