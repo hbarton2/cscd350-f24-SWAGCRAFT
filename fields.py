@@ -1,8 +1,8 @@
 from diagram import diagram
 
-# I am now initializing the valid field types 
+ 
 
-FIELD_TYPES = ['int', 'double', 'User']
+# FIELD_TYPES = ['int', 'double']
 
 
 def addField(class_name, field_name, field_type):
@@ -20,8 +20,8 @@ def addField(class_name, field_name, field_type):
 
     # Validate the field types with the list 
     # Return False if not
-    if field_type not in FIELD_TYPES:
-        return False
+    # if field_type not in FIELD_TYPES:
+        # return False
     
     # Checking to see if the class exists in the diagram dict 
     # Return false if not 
