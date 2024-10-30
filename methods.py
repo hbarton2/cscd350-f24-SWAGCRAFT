@@ -252,3 +252,43 @@ def changeParameter(class_name, method_name, overload_index, param_index, new_na
             return True
     
     return False
+
+def changeAllParameters(class_name, method_name, overload_index, new_names, new_types):
+    """
+    Replace all parameters in a method/overloaded method with new parameters.
+    The new parameters are defined by parallel lists of names and types.
+
+    Parameters:
+    class_name (str): The name of the class that contains the method.
+    method_name (str): The name of the method to change the parameters in.
+    overload_index (int): The index of the overloaded method to change the parameters in.
+    new_names (list[str]): The new names for all parameters.
+    new_types (list[str]): The new types for all parameters.
+
+    Returns:
+    bool: True if parameters were changed successfully, False otherwise.
+    """
+    # Validate input lengths match
+    if len(new_names) != len(new_types):
+        return False
+
+    if class_name not in diagram:
+        return False
+    
+    class_info = diagram[class_name]
+    if 'Methods' not in class_info or method_name not in class_info['Methods']:
+        return False
+    
+    methods = class_info['Methods']
+    overloaded_methods = methods[method_name]
+    
+    # Validate overload index
+    if overload_index < 0 or overload_index >= len(overloaded_methods):
+        return False
+
+    # Create new parameter list
+    new_params = [f"{name}: {type_}" for name, type_ in zip(new_names, new_types)]
+    
+    # Replace entire parameter list for the specified method/overload
+    methods[method_name][overload_index] = new_params
+    return True
