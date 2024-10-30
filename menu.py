@@ -378,7 +378,6 @@ def menuCLI():
         #CHANGE TYPE (FIELD)
 
         #RELATIONSHIPS
-        # WILL NEED TO ADD TYPES HERE ONCE THAT IS UPDATED!!!
 
         #ADD RELATIONSHIP
         #Attempts to add a relationship between two classes. True returns success message, False returns error message
@@ -399,10 +398,20 @@ def menuCLI():
                 print(Fore.RED + "Class " + className2 + " isn't in diagram")
                 continue
 
-            if(controllerAddRelationship(className1, className2)):
-                print(Fore.GREEN + "Successfully created a relationship between " + className1 + " and " + className2)
+            print(Fore.YELLOW + "Input the relationship type: ")
+            relationshipType = clean(input())
+            #Checks User Input for Type
+            while(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
+                if(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
+                    print(Fore.RED + "Incorrect relationship type, try again!")
+                    print(Fore.YELLOW + "Input the relationship type: ")
+                    relationshipType = clean(input())
             else:
-                print(Fore.RED + "An error has occured")
+                if(controllerAddRelationship(className1, className2, relationshipType)):
+                    print(Fore.GREEN + "Successfully created a relationship between " + className1 + " and " + className2 + " with type " + relationshipType)
+                else:
+                    print(Fore.RED + "An error has occured")
+
 
 
         #DELETE RELATIONSHIP
