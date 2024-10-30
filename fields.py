@@ -23,26 +23,25 @@ def addField(class_name, field_name, field_type):
     # if field_type not in FIELD_TYPES:
         # return False
     
-    # Checking to see if the class exists in the diagram dict 
-    # Return false if not 
+
     if class_name not in diagram:
         return False
     
-    # Get the class information 
+     
     class_info = diagram[class_name]
 
-    # Now we initialize the fields dictionary if it does not exist 
+    
     if 'Fields' not in class_info:
         class_info['Fields'] = {}
 
-    # Get existing fields of the class
+    
     fields = class_info['Fields']
 
-    # Check if the fields already exists in the class 
+    
     if field_name in fields:
         return False
     
-    # Add the new field to the class 
+    
     fields[field_name] = field_type
     return True 
 
@@ -58,21 +57,21 @@ def removeField(class_name, field_name):
         bool: True if the field is removed successfully, False otherwise.
     '''
 
-    # Check if the class exists in the diagram 
+    
     if class_name not in diagram:
         return False 
     
-    # Retrieve the class info
+    
     class_info = diagram[class_name]
 
-    # Check if the field dict exists and field name is valid 
+    
     if 'Fields' not in class_info or field_name not in class_info['Fields']:
         return False
     
-    # Get the existing fields of the class 
+    
     fields = class_info['Fields']
 
-    # Remove the field 
+    
     del fields[field_name]
     return True
 
@@ -91,33 +90,25 @@ def renameField(class_name, old_field_name, new_field_name):
     '''
 
 
-    # Checks if the class exists in the diagram 
     if class_name not in diagram:
         return False
     
-    # Retrieve the class information 
     class_info = diagram[class_name]
 
-    # Check if the Fields dict exists 
     if 'Fields' not in class_info:
         return False
     
-    # Get existing fields class 
     fields = class_info['Fields']
 
-    # Check if the old field name is valid 
     if old_field_name not in fields:
         return False
     
-    # Ensure the new field name is different from the old name 
     if new_field_name == old_field_name:
         return False
     
-    # Check if new field name already exists 
     if new_field_name in fields:
         return False
     
-    # Rename the field 
     fields[new_field_name] = fields.pop(old_field_name)
     return True
     
