@@ -28,6 +28,7 @@ def printCommands():
     print(Fore.MAGENTA + " | Add Field             | Add Parameter             |")
     print(Fore.MAGENTA + " | Rename Field          | Rename Parameter          |")
     print(Fore.MAGENTA + " | Delete Field          | Remove Parameter          |")
+    print(Fore.MAGENTA + " | Change Field Type     |                           |")
     print(Fore.CYAN + "-+-----------------------+---------------------------+")
     print(Fore.MAGENTA + " | Relationship Commands |       Other Commands      |")
     print(Fore.CYAN + " +-----------------------+---------------------------+")
@@ -62,9 +63,11 @@ How to Use the CLI Application:""")
 - Add Field           |   : Add a field to the current class.
 - Rename Field        |   : Rename a field. 
 - Delete Field        |   : Delete a field from the current class.
+- Change Field Type   |   : Change the type category of a field
 - Add Relationship    |   : Create a relationship between classes.
 - Delete Relationship |   : Remove a relationship between classes.
 - Show Relationships  |   : Show the relationships between all classes.
+- Change Relation Type|   : Change a relationship type between two classes.          
 - Save                |   : Save the diagram.
 - Load                |   : Load the diagram.
 - Help                |   : Display this help menu.
