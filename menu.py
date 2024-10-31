@@ -373,10 +373,35 @@ def menuCLI():
             else:
                 print(Fore.RED + "An error has occured")
             
-        #ADD TYPE (FIELD)
 
-        #CHANGE TYPE (FIELD)
+        #CHANGE FIELD TYPE
+            '''
+            elif (choice == "changefieldtype"):
+            print(Fore.YELLOW + "Input the class name: ")
+            className = str(input()).strip()
 
+            #Checks user input for class exists
+            if(controllerClassExists(className)== False):
+                print(Fore.RED + "Class " + className + " isn't in diagram")
+                continue
+
+            print(Fore.YELLOW + "Input the field name: ")
+            fieldName = clean(input())
+
+            #Checks user input for field exists
+            if(controllerFieldExists(className,fieldName)== False):
+                print(Fore.RED + "Filed " + fieldName + " isn't in diagram")
+                continue
+
+            print(Fore.YELLOW + "Input the new field type: ")
+            newFieldType= clean(input())
+               
+            if(controllerChangeFieldType(className, fieldName, newFieldType)):
+                print(Fore.GREEN + "Successfully changed filed type for " + className + " to new type " + newFieldType)
+            else:
+                print(Fore.RED + "An error has occured")
+
+            '''
         #RELATIONSHIPS
 
         #ADD RELATIONSHIP
