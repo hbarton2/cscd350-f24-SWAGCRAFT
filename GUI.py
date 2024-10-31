@@ -55,9 +55,38 @@ class UMLApp(ctk.CTk):
         addRelBTN = ctk.CTkButton(tboxFRAME, text="Add Relationship", command=self.addRelationship)
         addRelBTN.pack(padx=10, pady=5)
 
+        #delete relationship button
+        deleteRelationshipBTN = ctk.CTkButton(tboxFRAME, text="Delete Relationship", command=self.deleteRelationship)
+        deleteRelationshipBTN.pack(padx=10, pady=5)
+
         #overall diagram button
         overallDiagramBTN = ctk.CTkButton(tboxFRAME, text="Overall Diagram", command=self.showOverallDiagram)
         overallDiagramBTN.pack(padx=10, pady=5)
+
+    def deleteRelationship(self):
+        """Function to call the controller to have it delete a relationship"""
+        dialogue = ctk.CTkInputDialog(text="Enter the source class name:", title="Delete Relationship")
+        source = dialogue.get_input().strip()
+
+        if(source):
+            dialogue = ctk.CTkInputDialog(text="Enter the destination class name:", title="Delete Relationship")
+            destination = dialogue.get_input().strip()
+
+            if(destination):
+                if(deleteRelationship(source, destination) == True):
+                    self.drawDiagram()
+                    self.statLabel.configure(text = f"Status: Relationship between {source} and {destination} deleted")
+
+                else:
+                    self.statLabel.configure(text = f"Status: Relationship between {source} and {destination} not found")
+
+            else:
+                self.statLabel.configure(text = "Status: Destination class name is required")
+
+        else:
+            self.statLabel.configure(text = "Status: Source class name is required")
+
+        
 
 
     def createDrwArea(self):
