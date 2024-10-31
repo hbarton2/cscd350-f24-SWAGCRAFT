@@ -19,7 +19,7 @@ def printCommands():
     print(Fore.CYAN + "=" * 55)
     print(Fore.MAGENTA + " |     Class Commands    |     Method Commands       |")
     print(Fore.CYAN + "-+-----------------------+---------------------------+")
-    print(Fore.MAGENTA + " | Add class             | Add Method                |")
+    print(Fore.MAGENTA + " | Add Class             | Add Method                |")
     print(Fore.MAGENTA + " | Rename Class          | Rename Method             |")
     print(Fore.MAGENTA + " | Delete Class          | Delete Method             |")
     print(Fore.CYAN + "-+-----------------------+---------------------------+")
