@@ -144,9 +144,11 @@ def menuCLI():
             print(Fore.YELLOW + "Input the method name: ")
             methodName = str(input()).strip()
             
+            print(Fore.YELLOW + "Input the parameter name: ")
+            parameterName = str(input()).strip()
             #Attempts to add a method. True returns success message, False returns error message
-            if(controllerAddMethod(className, methodName)):
-                print(Fore.GREEN + "Successfully created method " + methodName)
+            if(controllerAddMethod(className, methodName, parameterName)):
+                print(Fore.GREEN + "Successfully created method " + methodName + " with parameter " + parameterName)
             else:
                 print(Fore.RED + "An error has occured")                
         

@@ -42,8 +42,8 @@ def controllerDeleteClass(unwantedClass):
 
 
 #Receives input from menu and calls method to add a method then returns True or False
-def controllerAddMethod(className, methodName):
-    return addMethod(className, methodName)
+def controllerAddMethod(className, methodName, parameterName):
+    return addMethod(className, methodName, parameterName)
 
 #Receives input from menu and calls method to rename a method then returns True or False
 def controllerRenameMethod(className, oldMethodName, newMethodName):
