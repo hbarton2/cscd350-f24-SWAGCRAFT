@@ -1,6 +1,6 @@
 import tkinter as tk
 import customtkinter as ctk
-from tkinter import messagebox
+from tkinter import messagebox, ttk #new import. ttk for scollbar
 from controller import diagram
 from controller import addClass, renameClass, deleteClass
 from controller import addField, removeField, renameField
@@ -243,8 +243,24 @@ class UMLApp(ctk.CTk):
     def editClass(self, className):
         editWin = tk.Toplevel(self)
         editWin.title(f"Edit Class '{className}'")
-        editWin.geometry("500x1000")
+        editWin.geometry("450x500")
 
+        #remaking to use scrollable frame
+        scrollCntnr = ttk.Frame(editWin)
+        scrollCntnr.pack(fill="both", expand=True)
+
+        classEdt = tk.Canvas(scrollCntnr)
+        classEdt.pack(side="left", fill="both", expand=True)
+
+        scrollbr = ttk.Scrollbar(scrollCntnr, orient="vertical", command=classEdt.yview) #huzzah. yview scroll down!
+        scrollbr.pack(side="right", fill="y")
+
+        classEdt.configure(yscrollcommand=scrollbr.set)
+        classEdt.bind('<Configure>', lambda e: classEdt.configure(scrollregion=classEdt.bbox("all"))) #for anyone in the team reviewing my code(peer programming w/robert?). I used this for reference: https://blog.teclado.com/tkinter-scrollable-frames/
+        #lambda dynamically update the scroll region of classEdt :)
+
+        contentFRM = ttk.Frame(classEdt) #going to have to change references for fields to contentFRM. :/
+        classEdt.create_window((0, 0), window=contentFRM, anchor="nw")
 
         def addFieldHandler():
             fieldName = fieldEntry.get().strip()
@@ -309,74 +325,74 @@ class UMLApp(ctk.CTk):
                 self.statLabel.configure(text=f"Status: Parameter '{paramName}' removed from method '{methodName}' in class '{className}'")
 
         #fields section
-        tk.Label(editWin, text="Add Field: (name and type)").pack(pady=5)
-        fieldEntry = tk.Entry(editWin)
+        tk.Label(contentFRM, text="Add Field: (name and type)").pack(pady=5)
+        fieldEntry = tk.Entry(contentFRM)
         fieldEntry.pack(pady=5)
         fieldEntry.insert(0, "field_name") #inserting placeholder text so user knows which is which
-        fieldTypeEntry = tk.Entry(editWin)
+        fieldTypeEntry = tk.Entry(contentFRM)
         fieldTypeEntry.pack(pady=5)
         fieldTypeEntry.insert(0, "field_type")
-        addFieldBTN = tk.Button(editWin, text="Add Field", command=addFieldHandler)
+        addFieldBTN = tk.Button(contentFRM, text="Add Field", command=addFieldHandler)
         addFieldBTN.pack(pady=5)
 
-        tk.Label(editWin, text="Remove Field: (name)").pack(pady=5)
-        fieldRemoveEntry = tk.Entry(editWin)
+        tk.Label(contentFRM, text="Remove Field: (name)").pack(pady=5)
+        fieldRemoveEntry = tk.Entry(contentFRM)
         fieldRemoveEntry.pack(pady=5)
         fieldRemoveEntry.insert(0, "field_name")
-        removeFieldBTN = tk.Button(editWin, text="Remove Field", command=removeFieldHandler)
+        removeFieldBTN = tk.Button(contentFRM, text="Remove Field", command=removeFieldHandler)
         removeFieldBTN.pack(pady=5)
 
-        tk.Label(editWin, text="Rename Field: (old name and new name)").pack(pady=5)
-        fieldRenameOldEntry = tk.Entry(editWin)
+        tk.Label(contentFRM, text="Rename Field: (old name and new name)").pack(pady=5)
+        fieldRenameOldEntry = tk.Entry(contentFRM)
         fieldRenameOldEntry.pack(pady=5)
         fieldRenameOldEntry.insert(0, "old_field_name")
-        fieldRenameNewEntry = tk.Entry(editWin)
+        fieldRenameNewEntry = tk.Entry(contentFRM)
         fieldRenameNewEntry.pack(pady=5)
         fieldRenameNewEntry.insert(0, "new_field_name")
-        renameFieldBTN = tk.Button(editWin, text="Rename Field", command=renameFieldHandler)
+        renameFieldBTN = tk.Button(contentFRM, text="Rename Field", command=renameFieldHandler)
         renameFieldBTN.pack(pady=5)
 
         #methods sect
-        tk.Label(editWin, text="Add Method: (name and parameters)").pack(pady=5)
-        methodEntry = tk.Entry(editWin)
+        tk.Label(contentFRM, text="Add Method: (name and parameters)").pack(pady=5)
+        methodEntry = tk.Entry(contentFRM)
         methodEntry.pack(pady=5)
         methodEntry.insert(0, "method_name")
-        paramEntry = tk.Entry(editWin)
+        paramEntry = tk.Entry(contentFRM)
         paramEntry.pack(pady=5)
         paramEntry.insert(0, "param1: type1, param2: type2") #worked hard on this
-        addMethodBTN = tk.Button(editWin, text="Add Method", command=addMethodHandler)
+        addMethodBTN = tk.Button(contentFRM, text="Add Method", command=addMethodHandler)
         addMethodBTN.pack(pady=5)
 
-        tk.Label(editWin, text="Remove Method: (name)").pack(pady=5)
-        methodRemoveEntry = tk.Entry(editWin)
+        tk.Label(contentFRM, text="Remove Method: (name)").pack(pady=5)
+        methodRemoveEntry = tk.Entry(contentFRM)
         methodRemoveEntry.pack(pady=5)
         methodRemoveEntry.insert(0, "method_name")
-        removeMethodBTN = tk.Button(editWin, text="Remove Method", command=removeMethodHandler)
+        removeMethodBTN = tk.Button(contentFRM, text="Remove Method", command=removeMethodHandler)
         removeMethodBTN.pack(pady=5)
 
         #parameters section...scuffed but will do
-        tk.Label(editWin, text="Add Parameter to Method: (method, parameter name, type)").pack(pady=5)
-        addParamMethodEntry = tk.Entry(editWin)
+        tk.Label(contentFRM, text="Add Parameter to Method: (method, parameter name, type)").pack(pady=5)
+        addParamMethodEntry = tk.Entry(contentFRM)
         addParamMethodEntry.pack(pady=5)
         addParamMethodEntry.insert(0, "method_name") #more placeholder text to autofill.
-        addParamNameEntry = tk.Entry(editWin)
+        addParamNameEntry = tk.Entry(contentFRM)
         addParamNameEntry.pack(pady=5)
         addParamNameEntry.insert(0, "param_name")
-        addParamTypeENT = tk.Entry(editWin)
+        addParamTypeENT = tk.Entry(contentFRM)
         addParamTypeENT.pack(pady=5)
         addParamTypeENT.insert(0, "param_type")
-        addParamBTN = tk.Button(editWin, text="Add Parameter", command=addParameterHandler) #call my new handler
+        addParamBTN = tk.Button(contentFRM, text="Add Parameter", command=addParameterHandler) #call my new handler
         addParamBTN.pack(pady=5)
 
         #new addition. actually being able to remove parameters
-        tk.Label(editWin, text="Remove Parameter from Method: (method, parameter name)").pack(pady=5) #labels
-        removeParamMethodEntry = tk.Entry(editWin)
+        tk.Label(contentFRM, text="Remove Parameter from Method: (method, parameter name)").pack(pady=5) #labels
+        removeParamMethodEntry = tk.Entry(contentFRM)
         removeParamMethodEntry.pack(pady=5)
         removeParamMethodEntry.insert(0, "method_name")
-        removeParamNameEntry = tk.Entry(editWin)
+        removeParamNameEntry = tk.Entry(contentFRM)
         removeParamNameEntry.pack(pady=5)
         removeParamNameEntry.insert(0, "param_name")
-        removeParamBTN = tk.Button(editWin, text="Remove Parameter", command=removeParameterHandler)
+        removeParamBTN = tk.Button(contentFRM, text="Remove Parameter", command=removeParameterHandler)
         removeParamBTN.pack(pady=5)
 
     def listClasses(self):
