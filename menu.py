@@ -380,8 +380,7 @@ def menuCLI():
             
 
         #CHANGE FIELD TYPE
-            '''
-            elif (choice == "changefieldtype"):
+        elif (choice == "changefieldtype"):
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
 
@@ -402,11 +401,10 @@ def menuCLI():
             newFieldType= clean(input())
                
             if(controllerChangeFieldType(className, fieldName, newFieldType)):
-                print(Fore.GREEN + "Successfully changed filed type for " + className + " to new type " + newFieldType)
+                print(Fore.GREEN + "Successfully changed field type for " + fieldName + " to new type " + newFieldType)
             else:
                 print(Fore.RED + "An error has occured")
 
-            '''
         #RELATIONSHIPS
 
         #ADD RELATIONSHIP
