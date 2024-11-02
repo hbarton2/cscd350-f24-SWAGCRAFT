@@ -138,7 +138,8 @@ def addParameter(class_name, method_name, new_param_name, new_param_type, overlo
     method_name (str): The name of the method to add the parameter to.
     new_param_name (str): The name of the new parameter.
     new_param_type (str): The type of the new parameter.
-    overload_index (int, optional): The index of the overloaded method to add the parameter to (default is None, which adds the parameter to all overloads).
+    overload_index (int, optional): The index of the overloaded method to add the parameter to 
+                                    (default is None, which adds the parameter to the 0th overload).
 
     Returns:
     bool: True if the parameter was added successfully, False otherwise.
@@ -158,19 +159,27 @@ def addParameter(class_name, method_name, new_param_name, new_param_type, overlo
     # Get overloaded_methods
     overloaded_methods = methods[method_name]
 
-    # Determine the method to modify
+    # Set overload_index to 0 if None
     if overload_index is None:
-        methods_to_modify = overloaded_methods
-    else:
-        methods_to_modify = [overloaded_methods[overload_index]]
+        overload_index = 0
 
-    # Add the params to the method(s)
-    for params in methods_to_modify:
-        if new_param_name in params:
-            return False
-        params.append(f"{new_param_name}: {new_param_type}")
+    # Check if the overload_index is valid
+    if overload_index < 0 or overload_index >= len(overloaded_methods):
+        return False
+    
+    print("Overlaoded methods: ", overloaded_methods)
+    print("Overlaoded index: ", overload_index)
+    print("The one your looking for: ", overloaded_methods[overload_index])
+
+
+    # Modify only the specified overload
+    params = overloaded_methods[overload_index]
+    if new_param_name in params:
+        return False  # Parameter already exists in this overload
+    params.append(f"{new_param_type} {new_param_name}")
 
     return True
+
 
 
 def removeParameter(class_name, method_name, param_name, overload_index=None):
