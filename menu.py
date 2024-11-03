@@ -305,11 +305,11 @@ def menuCLI():
         
         #CHANGE METHOD TYPE
         elif (choice == "changemethodtype"):
-            return ("change method type in progress")
+            print("change method type in progress")
         
 
         #PARAMETERS
-        
+
         #ADD PARAMETER
         elif (choice == "addparameter"):
             # Get and validate class name
@@ -530,7 +530,7 @@ def menuCLI():
 
          #CHANGE PARAM TYPE
         elif (choice == "changeparamtype"):
-            return ("change param type in progress")
+            print("change param type in progress")
         
         #FIELDS
 
