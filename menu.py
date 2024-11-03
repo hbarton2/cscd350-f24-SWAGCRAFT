@@ -613,11 +613,17 @@ def menuCLI():
 
         # Save the diagram to json
         elif (choice == "save"):
-            controllerSave()
+            filename = input(Fore.YELLOW + "Enter filename to save (press Enter for default 'data.json'): ").strip()
+            if not filename:
+                filename = "data.json"
+            controllerSave(filename)
 
         # Load a diagram 
         elif (choice == "load"):
-            controllerLoad()
+            filename = input(Fore.YELLOW + "Enter filename to load (press Enter for default 'data.json'): ").strip()
+            if not filename:
+                filename = "data.json"
+            controllerLoad(filename)
 
         #GENERAL 
 
