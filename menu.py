@@ -602,12 +602,12 @@ def menuCLI():
                 connections = relationships.get("connections", [])
                 if connections:
                     relationships_exist = True
-                    for associated_class in connections:
-                        print(f"Relationship: {Fore.MAGENTA + class_name} -> {Fore.MAGENTA + associated_class}")
+                    for assocClass, relationType in connections:
+                        print(f"Relationship: {Fore.MAGENTA + class_name} -> {Fore.MAGENTA + assocClass} {Fore.YELLOW + '(' + relationType})")
 
             if not relationships_exist:
                 print(Fore.RED + "No relationships available.")
-        
+
         #SAVE AND LOAD
         #WILL NEED TO BE UPDATED WITH INPUTS FOR UPDATED LOAD
 
