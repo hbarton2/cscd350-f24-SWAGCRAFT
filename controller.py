@@ -46,12 +46,12 @@ def controllerAddMethod(className, methodName, parameters):
     return addMethod(className, methodName, parameters)
 
 #Receives input from menu and calls method to rename a method then returns True or False
-def controllerRenameMethod(className, oldMethodName, newMethodName):
-    return renameMethod(className, oldMethodName, newMethodName)
+def controllerRenameMethod(className, oldMethodName, newMethodName, overload_index):
+    return renameMethod(className, oldMethodName, newMethodName, overload_index)
 
 #Receives input from menu and calls method to delete a method then returns True or False
-def controllerRemoveMethod(className, methodName):
-    return removeMethod(className, methodName)
+def controllerRemoveMethod(className, methodName, overloaded_index):
+    return removeMethod(className, methodName, overloaded_index)
 
 
 #PARAMETERS
@@ -62,11 +62,11 @@ def controllerAddParameter(class_name, method_name, new_param_name, new_param_ty
 
 #Receives input from menu and calls method to delete a parameter then returns True or False
 def controllerRemoveParameter(className, methodName, parameterName, overloaded_index):
-    return removeParameter(className, methodName, overloaded_index)
+    return removeParameter(className, methodName, parameterName, overloaded_index)
 
 #Receives input from menu and calls method to change a parameter then returns True or False
-def controllerChangeParameter(className, methodName, parameterName, parameterType, overload_index):
-    return changeParameter(className, methodName, parameterName, parameterType, overload_index)
+def controllerChangeParameter(className, methodName, oldParameterName, newParameterName, parameterType, overloadIndex):
+    return changeParameter(className, methodName, oldParameterName, newParameterName, parameterType, overloadIndex)
 
 #FIELDS
 
