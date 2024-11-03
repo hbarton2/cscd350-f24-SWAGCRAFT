@@ -189,7 +189,8 @@ def menuCLI():
                 continue
             
             # Display all available methods in the class
-            class_info = diagram[className]
+            diagramCopy = controllerCopyData()
+            class_info = diagramCopy[className]
             if 'Methods' in class_info and class_info['Methods']:
                 print(Fore.CYAN + "\nAvailable methods in class " + className + ":")
                 # Handle both normal and overloaded methods
@@ -251,6 +252,7 @@ def menuCLI():
 
         #DELETE METHOD
         elif (choice == "deletemethod"):
+            diagramCopy = controllerCopyData()
             # Get and validate class name
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
@@ -264,8 +266,8 @@ def menuCLI():
             methodName = str(input()).strip()
             
             # Handle method deletion with special handling for overloaded methods
-            if className in diagram and 'Methods' in diagram[className] and methodName in diagram[className]['Methods']:
-                method_versions = diagram[className]['Methods'][methodName]
+            if className in diagramCopy and 'Methods' in diagramCopy[className] and methodName in diagramCopy[className]['Methods']:
+                method_versions = diagramCopy[className]['Methods'][methodName]
                 if len(method_versions) > 1:
                     # Display all overloaded versions of the method
                     print(Fore.YELLOW + "\nThis method is overloaded. Found " + str(len(method_versions)) + " versions:")
@@ -316,7 +318,8 @@ def menuCLI():
                 continue
 
             # Handle overloaded methods
-            class_info = diagram[className]
+            diagramCopy = controllerCopyData()
+            class_info = diagramCopy[className]
             overload_index = 0
             if len(class_info['Methods'][methodName]) > 1:
                 # Display all overloaded versions
@@ -434,7 +437,8 @@ def menuCLI():
                 continue
 
             # Get method details and validate parameters exist
-            class_info = diagram[className]
+            diagramCopy = controllerCopyData()
+            class_info = diagramCopy[className]
             method_overloads = class_info['Methods'].get(methodName, [])
             
             if not method_overloads:
