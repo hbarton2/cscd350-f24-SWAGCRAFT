@@ -829,11 +829,42 @@ def menuCLI():
 
         # Save the diagram to json
         elif (choice == "save"):
-            controllerSave()
+            filename = input(Fore.YELLOW + "Enter filename to save (press Enter for default 'data.json'): ").strip()
+            if not filename:
+                filename = "data.json"
+            if not controllerSave(filename):
+                print(Fore.GREEN + "UML Saved Successfully!")
+            else:
+                print(Fore.RED + "File not Found!")
 
         # Load a diagram 
         elif (choice == "load"):
-            controllerLoad()
+            while True:
+                response = input(Fore.YELLOW + "Do you want to save before you load? (Yes/No): ").strip().lower()
+                
+                if response == "yes":
+                    filename = input(Fore.YELLOW + "Enter filename to save (press Enter for default 'data.json'): ").strip()
+                    if not filename:
+                        filename = "data.json"
+                    
+                    if not controllerSave(filename):
+                        print(Fore.GREEN + "UML Saved Successfully!")
+                    else:
+                        print(Fore.RED + "File not Found!")
+
+                    response = "no"
+                
+                # Check the response to decide whether to continue the loop
+                if response.lower() != "yes":
+                    break
+
+            filename = input(Fore.YELLOW + "Enter filename to load (press Enter for default 'data.json'): ").strip()
+            if not filename:
+                filename = "data.json"
+            if not controllerLoad(filename):
+                print(Fore.GREEN + "UML Saved Successfully!")
+            else:
+                print(Fore.RED + "File not Found!")
 
         #GENERAL 
 

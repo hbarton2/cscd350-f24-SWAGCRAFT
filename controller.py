@@ -114,8 +114,8 @@ def controllerCopyData():
 #WILL NEED TO BE UPDATED WITH INPUTS FOR UPDATED LOAD
 
 
-def controllerSave():
-    save()
+def controllerSave(filename):
+    save(filename)
 
-def controllerLoad():
-    load()
+def controllerLoad(filename):
+    load(filename)
