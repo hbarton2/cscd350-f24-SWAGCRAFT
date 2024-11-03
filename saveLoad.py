@@ -3,6 +3,8 @@
 import json
 from diagram import diagram
 def save(filename="data.json"):
+    if not filename.endswith(".json"):
+        filename += ".json"  # Append .json if missing
     try:
         with open(filename, "w") as file:
             json.dump(diagram, file, indent=4)
@@ -12,6 +14,8 @@ def save(filename="data.json"):
 
 def load(filename="data.json"):
     global diagram
+    if not filename.endswith(".json"):
+        filename += ".json"  # Append .json if missing
     try:
         with open(filename, "r") as file:
             diagram.clear()  # Clear the existing diagram
