@@ -364,7 +364,8 @@ def menuCLI():
                 continue
 
             # Get method details and validate parameters exist
-            class_info = diagram[className]
+            diagramCopy = controllerCopyData()
+            class_info = diagramCopy[className]
             method_overloads = class_info['Methods'].get(methodName, [])
             
             if not method_overloads:
