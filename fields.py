@@ -113,7 +113,7 @@ def renameField(class_name, old_field_name, new_field_name):
     return True
     
     
-def changeType(class_name, field_name, new_type):
+def changeFieldType(class_name, field_name, new_type):
     '''
     Changes the data type of an existing field in a specified class.
 
@@ -126,10 +126,10 @@ def changeType(class_name, field_name, new_type):
         bool: True if the field type is changed successfully, False otherwise.
     '''
 
-    
+    '''
     if new_type not in FIELD_TYPES:
         return False  
-    
+    '''
    
     if class_name not in diagram:
         return False  

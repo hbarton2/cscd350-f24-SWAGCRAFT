@@ -19,7 +19,7 @@ def printCommands():
     print(Fore.CYAN + "=" * 55)
     print(Fore.MAGENTA + " |     Class Commands    |     Method Commands       |")
     print(Fore.CYAN + "-+-----------------------+---------------------------+")
-    print(Fore.MAGENTA + " | Add class             | Add Method                |")
+    print(Fore.MAGENTA + " | Add Class             | Add Method                |")
     print(Fore.MAGENTA + " | Rename Class          | Rename Method             |")
     print(Fore.MAGENTA + " | Delete Class          | Delete Method             |")
     print(Fore.CYAN + "-+-----------------------+---------------------------+")
@@ -28,6 +28,7 @@ def printCommands():
     print(Fore.MAGENTA + " | Add Field             | Add Parameter             |")
     print(Fore.MAGENTA + " | Rename Field          | Rename Parameter          |")
     print(Fore.MAGENTA + " | Delete Field          | Remove Parameter          |")
+    print(Fore.MAGENTA + " | Change Field Type     |                           |")
     print(Fore.CYAN + "-+-----------------------+---------------------------+")
     print(Fore.MAGENTA + " | Relationship Commands |       Other Commands      |")
     print(Fore.CYAN + " +-----------------------+---------------------------+")
@@ -62,9 +63,11 @@ How to Use the CLI Application:""")
 - Add Field           |   : Add a field to the current class.
 - Rename Field        |   : Rename a field. 
 - Delete Field        |   : Delete a field from the current class.
+- Change Field Type   |   : Change the type category of a field
 - Add Relationship    |   : Create a relationship between classes.
 - Delete Relationship |   : Remove a relationship between classes.
 - Show Relationships  |   : Show the relationships between all classes.
+- Change Relation Type|   : Change a relationship type between two classes.          
 - Save                |   : Save the diagram.
 - Load                |   : Load the diagram.
 - Help                |   : Display this help menu.
@@ -144,9 +147,11 @@ def menuCLI():
             print(Fore.YELLOW + "Input the method name: ")
             methodName = str(input()).strip()
             
+            print(Fore.YELLOW + "Input the parameter name: ")
+            parameterName = str(input()).strip()
             #Attempts to add a method. True returns success message, False returns error message
-            if(controllerAddMethod(className, methodName)):
-                print(Fore.GREEN + "Successfully created method " + methodName)
+            if(controllerAddMethod(className, methodName, parameterName)):
+                print(Fore.GREEN + "Successfully created method " + methodName + " with parameter " + parameterName)
             else:
                 print(Fore.RED + "An error has occured")                
         
@@ -336,7 +341,7 @@ def menuCLI():
             oldFieldName = str(input()).strip()
 
             #Checks user input for field exists
-            if(controllerFieldExists(oldFieldName)== False):
+            if(controllerFieldExists(className, oldFieldName)== False):
                 print(Fore.RED + "Filed " + oldFieldName + " isn't in diagram")
                 continue
 
@@ -364,7 +369,7 @@ def menuCLI():
             fieldName = str(input()).strip()
 
             #Checks user input for field exists
-            if(controllerFieldExists(fieldName)== False):
+            if(controllerFieldExists(className,fieldName)== False):
                 print(Fore.RED + "Filed " + fieldName + " isn't in diagram")
                 continue
 
@@ -373,9 +378,32 @@ def menuCLI():
             else:
                 print(Fore.RED + "An error has occured")
             
-        #ADD TYPE (FIELD)
 
-        #CHANGE TYPE (FIELD)
+        #CHANGE FIELD TYPE
+        elif (choice == "changefieldtype"):
+            print(Fore.YELLOW + "Input the class name: ")
+            className = str(input()).strip()
+
+            #Checks user input for class exists
+            if(controllerClassExists(className)== False):
+                print(Fore.RED + "Class " + className + " isn't in diagram")
+                continue
+
+            print(Fore.YELLOW + "Input the field name: ")
+            fieldName = clean(input())
+
+            #Checks user input for field exists
+            if(controllerFieldExists(className,fieldName)== False):
+                print(Fore.RED + "Filed " + fieldName + " isn't in diagram")
+                continue
+
+            print(Fore.YELLOW + "Input the new field type: ")
+            newFieldType= clean(input())
+               
+            if(controllerChangeFieldType(className, fieldName, newFieldType)):
+                print(Fore.GREEN + "Successfully changed field type for " + fieldName + " to new type " + newFieldType)
+            else:
+                print(Fore.RED + "An error has occured")
 
         #RELATIONSHIPS
 
