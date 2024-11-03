@@ -138,7 +138,8 @@ def addParameter(class_name, method_name, new_param_name, new_param_type, overlo
     method_name (str): The name of the method to add the parameter to.
     new_param_name (str): The name of the new parameter.
     new_param_type (str): The type of the new parameter.
-    overload_index (int, optional): The index of the overloaded method to add the parameter to (default is None, which adds the parameter to all overloads).
+    overload_index (int, optional): The index of the overloaded method to add the parameter to 
+                                    (default is None, which adds the parameter to the 0th overload).
 
     Returns:
     bool: True if the parameter was added successfully, False otherwise.
@@ -158,67 +159,78 @@ def addParameter(class_name, method_name, new_param_name, new_param_type, overlo
     # Get overloaded_methods
     overloaded_methods = methods[method_name]
 
-    # Determine the method to modify
+    # Set overload_index to 0 if None
     if overload_index is None:
-        methods_to_modify = overloaded_methods
-    else:
-        methods_to_modify = [overloaded_methods[overload_index]]
+        overload_index = 0
 
-    # Add the params to the method(s)
-    for params in methods_to_modify:
-        if new_param_name in params:
-            return False
-        params.append(f"{new_param_name}: {new_param_type}")
+    # Check if the overload_index is valid
+    if overload_index < 0 or overload_index >= len(overloaded_methods):
+        return False
+
+    # Modify only the specified overload
+    params = overloaded_methods[overload_index]
+    if new_param_name in params:
+        return False  # Parameter already exists in this overload
+    params.append(f"{new_param_type} {new_param_name}")
 
     return True
+
 
 
 def removeParameter(class_name, method_name, param_name, overload_index=None):
     """
     Remove a parameter from a method in a class in the diagram.
+    If the method is overloaded, only modifies the specified overloaded method.
+    If no overload_index is provided and the method is overloaded, returns False.
 
     Parameters:
     class_name (str): The name of the class that contains the method.
     method_name (str): The name of the method to remove the parameter from.
     param_name (str): The name of the parameter to remove.
-    overload_index (int, optional): The index of the overloaded method to remove the parameter from (default is None, which removes the parameter from all overloads).
+    overload_index (int, optional): The index of the overloaded method to remove the parameter from.
 
     Returns:
     bool: True if the parameter was removed successfully, False otherwise.
     """
-    # Check if class_name not in diagram
+        # Check if class exists
     if class_name not in diagram:
         return False
 
-    # Get class_info
+    # Get class info
     class_info = diagram[class_name]
     if 'Methods' not in class_info or method_name not in class_info['Methods']:
         return False
 
     # Get methods
     methods = class_info['Methods']
-
-    # Get overloaded methods
     overloaded_methods = methods[method_name]
 
-    # Determine the method to modify
-    if overload_index is None:
-        methods_to_modify = overloaded_methods
+    # If method is overloaded but no index provided, return False
+    if len(overloaded_methods) > 1 and overload_index is None:
+        return False
+
+    # If overload_index is provided, validate it
+    if overload_index is not None:
+        if overload_index < 0 or overload_index >= len(overloaded_methods):
+            return False
+        method_index = overload_index
     else:
-        methods_to_modify = [overloaded_methods[overload_index]]
+        method_index = 0
 
-    # Remove the parameter
-    for params in methods_to_modify:
-        for i, param in enumerate(params):
-            if param.split(':')[0].strip() == param_name:
-                params[i] = None
-                del params[i]
-                return True
+    # Get parameters for the specific method
+    params = overloaded_methods[method_index]
+    
+    # Find and remove the parameter by name
+    removed = False  # Track if any parameter was removed
+    for p in params[:]:  # Create a copy for safe removal during iteration
+        param_name_only = p.split(" ")[1].strip()  # Extract just the parameter name (before any type annotation)
+        if param_name_only == param_name:
+            params.remove(p)
+            removed = True
 
-    return False
+    return removed  # Return True if a parameter was removed, False otherwise
 
-
-def changeParameter(class_name, method_name, overload_index, param_index, new_name, new_type):
+def changeParameter(className, methodName, oldParameterName, newParameterName, parameterType, overloadIndex):
     """
     Change the name and type of a parameter in a method in a class in the diagram.
 
@@ -233,24 +245,30 @@ def changeParameter(class_name, method_name, overload_index, param_index, new_na
     Returns:
     bool: True if the parameter was changed successfully, False otherwise.
     """
-    if class_name not in diagram:
+    # Validate inputs exist in diagram
+    if className not in diagram:
         return False
-    
-    class_info = diagram[class_name]
-    if 'Methods' not in class_info or method_name not in class_info['Methods']:
+    if 'Methods' not in diagram[className]:
         return False
+    if methodName not in diagram[className]['Methods']:
+        return False
+        
+    method_overloads = diagram[className]['Methods'][methodName]
+    if overloadIndex >= len(method_overloads):
+        return False
+
+    # Get the parameters for the specific overload
+    parameters = method_overloads[overloadIndex]
     
-    methods = class_info['Methods']
-    overloaded_methods = methods[method_name]
-    
-    # Determine the method to modify
-    if 0 <= overload_index < len(overloaded_methods):
-        current_params = overloaded_methods[overload_index]
-        if 0 <= param_index < len(current_params):
-            current_params[param_index] = f"{new_name}: {new_type}"
-            methods[method_name][overload_index] = current_params
+    # Find and replace the parameter
+    for i, param in enumerate(parameters):
+        param_parts = param.split()
+        if len(param_parts) >= 2 and param_parts[-1] == oldParameterName:
+            # Create new parameter string with same type but new name
+            new_param = f"{parameterType} {newParameterName}"
+            parameters[i] = new_param
             return True
-    
+            
     return False
 
 def changeAllParameters(class_name, method_name, overload_index, new_names, new_types):
