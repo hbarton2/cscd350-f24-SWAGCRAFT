@@ -113,3 +113,41 @@ def renameField(class_name, old_field_name, new_field_name):
     return True
     
     
+def changeFieldType(class_name, field_name, new_type):
+    '''
+    Changes the data type of an existing field in a specified class.
+
+    Parameters:
+        class_name (STR): The name of the class containing the field.
+        field_name (STR): The name of the field whose type will be changed.
+        new_type (STR): The new data type for the field.
+
+    Returns:
+        bool: True if the field type is changed successfully, False otherwise.
+    '''
+
+    '''
+    if new_type not in FIELD_TYPES:
+        return False  
+    '''
+   
+    if class_name not in diagram:
+        return False  
+    
+    
+    class_info = diagram[class_name]
+
+    
+    if 'Fields' not in class_info:
+        return False  
+    
+    
+    fields = class_info['Fields']
+
+    
+    if field_name not in fields:
+        return False 
+    
+    
+    fields[field_name] = new_type
+    return True  

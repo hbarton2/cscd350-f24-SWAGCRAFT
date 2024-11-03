@@ -82,7 +82,12 @@ def controllerRenameField(className, oldFieldName, newFieldName):
 def controllerRemoveField(className, fieldName):
     return removeField(className, fieldName)
 
-#RELATIONSHIPS #Will have to add method to change type and update to include types
+#Receives input from menu and calls method to change field type then returns True or False
+def controllerChangeFieldType(className, fieldName, newFieldType):
+    return changeFieldType(className, fieldName, newFieldType)
+
+
+#RELATIONSHIPS
 
 #Receives input from menu and calls method to add a relationship then returns True or False
 def controllerAddRelationship(className1, className2, relationshipType):
