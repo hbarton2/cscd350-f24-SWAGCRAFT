@@ -6,6 +6,7 @@ from controller import addClass, renameClass, deleteClass
 from controller import addField, removeField, renameField
 from controller import addMethod, removeMethod, renameMethod, addParameter, removeParameter, changeParameter
 from controller import addRelationship, deleteRelationship
+from controller import save, load
 
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")  #blue is my favorite colon -cn
@@ -64,7 +65,7 @@ class UMLApp(ctk.CTk):
         overallDiagramBTN.pack(padx=10, pady=5)
         
         #save and load button (no functionality attached yet. gonna chat with adrian)
-        saveLoadBTN = ctk.CTkButton(tboxFRAME, text="Save/Load")  #placeholder
+        saveLoadBTN = ctk.CTkButton(tboxFRAME, text="Save/Load", command=self.saveLoad)  #no longer a placeholder ;)
         saveLoadBTN.pack(padx=10, pady=5)
 
     def deleteRelationship(self):
@@ -502,6 +503,49 @@ class UMLApp(ctk.CTk):
 
         diagramText.insert(tk.END, f"{self.diagram}")
         diagramText.config(state=tk.DISABLED)
+
+    def saveLoad(self):
+        #create a new dialog for save/load actions
+        dialogWin = tk.Toplevel(self)
+        dialogWin.title("Save or Load Diagram")
+        dialogWin.geometry("400x200")
+
+        #entry field for the file name. All this drive to use customtkinter and I've been neglecting to use it for parts
+        fileLbl = ctk.CTkLabel(dialogWin, text="Enter file name (optional):", text_color="black")
+        fileLbl.pack(pady=5)
+
+        fileEntry = ctk.CTkEntry(dialogWin)
+        fileEntry.pack(pady=5)
+
+        #handler for save action
+        def saveHandler():
+            fileName = fileEntry.get().strip() or "data.json"  #default to data.json if empty
+            if save(fileName):  #call save function
+                self.statLabel.configure(text=f"Status: The diagram was saved as '{fileName}'")
+            else:
+                self.statLabel.configure(text="Status: Error when saving diagram")
+            dialogWin.destroy()  #close the dialog
+
+        #handler for load action
+        def loadHandler():
+            fileName = fileEntry.get().strip() or "data.json"  #default to data.json if empty
+
+            if load(fileName):  #call load function
+                self.drawDiagram()  #update GUI with loaded data
+                self.statLabel.configure(text=f"Status: Diagram loaded from '{fileName}'")
+            else:
+                self.statLabel.configure(text="Status: Error loading diagram")
+            dialogWin.destroy()  #close the dialog. I am become death. Destroyer of worlds
+
+        #buttons for save load and cancel
+        saveBtn = ctk.CTkButton(dialogWin, text="Save", command=saveHandler)
+        saveBtn.pack(pady=5)
+
+        loadBtn = ctk.CTkButton(dialogWin, text="Load", command=loadHandler)
+        loadBtn.pack(pady=5)
+
+        cancelBtn = ctk.CTkButton(dialogWin, text="Cancel", command=dialogWin.destroy)
+        cancelBtn.pack(pady=5)
 
 
 def startGUI():
