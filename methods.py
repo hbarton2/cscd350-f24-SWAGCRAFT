@@ -134,12 +134,12 @@ def addParameter(class_name, method_name, param_type, param_name, overload_index
     class_info = diagram[class_name]
     if 'Methods' not in class_info or method_name not in class_info['Methods']:
         return False
-    
-    if overload_index is None:
-        overload_index = 0
 
     methods = class_info['Methods']
     overloaded_methods = methods[method_name]
+
+    if overload_index is None:
+        overload_index = 0
 
     if overload_index < 0 or overload_index >= len(overloaded_methods):
         return False
@@ -152,6 +152,7 @@ def addParameter(class_name, method_name, param_type, param_name, overload_index
 
     method_info["parameters"].append(new_param)
     return True
+
 
 def removeParameter(class_name, method_name, param_name, overload_index=None):
     """

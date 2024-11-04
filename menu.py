@@ -328,7 +328,9 @@ def menuCLI():
                 # Display all overloaded versions
                 print(Fore.YELLOW + "\nThis method has multiple overloads:")
                 for idx, params in enumerate(class_info['Methods'][methodName]):
-                    print(f"{idx}: {params['return_type']} {methodName}({', '.join(params['parameters'])})")
+                    params_str = ', '.join(params['parameters'])
+                    return_type = params['return_type']
+                    print(f"{idx}: {return_type} {methodName}({params_str})")
 
                 # Let user select which overload to modify
                 print(Fore.YELLOW + "\nEnter the overload index to modify: ")
@@ -346,10 +348,11 @@ def menuCLI():
             parameterType = str(input()).strip()
 
             # Add parameter and provide feedback
-            if(controllerAddParameter(className, methodName, parameterName, parameterType, overload_index)):
+            if(controllerAddParameter(className, methodName, parameterType, parameterName, overload_index)):
                 print(Fore.GREEN + "Successfully added parameter " + parameterName + " with type " + parameterType)
             else:
                 print(Fore.RED + "An error has occurred")
+
 
         # REMOVE PARAMETER
         elif choice == "removeparameter":
