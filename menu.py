@@ -22,13 +22,14 @@ def printCommands():
     print(Fore.MAGENTA + " | Add Class             | Add Method                |")
     print(Fore.MAGENTA + " | Rename Class          | Rename Method             |")
     print(Fore.MAGENTA + " | Delete Class          | Delete Method             |")
+    print(Fore.MAGENTA + " |                       | Change Method Type        |")
     print(Fore.CYAN + "-+-----------------------+---------------------------+")
     print(Fore.MAGENTA + " |   Field Commands      |     Parameter Commands    |")
     print(Fore.CYAN + "-+-----------------------+---------------------------+")
     print(Fore.MAGENTA + " | Add Field             | Add Parameter             |")
     print(Fore.MAGENTA + " | Rename Field          | Rename Parameter          |")
     print(Fore.MAGENTA + " | Delete Field          | Remove Parameter          |")
-    print(Fore.MAGENTA + " | Change Field Type     |                           |")
+    print(Fore.MAGENTA + " | Change Field Type     | Change Param Type         |")
     print(Fore.CYAN + "-+-----------------------+---------------------------+")
     print(Fore.MAGENTA + " | Relationship Commands |       Other Commands      |")
     print(Fore.CYAN + " +-----------------------+---------------------------+")
@@ -57,9 +58,11 @@ How to Use the CLI Application:""")
 - Add Method          |   : Add a method to the current class. 
 - Rename Method       |   : Rename a method. 
 - Delete Method       |   : Delete a method from the current class.
+- Change Method Type  |   : Change method return type          
 - Add a Parameter     |   : Add a parameter to a method.
 - Remove a Parameter  |   : Remove a parameter from a method.
 - Rename a Parameter  |   : Rename a parameter belonging to an existing method.
+- Change Param Type   |   : Change parameter type
 - Add Field           |   : Add a field to the current class.
 - Rename Field        |   : Rename a field. 
 - Delete Field        |   : Delete a field from the current class.
@@ -291,7 +294,15 @@ def menuCLI():
             else:
                 print(Fore.RED + "Method " + methodName + " isn't in diagram")
 
-        # ADD PARAMETER
+        
+        #CHANGE METHOD TYPE
+        elif (choice == "changemethodtype"):
+            print("change method type in progress")
+        
+
+        #PARAMETERS
+
+        #ADD PARAMETER
         elif (choice == "addparameter"):
             # Get and validate class name
             print(Fore.YELLOW + "Input the class name: ")
@@ -595,7 +606,9 @@ def menuCLI():
             if(controllerChangeParameterType(className, methodName, oldParameterName, parameter_type, overload_index)):
                 print(Fore.GREEN + f"Successfully changed parameter type for {oldParameterName}")
             else:
-                print(Fore.RED + "An error occurred while changing the parameter type")
+                print(Fore.RED + "An error occurred while renaming the parameter")
+        
+        #FIELDS
 
         # ADD FIELD
         elif (choice == "addfield"):
