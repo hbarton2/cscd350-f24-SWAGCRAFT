@@ -63,7 +63,7 @@ class UMLApp(ctk.CTk):
         #overall diagram button
         overallDiagramBTN = ctk.CTkButton(tboxFRAME, text="Overall Diagram", command=self.showOverallDiagram)
         overallDiagramBTN.pack(padx=10, pady=5)
-        
+
         #save and load button (no functionality attached yet. gonna chat with adrian)
         saveLoadBTN = ctk.CTkButton(tboxFRAME, text="Save/Load", command=self.saveLoad)  #no longer a placeholder ;)
         saveLoadBTN.pack(padx=10, pady=5)
@@ -129,7 +129,7 @@ class UMLApp(ctk.CTk):
         yOffST = 50
         xSpacing = maxWidth + 50  #base it on the widest class
         ySpacing = 150
-        maxRowWDTH = 3
+        maxRowWDTH = 2 #rechange for now
 
         for idx, (className, classData) in enumerate(self.diagram.items()):#took too much effort but it looks amazing
             x = xOffST + (idx % maxRowWDTH) * xSpacing
@@ -151,7 +151,8 @@ class UMLApp(ctk.CTk):
 
     def calculateClassDimensions(self, className, classData):
         width = 150  #minimum width
-        height = 40 + len(classData.get("Fields", {})) * 15 + len(classData.get("Methods", {})) * 20
+        methodCount = sum(len(overloads) for overloads in classData.get("Methods", {}).values()) #killed me
+        height = 40 + len(classData.get("Fields", {})) * 15 + methodCount * 20
 
         #calculate width based on text length to prevent overflow
         classNameLength = len(className)
@@ -161,7 +162,7 @@ class UMLApp(ctk.CTk):
 
         #calc max length of each method line
         methodLen = [  #calc max length of each method line
-            len(f"+{methodName}({', '.join(params)})") #join em
+            len(f"+{methodName}({', '.join(params['parameters'])}): {params.get('return_type', 'void')}") #join em
             for methodName, methodDetails in classData.get("Methods", {}).items()
             for params in methodDetails
         ]
@@ -196,8 +197,9 @@ class UMLApp(ctk.CTk):
         if classData.get('Methods'):
             for methodName, methodDetails in classData['Methods'].items():
                 for params in methodDetails:
-                    paramStr = ', '.join(params)
-                    self.canvas.create_text((x0 + x1) // 2, yText, text=f"+{methodName}({paramStr})", font=("Arial", 10, "italic"))
+                    paramStr = ', '.join(params["parameters"])
+                    returnType = params.get("return_type", "void")
+                    self.canvas.create_text((x0 + x1) // 2, yText, text=f"+{methodName}({paramStr}): {returnType}", font=("Arial", 10, "italic"))
                     yText += 20
 
     def drawRelationship(self, className1, className2, relType):
@@ -336,12 +338,31 @@ class UMLApp(ctk.CTk):
         def addMethodHandler():
             methodName = methodEntry.get().strip()
             paramEntryGet = paramEntry.get().strip()
-            params = [param.strip() for param in paramEntryGet.split(',')] if paramEntryGet else []
-            if methodName:
-                addMethod(className, methodName, params)  #use addMethod from methods class
-                self.drawDiagram()
-                self.statLabel.configure(text=f"Status: Method '{methodName}' added to class '{className}'")
+            params = []
+            if paramEntryGet:
+                paramList = [param.strip() for param in paramEntryGet.split(',')]
+                for param in paramList:
+                    if ':' in param:
+                        paramName, paramType = param.split(':')
+                        paramName = paramName.strip()
+                        paramType = paramType.strip()
+                        params.append(f"{paramType} {paramName}")
+                    else:
+                        params.append(param.strip())
 
+            if methodName:
+                methodSig = {
+                    "parameters": params,
+                    "return_type": "void"  #default return typefor now. Later I will modify it to accept user input with edit class.
+                }
+                success = addMethod(className, methodName, methodSig) #use addMethod from methods class
+                if success:
+                    self.drawDiagram()
+                    self.statLabel.configure(text=f"Status: Method '{methodName}' added to class '{className}'")
+                else:
+                    self.statLabel.configure(text=f"Status: Method '{methodName}' already exists in class '{className}'")
+            else:
+                self.statLabel.configure(text="Status: Please provide a method name.")
 
         def removeMethodHandler():
             methodName = methodRemoveEntry.get().strip()
@@ -356,17 +377,27 @@ class UMLApp(ctk.CTk):
             paramType = addParamTypeENT.get().strip()
 
             if methodName and paramName and paramType:
-                addParameter(className, methodName, paramName, paramType)
-                self.drawDiagram()
-                self.statLabel.configure(text=f"Status: Parameter '{paramName}' added to method '{methodName}' in class '{className}'")
+                success = addParameter(className, methodName, paramType, paramName, overload_index=0)
+                if success:
+                    self.drawDiagram()
+                    self.statLabel.configure(text=f"Status: Parameter '{paramName}' added to method '{methodName}' in class '{className}'")
+                else:
+                    self.statLabel.configure(text=f"Status: Failed to add parameter '{paramName}' to method '{methodName}' in class '{className}'")
+            else:
+                self.statLabel.configure(text="Status: Please provide method name, parameter name, and parameter type.")
 
         def removeParameterHandler():
             methodName = removeParamMethodEntry.get().strip()
             paramName = removeParamNameEntry.get().strip()
             if methodName and paramName:
-                removeParameter(className, methodName, paramName)
-                self.drawDiagram()
-                self.statLabel.configure(text=f"Status: Parameter '{paramName}' removed from method '{methodName}' in class '{className}'")
+                success = removeParameter(className, methodName, paramName, overload_index=0)
+                if success:
+                    self.drawDiagram()
+                    self.statLabel.configure(text=f"Status: Parameter '{paramName}' removed from method '{methodName}' in class '{className}'")
+                else:
+                    self.statLabel.configure(text=f"Status: Failed to remove parameter '{paramName}' from method '{methodName}' in class '{className}'")
+            else:
+                self.statLabel.configure(text="Status: Please provide method name and parameter name.")
 
         #fields section
         tk.Label(editWin, text="Add Field: (name and type)").pack(pady=5)
