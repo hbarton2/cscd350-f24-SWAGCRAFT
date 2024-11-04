@@ -516,6 +516,105 @@ def menuCLI():
                 print(Fore.GREEN + f"Successfully renamed parameter {oldParameterName} to {newParameterName}")
             else:
                 print(Fore.RED + "An error occurred while renaming the parameter")
+
+        #CHANGE PARAMETER TYPE
+        elif (choice == "changeparamtype"):
+            # Get and validate class name
+            print(Fore.YELLOW + "Input the class name: ")
+            className = str(input()).strip()
+
+            if(controllerClassExists(className)== False):
+                print(Fore.RED + "Class " + className + " isn't in diagram")
+                continue
+
+            # Get and validate method name
+            print(Fore.YELLOW + "Input the method name: ")
+            methodName = str(input()).strip()
+
+            if(controllerMethodExists(className, methodName)== False):
+                print(Fore.RED + "Method " + methodName + " isn't in diagram")
+                continue
+
+            # Get method details and validate parameters exist
+            diagramCopy = controllerCopyData()
+            class_info = diagramCopy[className]
+            method_overloads = class_info['Methods'].get(methodName, [])
+            
+            if not method_overloads:
+                print(Fore.RED + "Method has no parameters")
+                continue
+
+            # Handle method overloads
+            overload_index = 0
+            if len(method_overloads) > 1:
+                # Display all overloaded versions
+                print(Fore.YELLOW + "\nThis method has multiple overloads:")
+                for idx, params in enumerate(method_overloads):
+                    print(f"{idx}: {methodName}({', '.join(params)})")
+                
+                # Let user select which overload to modify
+                print(Fore.YELLOW + "\nEnter the overload index to modify: ")
+                try:
+                    overload_index = int(input().strip())
+                    if not (0 <= overload_index < len(method_overloads)):
+                        print(Fore.RED + "Invalid overload index")
+                        continue
+                except ValueError:
+                    print(Fore.RED + "Invalid index - must be a number")
+                    continue
+
+            # Display current parameters for selected method/overload
+            parameters = method_overloads[overload_index]
+            if not parameters:
+                print(Fore.RED + "Selected method has no parameters")
+                continue
+
+            print(Fore.YELLOW + "\nCurrent parameters:")
+            for param in parameters:
+                param_parts = param.split()
+                if len(param_parts) >= 2:
+                    param_type = ' '.join(param_parts[:-1])  # Get parameter type
+                    param_name = param_parts[-1]  # Get parameter name
+                    print(f"{param_type} {param_name}")
+
+            # Get parameter to rename
+            print(Fore.YELLOW + "\nInput the parameter name to change the type of: ")
+            oldParameterName = str(input()).strip()
+
+            # Validate parameter exists
+            parameter_exists = False
+            parameter_type = None
+            for param in parameters:
+                param_parts = param.split()
+                if param_parts[-1] == oldParameterName:
+                    parameter_exists = True
+                    parameter_type = ' '.join(param_parts[:-1])
+                    break
+
+            if not parameter_exists:
+                print(Fore.RED + f"Parameter {oldParameterName} not found in method")
+                continue
+
+            # Get new parameter type
+            print(Fore.YELLOW + "Input the new parameter type: ")
+            parameter_type = str(input()).strip()
+
+            exists = False
+            # Validate new parameter name already exists
+            for param in parameters:
+                param_parts = param.split()
+                if param_parts[-1] == oldParameterName:
+                    exists = True
+                    continue
+            if not exists:
+                print(Fore.RED + f"Parameter {oldParameterName} does not exist in the method")
+                continue
+
+            # Call controller to rename parameter
+            if(controllerChangeParameterType(className, methodName, oldParameterName, parameter_type, overload_index)):
+                print(Fore.GREEN + f"Successfully renamed parameter {oldParameterName} to {oldParameterName}")
+            else:
+                print(Fore.RED + "An error occurred while renaming the parameter")
     
         
         #FIELDS
