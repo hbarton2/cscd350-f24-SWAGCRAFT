@@ -310,3 +310,56 @@ def changeAllParameters(class_name, method_name, overload_index, new_names, new_
     # Replace entire parameter list for the specified method/overload
     methods[method_name][overload_index] = new_params
     return True
+
+def changeParameterType(className, methodName, parameterName, newType, overloadIndex):
+    """
+    Change only the type of a parameter in a method.
+    
+    Parameters:
+    className (str): Name of the class containing the method
+    methodName (str): Name of the method containing the parameter
+    parameterName (str): Name of the parameter to modify
+    newType (str): New type for the parameter
+    overloadIndex (int): Index of the method overload to modify
+    
+    Returns:
+    bool: True if parameter type was changed successfully, False otherwise
+    """
+    # Input validation
+    if not all([className, methodName, parameterName, newType]):
+        return False
+        
+    # Verify class exists
+    if className not in diagram:
+        return False
+        
+    # Verify methods exist for class
+    if 'Methods' not in diagram[className]:
+        return False
+        
+    # Verify method exists
+    if methodName not in diagram[className]['Methods']:
+        return False
+        
+    # Get method overloads
+    method_overloads = diagram[className]['Methods'][methodName]
+    
+    # Verify overload index is valid
+    if not (0 <= overloadIndex < len(method_overloads)):
+        return False
+        
+    # Get parameters for specified overload
+    parameters = method_overloads[overloadIndex]
+    
+    # Find parameter to change
+    param_found = False
+    for i, param in enumerate(parameters):
+        param_parts = param.split()
+        if len(param_parts) >= 2 and param_parts[-1] == parameterName:
+            # Create new parameter string with new type but same name
+            parameters[i] = f"{newType} {parameterName}"
+            param_found = True
+            break
+            
+    # Return success/failure
+    return param_found

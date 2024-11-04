@@ -68,6 +68,10 @@ def controllerRemoveParameter(className, methodName, parameterName, overloaded_i
 def controllerChangeParameter(className, methodName, oldParameterName, newParameterName, parameterType, overloadIndex):
     return changeParameter(className, methodName, oldParameterName, newParameterName, parameterType, overloadIndex)
 
+def controllerChangeParameterType(className, methodName, parameterName, newType, overloadIndex):
+    return changeParameterType(className, methodName, parameterName, newType, overloadIndex)
+
+
 #FIELDS
 
 #Receives input from menu and calls method to add a field then returns True or False
