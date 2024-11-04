@@ -42,8 +42,8 @@ def controllerDeleteClass(unwantedClass):
 
 
 #Receives input from menu and calls method to add a method then returns True or False
-def controllerAddMethod(className, methodName, parameters):
-    return addMethod(className, methodName, parameters)
+def controllerAddMethod(class_name, method_name, method_signature):
+    return addMethod(class_name, method_name, method_signature)
 
 #Receives input from menu and calls method to rename a method then returns True or False
 def controllerRenameMethod(className, oldMethodName, newMethodName, overload_index):
@@ -57,8 +57,8 @@ def controllerRemoveMethod(className, methodName, overloaded_index):
 #PARAMETERS
 
 #Receives input from menu and calls method to add a parameter then returns True or False
-def controllerAddParameter(class_name, method_name, new_param_name, new_param_type, overload_index=None):
-    return addParameter(class_name, method_name, new_param_name, new_param_type, overload_index=None)
+def controllerAddParameter(class_name, method_name, new_param_name, new_param_type, overload_index=0):
+    return addParameter(class_name, method_name, new_param_name, new_param_type, overload_index)
 
 #Receives input from menu and calls method to delete a parameter then returns True or False
 def controllerRemoveParameter(className, methodName, parameterName, overloaded_index):
