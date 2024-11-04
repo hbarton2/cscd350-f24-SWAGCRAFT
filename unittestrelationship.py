@@ -9,7 +9,9 @@ class TestRelationships(unittest.TestCase):
     Unit tests for relationship.py
 
     These tests are designed for the 'relationships.py' script, which uses the key 'relationships'
-    instead of 'Relations'. This seems to differ from what Aiden constructed on discord as the template.
+    instead of 'Relations'. This seems to differ from what Adrian constructed on discord as the template.
+
+    This one straight up won't cooperate, and I'm having trouble with trouble shooting 
     '''
 
 
@@ -44,13 +46,13 @@ class TestRelationships(unittest.TestCase):
 
     def test_add_relationship_success(self):
         '''Test adding a relationship between two existing classes.'''
-        addRelationship("Class1", "Class2")
+        addRelationship("Class1", "Class2", "Aggregation")
         self.assertIn("Class2", diagram["Class1"]["relationships"]["connections"])
         self.assertIn("Class1", diagram["Class2"]["relationships"]["connections"])
 
     def test_add_relationship_class_not_found(self):
         '''Test adding a relationship where one or both classes do not exist.'''
-        addRelationship("NonExistentClass", "Class1")
+        addRelationship("NonExistentClass", "Class1", "Aggregation")
         output = sys.stdout.getvalue().strip()
         self.assertEqual(output, "'NonExistentClass' is not in the diagram.")
 
@@ -63,7 +65,7 @@ class TestRelationships(unittest.TestCase):
 
     def test_add_existing_relationship(self):
         '''Adding a relationship that already exists between two classes.'''
-        addRelationship("Class1", "Class2")  #Relationship already exists in setup duh
+        addRelationship("Class1", "Class2", "Aggregation")  #Relationship already exists in setup duh
         output = sys.stdout.getvalue().strip()
         self.assertIn("Class2", diagram["Class1"]["relationships"]["connections"])
         self.assertIn("Class1", diagram["Class2"]["relationships"]["connections"])
