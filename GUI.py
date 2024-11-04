@@ -6,6 +6,7 @@ from controller import addClass, renameClass, deleteClass
 from controller import addField, removeField, renameField
 from controller import addMethod, removeMethod, renameMethod, addParameter, removeParameter, changeParameter
 from controller import addRelationship, deleteRelationship
+from controller import save, load
 
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")  #blue is my favorite colon -cn
@@ -62,6 +63,10 @@ class UMLApp(ctk.CTk):
         #overall diagram button
         overallDiagramBTN = ctk.CTkButton(tboxFRAME, text="Overall Diagram", command=self.showOverallDiagram)
         overallDiagramBTN.pack(padx=10, pady=5)
+        
+        #save and load button (no functionality attached yet. gonna chat with adrian)
+        saveLoadBTN = ctk.CTkButton(tboxFRAME, text="Save/Load", command=self.saveLoad)  #no longer a placeholder ;)
+        saveLoadBTN.pack(padx=10, pady=5)
 
     def deleteRelationship(self):
         """Function to call the controller to have it delete a relationship"""
@@ -85,9 +90,6 @@ class UMLApp(ctk.CTk):
 
         else:
             self.statLabel.configure(text = "Status: Source class name is required")
-
-        
-
 
     def createDrwArea(self):
         #create area frame
@@ -140,10 +142,12 @@ class UMLApp(ctk.CTk):
         for className, classData in self.diagram.items():
             if "relationships" in classData:
                 connections = classData["relationships"].get("connections", [])
-                for connectedClass in connections:
+                for connectedClass, relationType in connections:
                     if connectedClass in self.classPos:
-                        self.drawRelationship(className, connectedClass)
+                        self.drawRelationship(className, connectedClass, relationType)
 
+        #draw color code reference in bottom right corner
+        self.drawRelationshipLegend()
 
     def calculateClassDimensions(self, className, classData):
         width = 150  #minimum width
@@ -152,8 +156,7 @@ class UMLApp(ctk.CTk):
         #calculate width based on text length to prevent overflow
         classNameLength = len(className)
 
-        fieldLen = [len(f"+{field_name}: {field_type}") for field_name, field_type in
-                         classData.get("Fields", {}).items()]  #calc max length of each field line
+        fieldLen = [len(f"+{field_name}: {field_type}") for field_name, field_type in classData.get("Fields", {}).items()]  #calc max length of each field line
         maxFieldLen = max(fieldLen, default=0)  #def 0 in case empty fields
 
         #calc max length of each method line
@@ -197,7 +200,7 @@ class UMLApp(ctk.CTk):
                     self.canvas.create_text((x0 + x1) // 2, yText, text=f"+{methodName}({paramStr})", font=("Arial", 10, "italic"))
                     yText += 20
 
-    def drawRelationship(self, className1, className2):
+    def drawRelationship(self, className1, className2, relType):
         x1, y1 = self.classPos[className1]
         x2, y2 = self.classPos[className2]
         width1, height1 = self.calculateClassDimensions(className1, self.diagram[className1])
@@ -208,9 +211,37 @@ class UMLApp(ctk.CTk):
         x2 += width2 // 2
         y2 += height2 // 2
 
-        lineID = self.canvas.create_line(x1, y1, x2, y2, fill="black", width=2)
+        #determine line color based on relationship type
+        lineColor = "black"
+        if relType == "aggregation":
+            lineColor = "blue"
+        elif relType == "composition":
+            lineColor = "green"
+        elif relType == "generalization":
+            lineColor = "red"
+        elif relType == "realization":
+            lineColor = "orange"
+
+        lineID = self.canvas.create_line(x1, y1, x2, y2, fill=lineColor, width=2)
         self.relationshipLines.append(lineID)
 
+    def drawRelationshipLegend(self):
+        #draw legend in bottom right corner
+        legendRelColor = {
+            "Aggregation": "blue",
+            "Composition": "green",
+            "Generalization": "red",
+            "Realization": "orange"
+        }
+
+        x0 = self.canvas.winfo_width() - 250
+        y0 = self.canvas.winfo_height() - 100
+        y = y0  #da start y position
+
+        for text, color in legendRelColor.items():
+            self.canvas.create_line(x0, y, x0 + 20, y, fill=color, width=2)
+            self.canvas.create_text(x0 + 30, y, anchor="w", text=text, font=("Arial", 10))
+            y += 20  #spacing next item
 
     def addClass(self):
         className = self.promptClassNM()  #pop up like one of those scam popup's on tabloid sites
@@ -421,7 +452,7 @@ class UMLApp(ctk.CTk):
     def addRelationship(self):
         relWin = tk.Toplevel(self)
         relWin.title("Add Relationship")
-        relWin.geometry("400x200")
+        relWin.geometry("600x300")
 
         tk.Label(relWin, text="Enter Source Class:").pack(pady=5)
         sourceEntry = tk.Entry(relWin)
@@ -431,11 +462,22 @@ class UMLApp(ctk.CTk):
         destEntry = tk.Entry(relWin)
         destEntry.pack(pady=5)
 
+        tk.Label(relWin, text="Enter Relationship Type (aggregation, composition, generalization, realization):").pack(pady=5)
+        typeEntry = tk.Entry(relWin)
+        typeEntry.pack(pady=5)
+
         def addRelHandler():
             source = sourceEntry.get().strip()
             dest = destEntry.get().strip()
+            relationType = typeEntry.get().strip().lower()
 
-            if source and dest:
+            validTypes = ["aggregation", "composition", "generalization", "realization"]
+
+            if source and dest and relationType:
+                if relationType not in validTypes:
+                    self.statLabel.configure(text="Status: Invalid relationship type given")
+                    return
+
                 if source == dest:
                     messagebox.showerror("Error", "Cannot create a relationship with the same class. silly.")
                     return
@@ -444,9 +486,9 @@ class UMLApp(ctk.CTk):
                     messagebox.showerror("Error", "One or both classes do not exist.")
                     return
 
-                addRelationship(source, dest)  #use addRelationship
+                addRelationship(source, dest, relationType) #use addRelationship
                 self.drawDiagram()
-                self.statLabel.configure(text=f"Status: Relationship added between '{source}' and '{dest}.'") #congratulations to the couple <3
+                self.statLabel.configure(text=f"Status: Relationship added between '{source}' and '{dest}' as '{relationType}'.")  #congratulations to the couple <3
 
         addRelBTN = tk.Button(relWin, text="Add Relationship", command=addRelHandler)
         addRelBTN.pack(pady=10)
@@ -461,6 +503,49 @@ class UMLApp(ctk.CTk):
 
         diagramText.insert(tk.END, f"{self.diagram}")
         diagramText.config(state=tk.DISABLED)
+
+    def saveLoad(self):
+        #create a new dialog for save/load actions
+        dialogWin = tk.Toplevel(self)
+        dialogWin.title("Save or Load Diagram")
+        dialogWin.geometry("400x200")
+
+        #entry field for the file name. All this drive to use customtkinter and I've been neglecting to use it for parts
+        fileLbl = ctk.CTkLabel(dialogWin, text="Enter file name (optional):", text_color="black")
+        fileLbl.pack(pady=5)
+
+        fileEntry = ctk.CTkEntry(dialogWin)
+        fileEntry.pack(pady=5)
+
+        #handler for save action
+        def saveHandler():
+            fileName = fileEntry.get().strip() or "data.json"  #default to data.json if empty
+            if save(fileName):  #call save function
+                self.statLabel.configure(text=f"Status: The diagram was saved as '{fileName}'")
+            else:
+                self.statLabel.configure(text="Status: Error when saving diagram")
+            dialogWin.destroy()  #close the dialog
+
+        #handler for load action
+        def loadHandler():
+            fileName = fileEntry.get().strip() or "data.json"  #default to data.json if empty
+
+            if load(fileName):  #call load function
+                self.drawDiagram()  #update GUI with loaded data
+                self.statLabel.configure(text=f"Status: Diagram loaded from '{fileName}'")
+            else:
+                self.statLabel.configure(text="Status: Error loading diagram")
+            dialogWin.destroy()  #close the dialog. I am become death. Destroyer of worlds
+
+        #buttons for save load and cancel
+        saveBtn = ctk.CTkButton(dialogWin, text="Save", command=saveHandler)
+        saveBtn.pack(pady=5)
+
+        loadBtn = ctk.CTkButton(dialogWin, text="Load", command=loadHandler)
+        loadBtn.pack(pady=5)
+
+        cancelBtn = ctk.CTkButton(dialogWin, text="Cancel", command=dialogWin.destroy)
+        cancelBtn.pack(pady=5)
 
 
 def startGUI():
