@@ -114,6 +114,41 @@ def removeMethod(class_name, method_name, overload_index=None):
 
     return True
 
+def changeMethodType(class_name, method_name, new_return_type, overload_index=None):
+    """
+    Change the return type of a method in a class in the diagram.
+
+    Parameters:
+    class_name (str): The name of the class that contains the method.
+    method_name (str): The name of the method to change the return type of.
+    new_return_type (str): The new return type for the method.
+    overload_index (int, optional): The index of the overloaded method to change.
+
+    Returns:
+    bool: True if the return type was changed successfully, False otherwise.
+    """
+    if class_name not in diagram:
+        return False
+
+    class_info = diagram[class_name]
+    if 'Methods' not in class_info or method_name not in class_info['Methods']:
+        return False
+
+    methods = class_info['Methods']
+    overloaded_methods = methods[method_name]
+
+    if overload_index is None:
+        if len(overloaded_methods) > 1:
+            return False
+        overload_index = 0
+
+    if overload_index < 0 or overload_index >= len(overloaded_methods):
+        return False
+
+    overloaded_methods[overload_index]['return_type'] = new_return_type
+    return True
+
+
 def addParameter(class_name, method_name, param_type, param_name, overload_index=0):
     """
     Add a new parameter to a method in a class in the diagram.

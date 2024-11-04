@@ -53,6 +53,9 @@ def controllerRenameMethod(className, oldMethodName, newMethodName, overload_ind
 def controllerRemoveMethod(className, methodName, overloaded_index):
     return removeMethod(className, methodName, overloaded_index)
 
+def controllerChangeMethodType(class_name, method_name, new_return_type, overload_index):
+    return changeMethodType(class_name, method_name, new_return_type, overload_index)
+
 
 #PARAMETERS
 
