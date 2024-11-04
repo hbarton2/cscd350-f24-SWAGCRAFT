@@ -2,335 +2,360 @@ from classes import *
 from diagram import diagram
 from colorama import init, Fore, Style
 
-#from main import diagram
+def addMethod(class_name, method_name, method_signature):
+    """
+    Add a new method to a class in the diagram.
 
-def addMethod(class_name, method_name, parameters=None):
-    # Check if class_name is already in the diagram
+    Parameters:
+    class_name (str): The name of the class to add the method to.
+    method_name (str): The name of the new method.
+    method_signature (dict): A dictionary containing the method signature with parameters and return type.
+
+    Returns:
+    bool: True if the method was added successfully, False otherwise.
+    """
     if class_name not in diagram:
-        print("Class name not found.")
-        return
-    
-    # Get the class info and create 'Methods' if not found
+        return False
+
     class_info = diagram[class_name]
     if 'Methods' not in class_info:
         class_info['Methods'] = {}
 
-    # Get the Methods
     methods = class_info['Methods']
-    
-    # If there are no parameters then make a parameters list
-    if parameters is None:
-        parameters = []
 
-    # Check if method is overloaded
+    # Check if method exists and if this parameter combination already exists
     if method_name not in methods:
-        methods[method_name] = [parameters]
-        print(f"Method '{method_name}' added successfully.")
-    else:
-        if parameters in methods[method_name]:
-            print(f"Method '{method_name}' with the same parameter list already exists.")
-        else:
-            methods[method_name].append(parameters)
-            print(f"Overloaded method '{method_name}' added successfully.")
+        methods[method_name] = []
 
+    # Check if this exact parameter/return type combination already exists
+    for existing_method in methods[method_name]:
+        if (existing_method["parameters"] == method_signature["parameters"] and
+            existing_method["return_type"] == method_signature["return_type"]):
+            return False
 
+    methods[method_name].append(method_signature)
+    return True
 
-def renameMethod(class_name, old_method_name, new_method_name):
-    # Check if class_name is not in diagram
+def renameMethod(class_name, old_method_name, new_method_name, overload_index=None):
+    """
+    Rename a method in a class in the diagram.
+
+    Parameters:
+    class_name (str): The name of the class that contains the method.
+    old_method_name (str): The current name of the method.
+    new_method_name (str): The new name for the method.
+    overload_index (int, optional): The index of the overloaded method to rename.
+
+    Returns:
+    bool: True if the method was renamed successfully, False otherwise.
+    """
     if class_name not in diagram:
-        print("Class name not found.")
-        return
+        return False
 
-    # Get class_info
     class_info = diagram[class_name]
     if 'Methods' not in class_info:
-        print("This class has no methods.")
-        return
+        return False
 
-    # Get methods
     methods = class_info['Methods']
     if old_method_name not in methods:
-        print("Method name not found.")
-        return
+        return False
 
-    # Get the overloaded_method(s)
     overloaded_methods = methods[old_method_name]
 
-    # Check if the method is overloaded
-    if len(overloaded_methods) > 1:
-        print(f"The method '{old_method_name}' is overloaded. Which one do you want to rename?")
-        for i, method_params in enumerate(overloaded_methods):
-            print(f"{i + 1}. {old_method_name}({', '.join(method_params)})")
-        
-        choice = input("Enter the number of the method to rename, or 'all' to rename all overloads: ")
-        
-        # If user input all
-        if choice.lower() == 'all':
-            methods_to_rename = overloaded_methods
-        else:
-            try:
-                index = int(choice) - 1
-                methods_to_rename = [overloaded_methods[index]]
-            except (ValueError, IndexError):
-                print("Invalid choice. Aborting.")
-                return
-    else:
-        methods_to_rename = overloaded_methods
-
-    # Check if the new name already exists with the same parameter list
-    if new_method_name in methods:
-        for params in methods_to_rename:
-            if params in methods[new_method_name]:
-                print(f"New name '{new_method_name}' already exists with the same parameter list.")
-                return
-
-    # Rename the method(s)
-    if new_method_name not in methods:
-        methods[new_method_name] = []
-
-    for params in methods_to_rename:
-        methods[new_method_name].append(params)
-
-    # Remove the old method(s)
-    methods[old_method_name] = [x for x in methods[old_method_name] if x not in methods_to_rename]
-
-    # Remove the old method if all overloads were renamed
-    if not methods[old_method_name]:
+    if overload_index is None:
+        methods_to_rename = overloaded_methods[:]
+        methods[new_method_name] = methods_to_rename
         del methods[old_method_name]
+    else:
+        if overload_index >= len(overloaded_methods):
+            return False
 
-    print(f"Method{'s' if len(methods_to_rename) > 1 else ''} renamed successfully.")
+        if new_method_name not in methods:
+            methods[new_method_name] = []
 
+        methods[new_method_name].append(overloaded_methods[overload_index])
+        overloaded_methods.pop(overload_index)
 
+        if not overloaded_methods:
+            del methods[old_method_name]
 
-def removeMethod(class_name, method_name):
-    # Check if class_name is not in diagram
+    return True
+
+def removeMethod(class_name, method_name, overload_index=None):
+    """
+    Remove a method from a class in the diagram.
+
+    Parameters:
+    class_name (str): The name of the class that contains the method.
+    method_name (str): The name of the method to remove.
+    overload_index (int, optional): The index of the overloaded method to remove.
+
+    Returns:
+    bool: True if the method was removed successfully, False otherwise.
+    """
     if class_name not in diagram:
-        print("Class name not found.")
-        return
+        return False
 
-    # Get class_info
     class_info = diagram[class_name]
     if 'Methods' not in class_info or method_name not in class_info['Methods']:
-        print("Method name not found.")
-        return
+        return False
 
-    # Get methods
     methods = class_info['Methods']
-
-    # Get overloaded methods
     overloaded_methods = methods[method_name]
 
-    # Check if the method is overloaded
-    if len(overloaded_methods) > 1:
-        print(f"The method '{method_name}' is overloaded. Which one do you want to remove?")
-        for i, params in enumerate(overloaded_methods):
-            print(f"{i + 1}. {method_name}({', '.join(params)})")
-        
-        choice = input("Enter the number of the method to remove, or 'all' to remove all overloads: ")
-        
-        # Check if user input is all
-        if choice.lower() == 'all':
-            # remove all overloaded methods
-            del methods[method_name]
-            print("All overloads of the method have been removed.")
-        else:
-            try:
-                index = int(choice) - 1
-                # remove the method
-                del methods[method_name][index]
-                if not methods[method_name]:
-                    del methods[method_name]
-                print("Method removed successfully.")
-            except (ValueError, IndexError):
-                print("Invalid choice. Aborting.")
-    else:
+    if overload_index is None:
         del methods[method_name]
-        print("Method removed successfully.")
+    else:
+        if overload_index >= len(overloaded_methods):
+            return False
+        overloaded_methods.pop(overload_index)
+        if not overloaded_methods:
+            del methods[method_name]
 
+    return True
 
+def changeMethodType(class_name, method_name, new_return_type, overload_index=None):
+    """
+    Change the return type of a method in a class in the diagram.
 
-def addParameter(class_name, method_name, new_param_name, new_param_type):
-    # Check if class_name not in diagram
+    Parameters:
+    class_name (str): The name of the class that contains the method.
+    method_name (str): The name of the method to change the return type of.
+    new_return_type (str): The new return type for the method.
+    overload_index (int, optional): The index of the overloaded method to change.
+
+    Returns:
+    bool: True if the return type was changed successfully, False otherwise.
+    """
     if class_name not in diagram:
-        print("Class name not found.")
-        return
+        return False
 
-    # Get class_info
     class_info = diagram[class_name]
     if 'Methods' not in class_info or method_name not in class_info['Methods']:
-        print("Method name not found.")
-        return
+        return False
 
-    # Get methods
     methods = class_info['Methods']
-
-    # Get overloaded_methods
     overloaded_methods = methods[method_name]
 
-    # Check if the method is overloaded
-    if len(overloaded_methods) > 1:
-        print(f"The method '{method_name}' is overloaded. Which one do you want to modify?")
-        for i, params in enumerate(overloaded_methods):
-            print(f"{i + 1}. {method_name}({', '.join(params)})")
-        
-        choice = input("Enter the number of the method to modify, or 'all' to modify all overloads: ")
-        
-        # Check if the user input is all
-        if choice.lower() == 'all':
-            methods_to_modify = overloaded_methods
-        else:
-            try:
-                index = int(choice) - 1
-                methods_to_modify = [overloaded_methods[index]]
-            except (ValueError, IndexError):
-                print("Invalid choice. Aborting.")
-                return
-    else:
-        methods_to_modify = overloaded_methods
+    if overload_index is None:
+        if len(overloaded_methods) > 1:
+            return False
+        overload_index = 0
 
-    # Add the params to the method(s)
-    for params in methods_to_modify:
-        if new_param_name in params:
-            print(f"Parameter '{new_param_name}' already exists in method.")
-            return
-        params.append(f"{new_param_name}: {new_param_type}")
+    if overload_index < 0 or overload_index >= len(overloaded_methods):
+        return False
 
-    print("Parameter added successfully.")
+    overloaded_methods[overload_index]['return_type'] = new_return_type
+    return True
 
 
+def addParameter(class_name, method_name, param_type, param_name, overload_index=0):
+    """
+    Add a new parameter to a method in a class in the diagram.
 
-def removeParameter(class_name, method_name, param_name):
-    # Check if class_name not in diagram
+    Parameters:
+    class_name (str): The name of the class that contains the method.
+    method_name (str): The name of the method to add the parameter to.
+    param_type (str): The type of the new parameter.
+    param_name (str): The name of the new parameter.
+    overload_index (int, optional): The index of the overloaded method.
+
+    Returns:
+    bool: True if the parameter was added successfully, False otherwise.
+    """
     if class_name not in diagram:
-        print("Class name not found.")
-        return
+        return False
 
-    # Get class_info
     class_info = diagram[class_name]
     if 'Methods' not in class_info or method_name not in class_info['Methods']:
-        print("Method name not found.")
-        return
+        return False
 
-    # Get methods
     methods = class_info['Methods']
-
-    # Get overloaded methods
     overloaded_methods = methods[method_name]
 
-    # Check if the method is overloaded
-    if len(overloaded_methods) > 1:
-        print(f"The method '{method_name}' is overloaded. Which one do you want to modify?")
-        for i, params in enumerate(overloaded_methods):
-            print(f"{i + 1}. {method_name}({', '.join(params)})")
-        
-        choice = input("Enter the number of the method to modify: ")
-        
-        try:
-            index = int(choice) - 1
-            params = overloaded_methods[index]
-        except (ValueError, IndexError):
-            print("Invalid choice. Aborting.")
-            return
-    else:
-        params = overloaded_methods[0]
+    if overload_index is None:
+        overload_index = 0
 
-    # Remove the parameter
-    for i, param in enumerate(params):
-        if param.split(':')[0].strip() == param_name:
-            params[i] = None
-            del params[i]
-            print("Parameter removed successfully.")
-            return
+    if overload_index < 0 or overload_index >= len(overloaded_methods):
+        return False
 
-    print("Parameter not found in the method.")
+    method_info = overloaded_methods[overload_index]
+    new_param = f"{param_type} {param_name}"
+
+    if new_param in method_info["parameters"]:
+        return False
+
+    method_info["parameters"].append(new_param)
+    return True
 
 
+def removeParameter(class_name, method_name, param_name, overload_index=None):
+    """
+    Remove a parameter from a method in a class in the diagram.
 
-def changeParameter(class_name, method_name):
+    Parameters:
+    class_name (str): The name of the class that contains the method.
+    method_name (str): The name of the method to remove the parameter from.
+    param_name (str): The name of the parameter to remove.
+    overload_index (int, optional): The index of the overloaded method.
+
+    Returns:
+    bool: True if the parameter was removed successfully, False otherwise.
+    """
     if class_name not in diagram:
-        print("Class name not found.")
-        return
-    
+        return False
+
     class_info = diagram[class_name]
     if 'Methods' not in class_info or method_name not in class_info['Methods']:
-        print("Method name not found.")
-        return
+        return False
     
+    if overload_index is None:
+        overload_index = 0
+
     methods = class_info['Methods']
     overloaded_methods = methods[method_name]
-    
-    # Handle method overloading
-    if len(overloaded_methods) > 1:
-        print(f"The method '{method_name}' is overloaded. Which one do you want to modify?")
-        for i, params in enumerate(overloaded_methods, 1):
-            param_str = ', '.join(params) if params else '()'
-            print(f"{i}. {method_name}({param_str})")
-        
-        choice = input("Enter the number of the method to modify: ")
-        try:
-            index = int(choice) - 1
-            if 0 <= index < len(overloaded_methods):
-                current_params = overloaded_methods[index]
-            else:
-                print("Invalid choice. Aborting.")
-                return
-        except ValueError:
-            print("Invalid input. Aborting.")
-            return
-    else:
-        current_params = overloaded_methods[0]
-    
-    # List current parameters and ask which one to rename
-    #print(f"\nCurrent method: {method_name}({', '.join(current_params) if current_params else '()'})")
-    print("Current parameters:")
-    if not current_params:
-        print("1. ()")
-    else:
-        for i, param in enumerate(current_params, 1):
-            print(f"{i}. ({param})")
-    
-    param_choice = input("\nEnter the number of the parameter to rename (or 'q' to quit): ")
-    
-    if param_choice.lower() == 'q':
-        print("No changes made.")
-        return
-    
-    try:
-        param_index = int(param_choice) - 1
-        if 0 <= param_index <= len(current_params):  # Note: we use <= to allow renaming ()
-            run = 0
-            while(True):
-                new_name = input("Press q to exit Parameter Renaming.\nEnter new parameter name: ")
-                if new_name.lower() == 'q':
-                    print("Exiting Parameter Renaming")
-                    return
-                new_type = input("Enter new parameter type: ")
-                if new_type.lower() == 'q':
-                    print("Exiting Parameter Renaming")
-                    return
-                if not current_params:  # Adding a parameter to ()
-                    current_params.append(f"{new_name}: {new_type}")
-                else:
-                    if(run == 0):
-                        current_params[param_index] = f"{new_name}: {new_type}"
-                    else:
-                        current_params[param_index] += f", {new_name}: {new_type}"
-                print("Parameter renamed successfully.")
-                run += 1
-        else:
-            print("Invalid parameter number. No changes made.")
-            return
-    except ValueError:
-        print("Invalid input. No changes made.")
-        return
-    
 
-    
-    # Update the method parameters
-    if len(overloaded_methods) > 1:
-        methods[method_name][index] = current_params
+    if len(overloaded_methods) > 1 and overload_index is None:
+        return False
+
+    if overload_index is not None:
+        if overload_index < 0 or overload_index >= len(overloaded_methods):
+            return False
+        method_index = overload_index
     else:
-        methods[method_name] = [current_params]
+        method_index = 0
+
+    method_info = overloaded_methods[method_index]
+    parameters = method_info["parameters"]
+
+    for param in parameters[:]:
+        param_name_only = param.split(" ")[1].strip()
+        if param_name_only == param_name:
+            parameters.remove(param)
+            return True
+
+    return False
+
+def changeParameter(class_name, method_name, old_param_name, new_param_name, param_type, overload_index):
+    """
+    Change the name and type of a parameter in a method.
+
+    Parameters:
+    class_name (str): The name of the class that contains the method.
+    method_name (str): The name of the method to change the parameter in.
+    old_param_name (str): The current name of the parameter.
+    new_param_name (str): The new name for the parameter.
+    param_type (str): The new type for the parameter.
+    overload_index (int): The index of the overloaded method.
+
+    Returns:
+    bool: True if the parameter was changed successfully, False otherwise.
+    """
+    if class_name not in diagram:
+        return False
+    if 'Methods' not in diagram[class_name]:
+        return False
+    if method_name not in diagram[class_name]['Methods']:
+        return False
+
+    methods = diagram[class_name]['Methods']
+    overloaded_methods = methods[method_name]
+
+    if overload_index is None:
+        overload_index = 0
+
+    if overload_index >= len(overloaded_methods):
+        return False
+
+    method_info = overloaded_methods[overload_index]
+    parameters = method_info["parameters"]
+
+    for i, param in enumerate(parameters):
+        param_parts = param.split()
+        if len(param_parts) >= 2 and param_parts[1] == old_param_name:
+            parameters[i] = f"{param_type} {new_param_name}"
+            return True
+
+    return False
+
+def changeAllParameters(class_name, method_name, overload_index, param_names, param_types):
+    """
+    Replace all parameters in a method with new parameters.
+
+    Parameters:
+    class_name (str): The name of the class that contains the method.
+    method_name (str): The name of the method to change the parameters in.
+    overload_index (int): The index of the overloaded method.
+    param_names (list): The new names for all parameters.
+    param_types (list): The new types for all parameters.
+
+    Returns:
+    bool: True if parameters were changed successfully, False otherwise.
+    """
+    if len(param_names) != len(param_types):
+        return False
+
+    if class_name not in diagram:
+        return False
+    if overload_index is None:
+        overload_index = 0
+
+    class_info = diagram[class_name]
+    if 'Methods' not in class_info or method_name not in class_info['Methods']:
+        return False
+
+    methods = class_info['Methods']
+    overloaded_methods = methods[method_name]
+
+    if overload_index < 0 or overload_index >= len(overloaded_methods):
+        return False
+
+    new_params = [f"{type_} {name}" for name, type_ in zip(param_names, param_types)]
+    overloaded_methods[overload_index]["parameters"] = new_params
+    return True
+
+def changeParameterType(class_name, method_name, param_name, new_type, overload_index):
+    """
+    Change only the type of a parameter in a method.
+
+    Parameters:
+    class_name (str): The name of the class that contains the method.
+    method_name (str): The name of the method to change the parameter in.
+    param_name (str): The name of the parameter to change.
+    new_type (str): The new type for the parameter.
+    overload_index (int): The index of the overloaded method.
+
+    Returns:
+    bool: True if parameter type was changed successfully, False otherwise.
+    """
+    if not all([class_name, method_name, param_name, new_type]):
+        return False
+
+    if class_name not in diagram:
+        return False
+
+    if 'Methods' not in diagram[class_name]:
+        return False
+
+    if method_name not in diagram[class_name]['Methods']:
+        return False
     
-    print(f"\nUpdated method: {method_name}({', '.join(current_params) if current_params else '()'})")
-    print("Changes saved successfully.")
+    if overload_index is None:
+        overload_index = 0
+
+    methods = diagram[class_name]['Methods']
+    overloaded_methods = methods[method_name]
+
+    if not (0 <= overload_index < len(overloaded_methods)):
+        return False
+
+    method_info = overloaded_methods[overload_index]
+    parameters = method_info["parameters"]
+
+    for i, param in enumerate(parameters):
+        param_parts = param.split()
+        if len(param_parts) >= 2 and param_parts[1] == param_name:
+            parameters[i] = f"{new_type} {param_name}"
+            return True
+
+    return False
