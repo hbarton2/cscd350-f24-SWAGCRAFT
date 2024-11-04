@@ -1,6 +1,6 @@
 import tkinter as tk
 import customtkinter as ctk
-from tkinter import messagebox, ttk #new import. ttk for scollbar
+from tkinter import messagebox
 from controller import diagram
 from controller import addClass, renameClass, deleteClass
 from controller import addField, removeField, renameField
@@ -55,10 +55,40 @@ class UMLApp(ctk.CTk):
         addRelBTN = ctk.CTkButton(tboxFRAME, text="Add Relationship", command=self.addRelationship)
         addRelBTN.pack(padx=10, pady=5)
 
+        #delete relationship button
+        deleteRelationshipBTN = ctk.CTkButton(tboxFRAME, text="Delete Relationship", command=self.deleteRelationship)
+        deleteRelationshipBTN.pack(padx=10, pady=5)
+
         #overall diagram button
         overallDiagramBTN = ctk.CTkButton(tboxFRAME, text="Overall Diagram", command=self.showOverallDiagram)
         overallDiagramBTN.pack(padx=10, pady=5)
+        
+        #save and load button (no functionality attached yet. gonna chat with adrian)
+        saveLoadBTN = ctk.CTkButton(tboxFRAME, text="Save/Load")  #placeholder
+        saveLoadBTN.pack(padx=10, pady=5)
 
+    def deleteRelationship(self):
+        """Function to call the controller to have it delete a relationship"""
+        dialogue = ctk.CTkInputDialog(text="Enter the source class name:", title="Delete Relationship")
+        source = dialogue.get_input().strip()
+
+        if(source):
+            dialogue = ctk.CTkInputDialog(text="Enter the destination class name:", title="Delete Relationship")
+            destination = dialogue.get_input().strip()
+
+            if(destination):
+                if(deleteRelationship(source, destination) == True):
+                    self.drawDiagram()
+                    self.statLabel.configure(text = f"Status: Relationship between {source} and {destination} deleted")
+
+                else:
+                    self.statLabel.configure(text = f"Status: Relationship between {source} and {destination} not found")
+
+            else:
+                self.statLabel.configure(text = "Status: Destination class name is required")
+
+        else:
+            self.statLabel.configure(text = "Status: Source class name is required")
 
     def createDrwArea(self):
         #create area frame
@@ -111,10 +141,12 @@ class UMLApp(ctk.CTk):
         for className, classData in self.diagram.items():
             if "relationships" in classData:
                 connections = classData["relationships"].get("connections", [])
-                for connectedClass in connections:
+                for connectedClass, relationType in connections:
                     if connectedClass in self.classPos:
-                        self.drawRelationship(className, connectedClass)
+                        self.drawRelationship(className, connectedClass, relationType)
 
+        #draw color code reference in bottom right corner
+        self.drawRelationshipLegend()
 
     def calculateClassDimensions(self, className, classData):
         width = 150  #minimum width
@@ -123,8 +155,7 @@ class UMLApp(ctk.CTk):
         #calculate width based on text length to prevent overflow
         classNameLength = len(className)
 
-        fieldLen = [len(f"+{field_name}: {field_type}") for field_name, field_type in
-                         classData.get("Fields", {}).items()]  #calc max length of each field line
+        fieldLen = [len(f"+{field_name}: {field_type}") for field_name, field_type in classData.get("Fields", {}).items()]  #calc max length of each field line
         maxFieldLen = max(fieldLen, default=0)  #def 0 in case empty fields
 
         #calc max length of each method line
@@ -168,7 +199,7 @@ class UMLApp(ctk.CTk):
                     self.canvas.create_text((x0 + x1) // 2, yText, text=f"+{methodName}({paramStr})", font=("Arial", 10, "italic"))
                     yText += 20
 
-    def drawRelationship(self, className1, className2):
+    def drawRelationship(self, className1, className2, relType):
         x1, y1 = self.classPos[className1]
         x2, y2 = self.classPos[className2]
         width1, height1 = self.calculateClassDimensions(className1, self.diagram[className1])
@@ -179,9 +210,37 @@ class UMLApp(ctk.CTk):
         x2 += width2 // 2
         y2 += height2 // 2
 
-        lineID = self.canvas.create_line(x1, y1, x2, y2, fill="black", width=2)
+        #determine line color based on relationship type
+        lineColor = "black"
+        if relType == "aggregation":
+            lineColor = "blue"
+        elif relType == "composition":
+            lineColor = "green"
+        elif relType == "generalization":
+            lineColor = "red"
+        elif relType == "realization":
+            lineColor = "orange"
+
+        lineID = self.canvas.create_line(x1, y1, x2, y2, fill=lineColor, width=2)
         self.relationshipLines.append(lineID)
 
+    def drawRelationshipLegend(self):
+        #draw legend in bottom right corner
+        legendRelColor = {
+            "Aggregation": "blue",
+            "Composition": "green",
+            "Generalization": "red",
+            "Realization": "orange"
+        }
+
+        x0 = self.canvas.winfo_width() - 250
+        y0 = self.canvas.winfo_height() - 100
+        y = y0  #da start y position
+
+        for text, color in legendRelColor.items():
+            self.canvas.create_line(x0, y, x0 + 20, y, fill=color, width=2)
+            self.canvas.create_text(x0 + 30, y, anchor="w", text=text, font=("Arial", 10))
+            y += 20  #spacing next item
 
     def addClass(self):
         className = self.promptClassNM()  #pop up like one of those scam popup's on tabloid sites
@@ -243,24 +302,8 @@ class UMLApp(ctk.CTk):
     def editClass(self, className):
         editWin = tk.Toplevel(self)
         editWin.title(f"Edit Class '{className}'")
-        editWin.geometry("450x500")
+        editWin.geometry("500x1000")
 
-        #remaking to use scrollable frame
-        scrollCntnr = ttk.Frame(editWin)
-        scrollCntnr.pack(fill="both", expand=True)
-
-        classEdt = tk.Canvas(scrollCntnr)
-        classEdt.pack(side="left", fill="both", expand=True)
-
-        scrollbr = ttk.Scrollbar(scrollCntnr, orient="vertical", command=classEdt.yview) #huzzah. yview scroll down!
-        scrollbr.pack(side="right", fill="y")
-
-        classEdt.configure(yscrollcommand=scrollbr.set)
-        classEdt.bind('<Configure>', lambda e: classEdt.configure(scrollregion=classEdt.bbox("all"))) #for anyone in the team reviewing my code(peer programming w/robert?). I used this for reference: https://blog.teclado.com/tkinter-scrollable-frames/
-        #lambda dynamically update the scroll region of classEdt :)
-
-        contentFRM = ttk.Frame(classEdt) #going to have to change references for fields to contentFRM. :/
-        classEdt.create_window((0, 0), window=contentFRM, anchor="nw")
 
         def addFieldHandler():
             fieldName = fieldEntry.get().strip()
@@ -325,74 +368,74 @@ class UMLApp(ctk.CTk):
                 self.statLabel.configure(text=f"Status: Parameter '{paramName}' removed from method '{methodName}' in class '{className}'")
 
         #fields section
-        tk.Label(contentFRM, text="Add Field: (name and type)").pack(pady=5)
-        fieldEntry = tk.Entry(contentFRM)
+        tk.Label(editWin, text="Add Field: (name and type)").pack(pady=5)
+        fieldEntry = tk.Entry(editWin)
         fieldEntry.pack(pady=5)
         fieldEntry.insert(0, "field_name") #inserting placeholder text so user knows which is which
-        fieldTypeEntry = tk.Entry(contentFRM)
+        fieldTypeEntry = tk.Entry(editWin)
         fieldTypeEntry.pack(pady=5)
         fieldTypeEntry.insert(0, "field_type")
-        addFieldBTN = tk.Button(contentFRM, text="Add Field", command=addFieldHandler)
+        addFieldBTN = tk.Button(editWin, text="Add Field", command=addFieldHandler)
         addFieldBTN.pack(pady=5)
 
-        tk.Label(contentFRM, text="Remove Field: (name)").pack(pady=5)
-        fieldRemoveEntry = tk.Entry(contentFRM)
+        tk.Label(editWin, text="Remove Field: (name)").pack(pady=5)
+        fieldRemoveEntry = tk.Entry(editWin)
         fieldRemoveEntry.pack(pady=5)
         fieldRemoveEntry.insert(0, "field_name")
-        removeFieldBTN = tk.Button(contentFRM, text="Remove Field", command=removeFieldHandler)
+        removeFieldBTN = tk.Button(editWin, text="Remove Field", command=removeFieldHandler)
         removeFieldBTN.pack(pady=5)
 
-        tk.Label(contentFRM, text="Rename Field: (old name and new name)").pack(pady=5)
-        fieldRenameOldEntry = tk.Entry(contentFRM)
+        tk.Label(editWin, text="Rename Field: (old name and new name)").pack(pady=5)
+        fieldRenameOldEntry = tk.Entry(editWin)
         fieldRenameOldEntry.pack(pady=5)
         fieldRenameOldEntry.insert(0, "old_field_name")
-        fieldRenameNewEntry = tk.Entry(contentFRM)
+        fieldRenameNewEntry = tk.Entry(editWin)
         fieldRenameNewEntry.pack(pady=5)
         fieldRenameNewEntry.insert(0, "new_field_name")
-        renameFieldBTN = tk.Button(contentFRM, text="Rename Field", command=renameFieldHandler)
+        renameFieldBTN = tk.Button(editWin, text="Rename Field", command=renameFieldHandler)
         renameFieldBTN.pack(pady=5)
 
         #methods sect
-        tk.Label(contentFRM, text="Add Method: (name and parameters)").pack(pady=5)
-        methodEntry = tk.Entry(contentFRM)
+        tk.Label(editWin, text="Add Method: (name and parameters)").pack(pady=5)
+        methodEntry = tk.Entry(editWin)
         methodEntry.pack(pady=5)
         methodEntry.insert(0, "method_name")
-        paramEntry = tk.Entry(contentFRM)
+        paramEntry = tk.Entry(editWin)
         paramEntry.pack(pady=5)
         paramEntry.insert(0, "param1: type1, param2: type2") #worked hard on this
-        addMethodBTN = tk.Button(contentFRM, text="Add Method", command=addMethodHandler)
+        addMethodBTN = tk.Button(editWin, text="Add Method", command=addMethodHandler)
         addMethodBTN.pack(pady=5)
 
-        tk.Label(contentFRM, text="Remove Method: (name)").pack(pady=5)
-        methodRemoveEntry = tk.Entry(contentFRM)
+        tk.Label(editWin, text="Remove Method: (name)").pack(pady=5)
+        methodRemoveEntry = tk.Entry(editWin)
         methodRemoveEntry.pack(pady=5)
         methodRemoveEntry.insert(0, "method_name")
-        removeMethodBTN = tk.Button(contentFRM, text="Remove Method", command=removeMethodHandler)
+        removeMethodBTN = tk.Button(editWin, text="Remove Method", command=removeMethodHandler)
         removeMethodBTN.pack(pady=5)
 
         #parameters section...scuffed but will do
-        tk.Label(contentFRM, text="Add Parameter to Method: (method, parameter name, type)").pack(pady=5)
-        addParamMethodEntry = tk.Entry(contentFRM)
+        tk.Label(editWin, text="Add Parameter to Method: (method, parameter name, type)").pack(pady=5)
+        addParamMethodEntry = tk.Entry(editWin)
         addParamMethodEntry.pack(pady=5)
         addParamMethodEntry.insert(0, "method_name") #more placeholder text to autofill.
-        addParamNameEntry = tk.Entry(contentFRM)
+        addParamNameEntry = tk.Entry(editWin)
         addParamNameEntry.pack(pady=5)
         addParamNameEntry.insert(0, "param_name")
-        addParamTypeENT = tk.Entry(contentFRM)
+        addParamTypeENT = tk.Entry(editWin)
         addParamTypeENT.pack(pady=5)
         addParamTypeENT.insert(0, "param_type")
-        addParamBTN = tk.Button(contentFRM, text="Add Parameter", command=addParameterHandler) #call my new handler
+        addParamBTN = tk.Button(editWin, text="Add Parameter", command=addParameterHandler) #call my new handler
         addParamBTN.pack(pady=5)
 
         #new addition. actually being able to remove parameters
-        tk.Label(contentFRM, text="Remove Parameter from Method: (method, parameter name)").pack(pady=5) #labels
-        removeParamMethodEntry = tk.Entry(contentFRM)
+        tk.Label(editWin, text="Remove Parameter from Method: (method, parameter name)").pack(pady=5) #labels
+        removeParamMethodEntry = tk.Entry(editWin)
         removeParamMethodEntry.pack(pady=5)
         removeParamMethodEntry.insert(0, "method_name")
-        removeParamNameEntry = tk.Entry(contentFRM)
+        removeParamNameEntry = tk.Entry(editWin)
         removeParamNameEntry.pack(pady=5)
         removeParamNameEntry.insert(0, "param_name")
-        removeParamBTN = tk.Button(contentFRM, text="Remove Parameter", command=removeParameterHandler)
+        removeParamBTN = tk.Button(editWin, text="Remove Parameter", command=removeParameterHandler)
         removeParamBTN.pack(pady=5)
 
     def listClasses(self):
@@ -408,7 +451,7 @@ class UMLApp(ctk.CTk):
     def addRelationship(self):
         relWin = tk.Toplevel(self)
         relWin.title("Add Relationship")
-        relWin.geometry("400x200")
+        relWin.geometry("600x300")
 
         tk.Label(relWin, text="Enter Source Class:").pack(pady=5)
         sourceEntry = tk.Entry(relWin)
@@ -418,11 +461,22 @@ class UMLApp(ctk.CTk):
         destEntry = tk.Entry(relWin)
         destEntry.pack(pady=5)
 
+        tk.Label(relWin, text="Enter Relationship Type (aggregation, composition, generalization, realization):").pack(pady=5)
+        typeEntry = tk.Entry(relWin)
+        typeEntry.pack(pady=5)
+
         def addRelHandler():
             source = sourceEntry.get().strip()
             dest = destEntry.get().strip()
+            relationType = typeEntry.get().strip().lower()
 
-            if source and dest:
+            validTypes = ["aggregation", "composition", "generalization", "realization"]
+
+            if source and dest and relationType:
+                if relationType not in validTypes:
+                    self.statLabel.configure(text="Status: Invalid relationship type given")
+                    return
+
                 if source == dest:
                     messagebox.showerror("Error", "Cannot create a relationship with the same class. silly.")
                     return
@@ -431,9 +485,9 @@ class UMLApp(ctk.CTk):
                     messagebox.showerror("Error", "One or both classes do not exist.")
                     return
 
-                addRelationship(source, dest)  #use addRelationship
+                addRelationship(source, dest, relationType) #use addRelationship
                 self.drawDiagram()
-                self.statLabel.configure(text=f"Status: Relationship added between '{source}' and '{dest}.'") #congratulations to the couple <3
+                self.statLabel.configure(text=f"Status: Relationship added between '{source}' and '{dest}' as '{relationType}'.")  #congratulations to the couple <3
 
         addRelBTN = tk.Button(relWin, text="Add Relationship", command=addRelHandler)
         addRelBTN.pack(pady=10)
