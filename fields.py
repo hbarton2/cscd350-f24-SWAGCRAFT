@@ -1,108 +1,153 @@
 from diagram import diagram
 
+ 
+
+# FIELD_TYPES = ['int', 'double']
+
 
 def addField(class_name, field_name, field_type):
     '''
-    Adds a new field to a specified class
-    Parameters: class_name(STR), field_name(STR), and Field type(STR)
-    Function is wrapped in try except catch for handling any arising errors
-    If class does not exist in the diagram an error message is printed and the function exits
-    If the class exists but already has the specified field an error message is printed and function exits once more
-    If field is successfully added a confirmation message is printed
+    Adds a new field to a specified class.
+    
+    Parameters: 
+        class_name (STR): The name of the class to which the field will be added.
+        field_name (STR): The name of the field to be added.
+        field_type (STR): The data type of the field.
+
+    Returns:
+        bool: True if the field is added successfully, False otherwise.
     '''
 
-    try:
-        if class_name not in diagram:
-            print("Class name not found...")
-            return
+    # Validate the field types with the list 
+    # Return False if not
+    # if field_type not in FIELD_TYPES:
+        # return False
+    
 
-        class_info = diagram[class_name]
+    if class_name not in diagram:
+        return False
+    
+     
+    class_info = diagram[class_name]
 
-        if 'Fields' not in class_info:
-            class_info['Fields'] = {}
+    
+    if 'Fields' not in class_info:
+        class_info['Fields'] = {}
 
-        fields = class_info['Fields']
+    
+    fields = class_info['Fields']
 
-        if field_name in fields:
-            print(f"Field '{field_name}' already exists in class '{class_name}'.")
-            return
-
-        fields[field_name] = field_type
-        print(f"Field '{field_name}: {field_type}' added successfully.")
-
-    except Exception as e:
-        print(f"An unexpected error occurred while adding the field: {e}")
-
+    
+    if field_name in fields:
+        return False
+    
+    
+    fields[field_name] = field_type
+    return True 
 
 def removeField(class_name, field_name):
     '''
-    Removes a specified field from a class
-    Fields class_name(STR) and field_name(STR)
+    Removes a specified field from a class.
+    
+    Parameters:
+        class_name (STR): The name of the class from which the field will be removed.
+        field_name (STR): The name of the field to be removed.
 
-    If the class does not exist in the diagram an error message is printed and the function exits
-    If the class exists but the specifified field does not exist then a error is printed and exit
-    If field is successfully removed, confirmation message is printed
+    Returns:
+        bool: True if the field is removed successfully, False otherwise.
     '''
 
-    try:
-        if class_name not in diagram:
-            print("Class name not found...")
-            return
+    
+    if class_name not in diagram:
+        return False 
+    
+    
+    class_info = diagram[class_name]
 
-        class_info = diagram[class_name]
-        if 'Fields' not in class_info or field_name not in class_info['Fields']:
-            print("Field name not found in the specified class...")
-            return
+    
+    if 'Fields' not in class_info or field_name not in class_info['Fields']:
+        return False
+    
+    
+    fields = class_info['Fields']
 
-        fields = class_info['Fields']
-        del fields[field_name]
-        print(f"Field '{field_name}' removed successfully.")
-
-    except Exception as e:
-        print(f"An unexpected error occurred while removing the field: {e}")
+    
+    del fields[field_name]
+    return True
 
 
 def renameField(class_name, old_field_name, new_field_name):
     '''
-    Renames an existing field in a specified class
+    Renames an existing field in a specified class.
 
-    Parameters: class_name(STR), old_field_name(STR), and new_field_name(STR)
+    Parameters:
+        class_name (STR): The name of the class containing the field.
+        old_field_name (STR): The current name of the field to be renamed.
+        new_field_name (STR): The new name for the field.
 
-    If class does not exist in diagram error message is printed and function exits
-    If class exists but field does not exist then error message is printed and exits
-    Renaming successful, print confirmation message
+    Returns:
+        bool: True if the field is renamed successfully, False otherwise.
     '''
 
-    try:
-        if class_name not in diagram:
-            print("Class name not found...")
-            return
 
-        class_info = diagram[class_name]
+    if class_name not in diagram:
+        return False
+    
+    class_info = diagram[class_name]
 
-        if 'Fields' not in class_info:
-            print("This class has no fields...")
-            return
+    if 'Fields' not in class_info:
+        return False
+    
+    fields = class_info['Fields']
 
-        fields = class_info['Fields']
+    if old_field_name not in fields:
+        return False
+    
+    if new_field_name == old_field_name:
+        return False
+    
+    if new_field_name in fields:
+        return False
+    
+    fields[new_field_name] = fields.pop(old_field_name)
+    return True
+    
+    
+def changeFieldType(class_name, field_name, new_type):
+    '''
+    Changes the data type of an existing field in a specified class.
 
-        if old_field_name not in fields:
-            print("Old field name not found.")
-            return
+    Parameters:
+        class_name (STR): The name of the class containing the field.
+        field_name (STR): The name of the field whose type will be changed.
+        new_type (STR): The new data type for the field.
 
+    Returns:
+        bool: True if the field type is changed successfully, False otherwise.
+    '''
 
-        if new_field_name == old_field_name:#Check if the new field name is the same as the old one case
-            print("The new field name must be different from the old field name.")
-            return
+    '''
+    if new_type not in FIELD_TYPES:
+        return False  
+    '''
+   
+    if class_name not in diagram:
+        return False  
+    
+    
+    class_info = diagram[class_name]
 
-        if new_field_name in fields:  #check if new field name already exists
-            print("New field name already exists in the class...")
-            return
+    
+    if 'Fields' not in class_info:
+        return False  
+    
+    
+    fields = class_info['Fields']
 
-        #Rename the field
-        fields[new_field_name] = fields.pop(old_field_name) #could use some .pop()corn
-        print(f"Field '{old_field_name}' renamed to '{new_field_name}' successfully.")
-
-
-    except Exception as e:
-        print(f"An unexpected error occurred while renaming the field: {e}")
+    
+    if field_name not in fields:
+        return False 
+    
+    
+    fields[field_name] = new_type
+    return True  

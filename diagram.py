@@ -1,1 +1,2 @@
+'''Creates the Diagram'''
 diagram = {}

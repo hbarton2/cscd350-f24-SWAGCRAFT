@@ -19,22 +19,24 @@ def printCommands():
     print(Fore.CYAN + "=" * 55)
     print(Fore.MAGENTA + " |     Class Commands    |     Method Commands       |")
     print(Fore.CYAN + "-+-----------------------+---------------------------+")
-    print(Fore.MAGENTA + " | Add class             | Add Method                |")
+    print(Fore.MAGENTA + " | Add Class             | Add Method                |")
     print(Fore.MAGENTA + " | Rename Class          | Rename Method             |")
     print(Fore.MAGENTA + " | Delete Class          | Delete Method             |")
+    print(Fore.MAGENTA + " |                       | Change Method Type        |")
     print(Fore.CYAN + "-+-----------------------+---------------------------+")
     print(Fore.MAGENTA + " |   Field Commands      |     Parameter Commands    |")
     print(Fore.CYAN + "-+-----------------------+---------------------------+")
     print(Fore.MAGENTA + " | Add Field             | Add Parameter             |")
     print(Fore.MAGENTA + " | Rename Field          | Rename Parameter          |")
     print(Fore.MAGENTA + " | Delete Field          | Remove Parameter          |")
+    print(Fore.MAGENTA + " | Change Field Type     | Change Param Type         |")
     print(Fore.CYAN + "-+-----------------------+---------------------------+")
     print(Fore.MAGENTA + " | Relationship Commands |       Other Commands      |")
     print(Fore.CYAN + " +-----------------------+---------------------------+")
     print(Fore.MAGENTA + " | Add Relationship      | List Classes              |")
     print(Fore.MAGENTA + " | Delete Relationship   | Show Class                |")
     print(Fore.MAGENTA + " | Show Relationships    | Help                      |")
-    print(Fore.MAGENTA + " |                       | Quit                      |")
+    print(Fore.MAGENTA + " | Change Relation Type  | Quit                      |")
     print(Fore.MAGENTA + " |                       | Save                      |")
     print(Fore.MAGENTA + " |                       | Load                      |")
     print(Fore.CYAN + " +-----------------------+---------------------------+")
@@ -56,15 +58,19 @@ How to Use the CLI Application:""")
 - Add Method          |   : Add a method to the current class. 
 - Rename Method       |   : Rename a method. 
 - Delete Method       |   : Delete a method from the current class.
+- Change Method Type  |   : Change method return type          
 - Add a Parameter     |   : Add a parameter to a method.
 - Remove a Parameter  |   : Remove a parameter from a method.
 - Rename a Parameter  |   : Rename a parameter belonging to an existing method.
+- Change Param Type   |   : Change parameter type
 - Add Field           |   : Add a field to the current class.
 - Rename Field        |   : Rename a field. 
 - Delete Field        |   : Delete a field from the current class.
+- Change Field Type   |   : Change the type category of a field
 - Add Relationship    |   : Create a relationship between classes.
 - Delete Relationship |   : Remove a relationship between classes.
 - Show Relationships  |   : Show the relationships between all classes.
+- Change Relation Type|   : Change a relationship type between two classes.          
 - Save                |   : Save the diagram.
 - Load                |   : Load the diagram.
 - Help                |   : Display this help menu.
@@ -96,216 +102,585 @@ def menuCLI():
             continue
 
 
-        #Gets user input for old class name and new class name and calls controller to rename class
+        # ADD CLASS
+        elif (choice == "addclass"):
+            print(Fore.YELLOW + "Input the class name: ")
+            className = str(input())
+
+            # Attempts to add class. If false class already in diagram else class is created
+            if (controllerAddClass(className)):
+                print(Fore.GREEN + "Successfully created class: " + className)
+            else:
+                print(Fore.RED + "Error: " + className + " already in diagram ")
+            continue
+
+        # RENAME CLASS
         elif (choice == "renameclass"):
             print(Fore.YELLOW + "Input the old class name: ")
             originalClassName = str(input())
 
-            #Checks user input for class exists
+            # Checks user input for class exists
             if(controllerClassExists(originalClassName) == False):
                 print(Fore.RED + "Class " + originalClassName + " isn't in diagram")
                 continue
-            
+
             print(Fore.YELLOW + "Input the new class name: ")
             newClassName = str(input())
 
-            #Attempts to rename class. True returns success message, False returns error message
+            # Attempts to rename class. True returns success message, False returns error message
             if(mainRenameClass(originalClassName, newClassName)):
                 print(Fore.GREEN + "Successfully renamed class " + originalClassName + " to " + newClassName)
             else:
-                print(Fore.RED + "An error has occured")
+                print(Fore.RED + "An error has occurred")
 
-
-        #Gets user input for old class name and new class name and calls controller to rename class
+        # DELETE CLASS
         elif (choice == "deleteclass"):
             print(Fore.YELLOW + "Input the class name: ")
             unwantedClass = str(input())
 
-
-            #Attempts to delete a class. True returns success message, False returns error message
+            # Attempts to delete a class. True returns success message, False returns error message
             if(controllerDeleteClass(unwantedClass)):
                 print(Fore.GREEN + "Successfully deleted class" + unwantedClass)
             else:
-                print(Fore.RED + "Class " + unwantedClass + " isn't in diagram")                
-        
-        #METHODS
+                print(Fore.RED + "Class " + unwantedClass + " isn't in diagram")
 
-        #ADD METHOD
-        #Gets user input for method name calls controller to add method
+        # ADD METHOD
         elif (choice == "addmethod"):
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
 
-            #Checks user input for class exists
-            if(controllerClassExists(className) == False):
+            if not controllerClassExists(className):
                 print(Fore.RED + "Class " + className + " isn't in diagram")
                 continue
 
             print(Fore.YELLOW + "Input the method name: ")
             methodName = str(input()).strip()
-            
-            #Attempts to add a method. True returns success message, False returns error message
-            if(controllerAddMethod(className, methodName)):
+
+            # Parameter collection
+            parameters = []
+            param_count = 1
+
+            while True:
+                print(Fore.YELLOW + f"Parameter {param_count} name (or type 'none' to finish): ")
+                param_name = str(input()).strip()
+
+                if param_name.lower() == 'none':
+                    break
+
+                print(Fore.YELLOW + f"Parameter {param_count} type: ")
+                param_type = str(input()).strip()
+
+                parameters.append(f"{param_type} {param_name}")
+                param_count += 1
+
+            # Get return type
+            print(Fore.YELLOW + "Input the return type: ")
+            return_type = str(input()).strip()
+
+            # Create method signature dict
+            method_signature = {
+                "parameters": parameters,
+                "return_type": return_type
+            }
+
+            if controllerAddMethod(className, methodName, method_signature):
                 print(Fore.GREEN + "Successfully created method " + methodName)
             else:
-                print(Fore.RED + "An error has occured")                
-        
+                print(Fore.RED + "An error has occurred")
 
-        #RENAME METHOD
-        #Gets user input for old and new method name calls controller to rename method
+        # RENAME METHOD
         elif (choice == "renamemethod"):
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
 
-            #Checks user input for class exists
-            if(controllerClassExists(className)== False):
+            if(controllerClassExists(className) == False):
                 print(Fore.RED + "Class " + className + " isn't in diagram")
                 continue
-            
-            print(Fore.YELLOW + "Input the old method name: ")
+
+            diagramCopy = controllerCopyData()
+            class_info = diagramCopy[className]
+
+            if 'Methods' in class_info and class_info['Methods']:
+                print(Fore.CYAN + "\nAvailable methods in class " + className + ":")
+                for method_name, method_signatures in class_info['Methods'].items():
+                    for idx, signature in enumerate(method_signatures):
+                        params = ', '.join(signature['parameters'])
+                        return_type = signature['return_type']
+                        print(f"{idx}: {return_type} {method_name}({params})")
+            else:
+                print(Fore.RED + "No methods found in class " + className)
+                continue
+
+            print(Fore.YELLOW + "\nInput the old method name: ")
             oldMethodName = str(input()).strip()
 
-            #Checks user input for method exists
-            if(controllerMethodExists(className, oldMethodName)== False):
+            if(controllerMethodExists(className, oldMethodName) == False):
                 print(Fore.RED + "Method " + oldMethodName + " isn't in diagram")
                 continue
+
+            method_signatures = class_info['Methods'][oldMethodName]
+            overload_index = None
+            if len(method_signatures) > 1:
+                print(Fore.YELLOW + "\nThis method has multiple overloads. Select index to rename (or 'all'): ")
+                overload_choice = str(input()).strip()
+
+                if overload_choice.lower() != 'all':
+                    try:
+                        overload_index = int(overload_choice)
+                        if overload_index < 0 or overload_index >= len(method_signatures):
+                            print(Fore.RED + "Invalid index")
+                            continue
+                    except ValueError:
+                        print(Fore.RED + "Invalid index")
+                        continue
 
             print(Fore.YELLOW + "Input the new method name: ")
             newMethodName = str(input()).strip()
 
-            #Attempts to rename a method. True returns success message, False returns error message
-            if(controllerRenameMethod(className, oldMethodName, newMethodName)):
-                print(Fore.GREEN + "Successfully renamed method " + oldMethodName + " to " + newMethodName)
+            if(controllerRenameMethod(className, oldMethodName, newMethodName, overload_index)):
+                if overload_index is not None:
+                    print(Fore.GREEN + f"Successfully renamed method {oldMethodName} (version {overload_index}) to {newMethodName}")
+                else:
+                    print(Fore.GREEN + "Successfully renamed method " + oldMethodName + " to " + newMethodName)
             else:
-                print(Fore.RED + "An error has occured") 
+                print(Fore.RED + "An error has occurred")
 
-        #REMOVE METHOD
-        #Gets user input for method name calls controller to delete method
+        # DELETE METHOD
         elif (choice == "deletemethod"):
+            diagramCopy = controllerCopyData()
+            # Get and validate class name
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
 
-            #Checks user input for class exists
             if(controllerClassExists(className)== False):
                 print(Fore.RED + "Class " + className + " isn't in diagram")
                 continue
 
+            # Get method name
             print(Fore.YELLOW + "Input the method name: ")
             methodName = str(input()).strip()
 
-            #Attempts to delete a method. True returns success message, False returns error message
-            if(controllerRemoveMethod(className, methodName)):
-                print(Fore.GREEN + "Successfully deleted method " + methodName)
-            else:
-                print(Fore.RED + "Method " + methodName + " isn't in diagram") 
+            # Handle method deletion with special handling for overloaded methods
+            if className in diagramCopy and 'Methods' in diagramCopy[className] and methodName in diagramCopy[className]['Methods']:
+                method_versions = diagramCopy[className]['Methods'][methodName]
+                if len(method_versions) > 1:
+                    # Display all overloaded versions of the method
+                    print(Fore.YELLOW + "\nThis method is overloaded. Found " + str(len(method_versions)) + " versions:")
+                    for idx, method in enumerate(method_versions):
+                        print(f"{idx}: {method['return_type']} {methodName}({', '.join(method['parameters'])})")
 
-        #ADD TYPE (METHOD)
+                    # Let user select which overloaded version to delete
+                    print(Fore.YELLOW + "\nEnter the index of the version to delete (0-" + str(len(method_versions)-1) + "): ")
+                    try:
+                        overloaded_index = int(input().strip())
+                        if overloaded_index < 0 or overloaded_index >= len(method_versions):
+                            print(Fore.RED + "Invalid index")
+                            continue
+                    except ValueError:
+                        print(Fore.RED + "Invalid input. Please enter a number.")
+                        continue
+
+                    # Delete specific overloaded version
+                    if(controllerRemoveMethod(className, methodName, overloaded_index)):
+                        print(Fore.GREEN + f"Successfully deleted overloaded method {methodName} (version {overloaded_index})")
+                    else:
+                        print(Fore.RED + "Failed to delete method " + methodName)
+                else:
+                    # Delete single method version
+                    if(controllerRemoveMethod(className, methodName, None)):
+                        print(Fore.GREEN + "Successfully deleted method " + methodName)
+                    else:
+                        print(Fore.RED + "Failed to delete method " + methodName)
+            else:
+                print(Fore.RED + "Method " + methodName + " isn't in diagram")
+
         
-        #CHANGE TYPE (METHOD)
+        # CHANGE METHOD TYPE
+        elif (choice == "changemethodtype"):
+            # Get and validate class name
+            print(Fore.YELLOW + "Input the class name: ")
+            className = str(input()).strip()
+
+            if not controllerClassExists(className):
+                print(Fore.RED + "Class " + className + " isn't in diagram")
+                continue
+
+            # Get and validate method name
+            print(Fore.YELLOW + "Input the method name: ")
+            methodName = str(input()).strip()
+
+            if not controllerMethodExists(className, methodName):
+                print(Fore.RED + "Method " + methodName + " isn't in diagram")
+                continue
+
+            # Handle overloaded methods
+            diagramCopy = controllerCopyData()
+            class_info = diagramCopy[className]
+            overload_index = None
+            if len(class_info['Methods'][methodName]) > 1:
+                # Display all overloaded versions
+                print(Fore.YELLOW + "\nThis method has multiple overloads:")
+                for idx, params in enumerate(class_info['Methods'][methodName]):
+                    params_str = ', '.join(params['parameters'])
+                    return_type = params['return_type']
+                    print(f"{idx}: {return_type} {methodName}({params_str})")
+
+                # Let user select which overload to modify
+                print(Fore.YELLOW + "\nEnter the overload index to modify (or 'all' to change all overloads): ")
+                overload_choice = str(input()).strip()
+
+                if overload_choice.lower() != 'all':
+                    try:
+                        overload_index = int(overload_choice)
+                        if overload_index < 0 or overload_index >= len(class_info['Methods'][methodName]):
+                            print(Fore.RED + "Invalid index")
+                            continue
+                    except ValueError:
+                        print(Fore.RED + "Invalid index")
+                        continue
+
+            # Get new return type
+            print(Fore.YELLOW + "Input the new return type: ")
+            newReturnType = str(input()).strip()
+
+            # Change method return type and provide feedback
+            if overload_index is not None:
+                if controllerChangeMethodType(className, methodName, newReturnType, overload_index):
+                    print(Fore.GREEN + f"Successfully changed return type of method {methodName} (version {overload_index}) to {newReturnType}")
+                else:
+                    print(Fore.RED + "An error occurred while changing the return type")
+            else:
+                all_successful = True
+                for i in range(len(class_info['Methods'][methodName])):
+                    if not controllerChangeMethodType(className, methodName, newReturnType, i):
+                        all_successful = False
+                        break
+                if all_successful:
+                    print(Fore.GREEN + f"Successfully changed return type of all overloads of method {methodName} to {newReturnType}")
+                else:
+                    print(Fore.RED + "An error occurred while changing the return type")
+
+        
 
         #PARAMETERS
 
         #ADD PARAMETER
-        #Attempts to add a parameter. True returns success message, False returns error message
         elif (choice == "addparameter"):
+            # Get and validate class name
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
 
-            #Checks user input for class exists
-            if(controllerClassExists(className)== False):
+            if(controllerClassExists(className) == False):
                 print(Fore.RED + "Class " + className + " isn't in diagram")
                 continue
 
+            # Get and validate method name
             print(Fore.YELLOW + "Input the method name: ")
             methodName = str(input()).strip()
 
-            #Checks user input for method exists
-            if(controllerMethodExists(className, methodName)== False):
+            if(controllerMethodExists(className, methodName) == False):
                 print(Fore.RED + "Method " + methodName + " isn't in diagram")
                 continue
 
-            print(Fore.YELLOW + "Input the name of the new parameter: ")
-            parameterName = str(input()).strip()
+            # Handle overloaded methods
+            diagramCopy = controllerCopyData()
+            class_info = diagramCopy[className]
+            overload_index = 0
+            if len(class_info['Methods'][methodName]) > 1:
+                # Display all overloaded versions
+                print(Fore.YELLOW + "\nThis method has multiple overloads:")
+                for idx, params in enumerate(class_info['Methods'][methodName]):
+                    params_str = ', '.join(params['parameters'])
+                    return_type = params['return_type']
+                    print(f"{idx}: {return_type} {methodName}({params_str})")
 
-            print(Fore.YELLOW + "Input the parameter datatype: ")
-            parameterType = str(input()).strip()
+                # Let user select which overload to modify
+                print(Fore.YELLOW + "\nEnter the overload index to modify: ")
+                try:
+                    overload_index = int(input().strip())
+                except ValueError:
+                    print(Fore.RED + "Invalid index")
+                    continue
 
-
-            if(controllerAddParameter(className, methodName, parameterName, parameterType)):
-                print(Fore.GREEN + "Successfully created parameter " + parameterName + " with type " + parameterType)
-            else:
-                print(Fore.RED + "An error has occured")                
-
-
-        #REMOVE PARAMETER
-        #Attempts to remove a parameter. True returns success message, False returns error message
-        elif (choice == "removeparameter"):
-            print(Fore.YELLOW + "Input the class name: ")
-            className = str(input()).strip()
-
-            #Checks user input for class exists
-            if(controllerClassExists(className)== False):
-                print(Fore.RED + "Class " + className + " isn't in diagram")
-                continue
-
-            print(Fore.YELLOW + "Input the method name: ")
-            methodName = str(input()).strip()
-
-            #Checks user input for method exists
-            if(controllerMethodExists(className, methodName)== False):
-                print(Fore.RED + "Method " + methodName + " isn't in diagram")
-                continue
-
+            # Get parameter details
             print(Fore.YELLOW + "Input the parameter name: ")
             parameterName = str(input()).strip()
 
-            if(controllerRemoveParameter(className, methodName, parameterName)):
-                print(Fore.GREEN + "Successfully deleted parameter " + parameterName)
+            print(Fore.YELLOW + "Input the parameter type: ")
+            parameterType = str(input()).strip()
+
+            # Add parameter and provide feedback
+            if(controllerAddParameter(className, methodName, parameterType, parameterName, overload_index)):
+                print(Fore.GREEN + "Successfully added parameter " + parameterName + " with type " + parameterType)
             else:
-                print(Fore.RED + "An error has occured") 
+                print(Fore.RED + "An error has occurred")
 
-        # RENAME UPDATE WITH NEW NAME ND OLD NAME GETTING SKIPPED FOR NOW -THOMAS
 
-        #RENAME PARAMTER
-        #Attempts to rename a parameter. True returns success message, False returns error message
-        elif (choice == "renameparameter"):
+        # REMOVE PARAMETER
+        elif choice == "removeparameter":
+            # Get and validate class name
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
 
-            #Checks user input for class exists
+            if not controllerClassExists(className):
+                print(Fore.RED + f"Class {className} isn't in diagram")
+                continue
+
+            # Get and validate method name
+            print(Fore.YELLOW + "Input the method name: ")
+            methodName = str(input()).strip()
+
+            if not controllerMethodExists(className, methodName):
+                print(Fore.RED + f"Method {methodName} isn't in diagram")
+                continue
+
+            # Get method details and validate parameters exist
+            diagramCopy = controllerCopyData()
+            class_info = diagramCopy[className]
+            method_overloads = class_info['Methods'].get(methodName, [])
+
+            if not method_overloads:
+                print(Fore.RED + "Method has no parameters")
+                continue
+
+            # Handle method overloads
+            overload_index = 0
+            if len(method_overloads) > 1:
+                # Display all overloaded versions
+                print(Fore.YELLOW + "\nThis method has multiple overloads:")
+                for idx, params in enumerate(method_overloads):
+                    print(f"{idx}: {params['return_type']} {methodName}({', '.join(params['parameters'])})")
+
+                # Let user select which overload to modify
+                print(Fore.YELLOW + "\nEnter the overload index to modify: ")
+                try:
+                    overload_index = int(input().strip())
+                    if not (0 <= overload_index < len(method_overloads)):
+                        print(Fore.RED + "Invalid overload index")
+                        continue
+                except ValueError:
+                    print(Fore.RED + "Invalid index - must be a number")
+                    continue
+
+            # Display current parameters
+            parameters = method_overloads[overload_index]["parameters"]
+            if not parameters:
+                print(Fore.RED + "Selected method has no parameters")
+                continue
+
+            print(Fore.YELLOW + "\nCurrent parameters:")
+            for idx, param in enumerate(parameters):
+                param_parts = param.split()
+                if len(param_parts) >= 2:
+                    param_type = ' '.join(param_parts[:-1])  # Get parameter type
+                    param_name = param_parts[-1]  # Get parameter name
+                    print(f"{param_type} {param_name}")
+
+            # Get parameter to remove
+            print(Fore.YELLOW + "\nInput the parameter name to remove: ")
+            parameterName = str(input()).strip()
+
+            # Remove parameter and provide feedback
+            if controllerRemoveParameter(className, methodName, parameterName, overload_index):
+                print(Fore.GREEN + f"Successfully deleted parameter {parameterName}")
+            else:
+                print(Fore.RED + "Parameter not found or could not be removed")
+
+        # RENAME PARAMETER
+        elif (choice == "renameparameter"):
+            # Get and validate class name
+            print(Fore.YELLOW + "Input the class name: ")
+            className = str(input()).strip()
+
             if(controllerClassExists(className)== False):
                 print(Fore.RED + "Class " + className + " isn't in diagram")
                 continue
 
+            # Get and validate method name
             print(Fore.YELLOW + "Input the method name: ")
             methodName = str(input()).strip()
 
-            #Checks user input for method exists
             if(controllerMethodExists(className, methodName)== False):
                 print(Fore.RED + "Method " + methodName + " isn't in diagram")
                 continue
 
-            # print(Fore.YELLOW + "Input the old parameter name: ")
-            # oldParameterName = str(input()).strip()
+            # Get method details and validate parameters exist
+            diagramCopy = controllerCopyData()
+            class_info = diagramCopy[className]
+            method_overloads = class_info['Methods'].get(methodName, [])
 
-            #print(Fore.YELLOW + "Input the new parameter name: ")
-            # newParameterName = str(input()).strip()
+            if not method_overloads:
+                print(Fore.RED + "Method has no parameters")
+                continue
 
-            if(controllerChangeParameter(className, methodName)):
-                print(Fore.GREEN + "Successfully deleted parameter " + parameterName)
+            # Handle method overloads
+            overload_index = 0
+            if len(method_overloads) > 1:
+                # Display all overloaded versions
+                print(Fore.YELLOW + "\nThis method has multiple overloads:")
+                for idx, params in enumerate(method_overloads):
+                    print(f"{idx}: {params['return_type']} {methodName}({', '.join(params['parameters'])})")
+
+                # Let user select which overload to modify
+                print(Fore.YELLOW + "\nEnter the overload index to modify: ")
+                try:
+                    overload_index = int(input().strip())
+                    if not (0 <= overload_index < len(method_overloads)):
+                        print(Fore.RED + "Invalid overload index")
+                        continue
+                except ValueError:
+                    print(Fore.RED + "Invalid index - must be a number")
+                    continue
+
+            # Display current parameters for selected method/overload
+            parameters = method_overloads[overload_index]["parameters"]
+            if not parameters:
+                print(Fore.RED + "Selected method has no parameters")
+                continue
+
+            print(Fore.YELLOW + "\nCurrent parameters:")
+            for param in parameters:
+                param_parts = param.split()
+                if len(param_parts) >= 2:
+                    param_type = ' '.join(param_parts[:-1])  # Get parameter type
+                    param_name = param_parts[-1]  # Get parameter name
+                    print(f"{param_type} {param_name}")
+
+            # Get parameter to rename
+            print(Fore.YELLOW + "\nInput the parameter name to rename: ")
+            oldParameterName = str(input()).strip()
+
+            # Validate parameter exists
+            parameter_exists = False
+            parameter_type = None
+            for param in parameters:
+                param_parts = param.split()
+                if param_parts[-1] == oldParameterName:
+                    parameter_exists = True
+                    parameter_type = ' '.join(param_parts[:-1])
+                    break
+
+            if not parameter_exists:
+                print(Fore.RED + f"Parameter {oldParameterName} not found in method")
+                continue
+
+            # Get new parameter name
+            print(Fore.YELLOW + "Input the new parameter name: ")
+            newParameterName = str(input()).strip()
+
+            # Get new parameter type
+            print(Fore.YELLOW + "Input the new parameter type: ")
+            parameter_type = str(input()).strip()
+
+            # Validate new parameter name doesn't already exist
+            for param in parameters:
+                param_parts = param.split()
+                if param_parts[-1] == newParameterName:
+                    print(Fore.RED + f"Parameter {newParameterName} already exists in method")
+                    continue
+
+            # Call controller to rename parameter
+            if(controllerChangeParameter(className, methodName, oldParameterName, newParameterName, parameter_type, overload_index)):
+                print(Fore.GREEN + f"Successfully renamed parameter {oldParameterName} to {newParameterName}")
             else:
-                print(Fore.RED + "An error has occured")
-    
+                print(Fore.RED + "An error occurred while renaming the parameter")
+
+        # CHANGE PARAMETER TYPE
+        elif (choice == "changeparamtype"):
+            # Get and validate class name
+            print(Fore.YELLOW + "Input the class name: ")
+            className = str(input()).strip()
+
+            if(controllerClassExists(className)== False):
+                print(Fore.RED + "Class " + className + " isn't in diagram")
+                continue
+
+            # Get and validate method name
+            print(Fore.YELLOW + "Input the method name: ")
+            methodName = str(input()).strip()
+
+            if(controllerMethodExists(className, methodName)== False):
+                print(Fore.RED + "Method " + methodName + " isn't in diagram")
+                continue
+
+            # Get method details and validate parameters exist
+            diagramCopy = controllerCopyData()
+            class_info = diagramCopy[className]
+            method_overloads = class_info['Methods'].get(methodName, [])
+
+            if not method_overloads:
+                print(Fore.RED + "Method has no parameters")
+                continue
+
+            # Handle method overloads
+            overload_index = 0
+            if len(method_overloads) > 1:
+                # Display all overloaded versions
+                print(Fore.YELLOW + "\nThis method has multiple overloads:")
+                for idx, params in enumerate(method_overloads):
+                    print(f"{idx}: {params['return_type']} {methodName}({', '.join(params['parameters'])})")
+
+                # Let user select which overload to modify
+                print(Fore.YELLOW + "\nEnter the overload index to modify: ")
+                try:
+                    overload_index = int(input().strip())
+                    if not (0 <= overload_index < len(method_overloads)):
+                        print(Fore.RED + "Invalid overload index")
+                        continue
+                except ValueError:
+                    print(Fore.RED + "Invalid index - must be a number")
+                    continue
+
+            # Display current parameters for selected method/overload
+            parameters = method_overloads[overload_index]["parameters"]
+            if not parameters:
+                print(Fore.RED + "Selected method has no parameters")
+                continue
+
+            print(Fore.YELLOW + "\nCurrent parameters:")
+            for param in parameters:
+                param_parts = param.split()
+                if len(param_parts) >= 2:
+                    param_type = ' '.join(param_parts[:-1])  # Get parameter type
+                    param_name = param_parts[-1]  # Get parameter name
+                    print(f"{param_type} {param_name}")
+
+            # Get parameter to rename
+            print(Fore.YELLOW + "\nInput the parameter name to change the type of: ")
+            oldParameterName = str(input()).strip()
+
+            # Validate parameter exists
+            parameter_exists = False
+            parameter_type = None
+            for param in parameters:
+                param_parts = param.split()
+                if param_parts[-1] == oldParameterName:
+                    parameter_exists = True
+                    parameter_type = ' '.join(param_parts[:-1])
+                    break
+
+            if not parameter_exists:
+                print(Fore.RED + f"Parameter {oldParameterName} not found in method")
+                continue
+
+            # Get new parameter type
+            print(Fore.YELLOW + "Input the new parameter type: ")
+            parameter_type = str(input()).strip()
+
+            # Call controller to rename parameter
+            if(controllerChangeParameterType(className, methodName, oldParameterName, parameter_type, overload_index)):
+                print(Fore.GREEN + f"Successfully changed parameter type for {oldParameterName}")
+            else:
+                print(Fore.RED + "An error occurred while renaming the parameter")
         
         #FIELDS
 
-        #ADD FIELD
-        #Attempts to add a field. True returns success message, False returns error message
+        # ADD FIELD
         elif (choice == "addfield"):
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
 
-            #Checks user input for class exists
+            # Checks user input for class exists
             if(controllerClassExists(className)== False):
                 print(Fore.RED + "Class " + className + " isn't in diagram")
                 continue
@@ -319,15 +694,14 @@ def menuCLI():
             if(controllerAddField(className, fieldName, fieldType)):
                 print(Fore.GREEN + "Successfully created a field " + fieldName + " with type " + fieldType)
             else:
-                print(Fore.RED + "An error has occured")
+                print(Fore.RED + "An error has occurred")
 
-        #RENAME FIELD
-        #Attempts to rename a field. True returns success message, False returns error message
+        # RENAME FIELD
         elif (choice == "renamefield"):
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
 
-            #Checks user input for class exists
+            # Checks user input for class exists
             if(controllerClassExists(className)== False):
                 print(Fore.RED + "Class " + className + " isn't in diagram")
                 continue
@@ -335,9 +709,9 @@ def menuCLI():
             print(Fore.YELLOW + "Input the old field name: ")
             oldFieldName = str(input()).strip()
 
-            #Checks user input for field exists
-            if(controllerFieldExists(oldFieldName)== False):
-                print(Fore.RED + "Filed " + oldFieldName + " isn't in diagram")
+            # Checks user input for field exists
+            if(controllerFieldExists(className, oldFieldName)== False):
+                print(Fore.RED + "Field " + oldFieldName + " isn't in diagram")
                 continue
 
             print(Fore.YELLOW + "Input the new field name: ")
@@ -346,16 +720,14 @@ def menuCLI():
             if(controllerRenameField(className, oldFieldName, newFieldName)):
                 print(Fore.GREEN + "Successfully renamed a field " + oldFieldName + " with " + newFieldName)
             else:
-                print(Fore.RED + "An error has occured")
+                print(Fore.RED + "An error has occurred")
 
-
-        #DELETE FIELD
-        #Attempts to delete a field. True returns success message, False returns error message
+        # DELETE FIELD
         elif (choice == "deletefield"):
             print(Fore.YELLOW + "Input the class name: ")
             className = str(input()).strip()
 
-            #Checks user input for class exists
+            # Checks user input for class exists
             if(controllerClassExists(className)== False):
                 print(Fore.RED + "Class " + className + " isn't in diagram")
                 continue
@@ -363,30 +735,48 @@ def menuCLI():
             print(Fore.YELLOW + "Input the name of the field to be removed: ")
             fieldName = str(input()).strip()
 
-            #Checks user input for field exists
-            if(controllerFieldExists(fieldName)== False):
-                print(Fore.RED + "Filed " + fieldName + " isn't in diagram")
+            # Checks user input for field exists
+            if(controllerFieldExists(className,fieldName)== False):
+                print(Fore.RED + "Field " + fieldName + " isn't in diagram")
                 continue
 
             if(controllerRemoveField(className, fieldName)):
                 print(Fore.GREEN + "Successfully deleted a field " + fieldName)
             else:
-                print(Fore.RED + "An error has occured")
-            
-        #ADD TYPE (FIELD)
+                print(Fore.RED + "An error has occurred")
 
-        #CHANGE TYPE (FIELD)
+        # CHANGE FIELD TYPE
+        elif (choice == "changefieldtype"):
+            print(Fore.YELLOW + "Input the class name: ")
+            className = str(input()).strip()
 
-        #RELATIONSHIPS
-        # WILL NEED TO ADD TYPES HERE ONCE THAT IS UPDATED!!!
+            # Checks user input for class exists
+            if(controllerClassExists(className)== False):
+                print(Fore.RED + "Class " + className + " isn't in diagram")
+                continue
 
-        #ADD RELATIONSHIP
-        #Attempts to add a relationship between two classes. True returns success message, False returns error message
+            print(Fore.YELLOW + "Input the field name: ")
+            fieldName = clean(input())
+
+            # Checks user input for field exists
+            if(controllerFieldExists(className,fieldName)== False):
+                print(Fore.RED + "Field " + fieldName + " isn't in diagram")
+                continue
+
+            print(Fore.YELLOW + "Input the new field type: ")
+            newFieldType= clean(input())
+
+            if(controllerChangeFieldType(className, fieldName, newFieldType)):
+                print(Fore.GREEN + "Successfully changed field type for " + fieldName + " to new type " + newFieldType)
+            else:
+                print(Fore.RED + "An error has occurred")
+
+        # ADD RELATIONSHIP
         elif (choice == "addrelationship"):
             print(Fore.YELLOW + "Input the first class name: ")
             className1 = str(input()).strip()
 
-            #Checks user input for class exists
+            # Checks user input for class exists
             if(controllerClassExists(className1)== False):
                 print(Fore.RED + "Class " + className1 + " isn't in diagram")
                 continue
@@ -394,31 +784,39 @@ def menuCLI():
             print(Fore.YELLOW + "Input the second class name: ")
             className2 = str(input()).strip()
 
-            #Checks user input for class exists
+            # Checks user input for class exists
             if(controllerClassExists(className2)== False):
                 print(Fore.RED + "Class " + className2 + " isn't in diagram")
                 continue
 
-            if(controllerAddRelationship(className1, className2)):
-                print(Fore.GREEN + "Successfully created a relationship between " + className1 + " and " + className2)
+            print(Fore.YELLOW + "Input the relationship type: ")
+            relationshipType = clean(input())
+            # Checks User Input for Type
+            while(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
+                if(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
+                    print(Fore.RED + "Incorrect relationship type, try again!")
+                    print(Fore.YELLOW + "Input the relationship type: ")
+                    relationshipType = clean(input())
+
+            if(controllerAddRelationship(className1, className2, relationshipType)):
+                print(Fore.GREEN + "Successfully created a relationship between " + className1 + " and " + className2 + " with type " + relationshipType)
             else:
-                print(Fore.RED + "An error has occured")
+                print(Fore.RED + "An error has occurred")
 
-
-        #DELETE RELATIONSHIP
+        # DELETE RELATIONSHIP
         elif (choice == "deleterelationship"):
             print(Fore.YELLOW + "Input the first class name: ")
             className1 = str(input()).strip()
 
-            #Checks user input for class exists
+            # Checks user input for class exists
             if(controllerClassExists(className1)== False):
                 print(Fore.RED + "Class " + className1 + " isn't in diagram")
                 continue
 
             print(Fore.YELLOW + "Input the second class name: ")
-            class2 = str(input()).strip()
+            className2 = str(input()).strip()
 
-            #Checks user input for class exists
+            # Checks user input for class exists
             if(controllerClassExists(className2)== False):
                 print(Fore.RED + "Class " + className2 + " isn't in diagram")
                 continue
@@ -426,20 +824,47 @@ def menuCLI():
             if(controllerDeleteRelationship(className1, className2)):
                 print(Fore.GREEN + "Successfully deleted the relationship between " + className1 + " and " + className2)
             else:
-                print(Fore.RED + "An error has occured")
+                print(Fore.RED + "An error has occurred")
 
+        # CHANGE RELATIONSHIP TYPE
+        elif (choice == "changerelationtype"):
+            print(Fore.YELLOW + "Input the first class name: ")
+            className1 = str(input()).strip()
 
+            # Checks user input for class exists
+            if(controllerClassExists(className1)== False):
+                print(Fore.RED + "Class " + className1 + " isn't in diagram")
+                continue
 
+            print(Fore.YELLOW + "Input the second class name: ")
+            className2 = str(input()).strip()
 
-        #DISPLAY DATA (THESE ALL NEED TO BE UPDATED)-THOMAS
+            # Checks user input for class exists
+            if(controllerClassExists(className2)== False):
+                print(Fore.RED + "Class " + className2 + " isn't in diagram")
+                continue
 
-        #LIST CLASSES
-        #Lists all classes and their details.
-        elif (choice == "listclasses"):
+            print(Fore.YELLOW + "Input the new relationship type: ")
+            newRelationshipType = clean(input())
+
+            # Checks User Input for Type
+            while(newRelationshipType != "aggregation" and newRelationshipType != "composition" and newRelationshipType !=  "generalization" and newRelationshipType != "realization"):
+                if(newRelationshipType != "aggregation" and newRelationshipType != "composition" and newRelationshipType !=  "generalization" and newRelationshipType != "realization"):
+                    print(Fore.RED + "Incorrect relationship type, try again!")
+                    print(Fore.YELLOW + "Input the relationship type: ")
+                    newRelationshipType = clean(input())
+
+            if(controllerChangeRelationType(className1, className2, newRelationshipType)):
+                print(Fore.GREEN + "Successfully changed relationship type for " + className1 + " and " + className2 + " to new type " + newRelationshipType)
+            else:
+                print(Fore.RED + "An error has occurred")
+
+        # LIST CLASSES
+        elif choice == "listclasses":
             diagramCopy = controllerCopyData()
 
             print(Fore.CYAN + "\n" + "=" * 40)
-            print(Fore.GREEN + "            List of Classes")
+            print(Fore.GREEN + " List of Classes")
             print(Fore.CYAN + "=" * 40)
 
             if not diagramCopy:
@@ -448,34 +873,34 @@ def menuCLI():
                 for class_name, details in diagramCopy.items():
                     print(f"Class: {Fore.MAGENTA + class_name}")
 
-
-                    #Extract and display fields yeeebooooiii
+                    # Extract and display fields
                     fields_dict = details.get('Fields', {})
                     if fields_dict:
                         fields = ', '.join(f"{name}: {type_}" for name, type_ in fields_dict.items())
                     else:
                         fields = "None"
-                    print(f"  Fields: {fields}")
+                    print(f" Fields: {fields}")
 
-                    methods_dict = details.get('Methods', {}) #this was not fun
+                    # Extract and display methods vertically
+                    methods_dict = details.get('Methods', {})
                     if methods_dict:
-                        methods = []
+                        print(" Methods:")
                         for method_name, method_signatures in methods_dict.items():
-                            signatures = [", ".join(signature) for signature in method_signatures]
-                            methods.append(f"{method_name}({'; '.join(signatures)})")
-                        methods_display = ', '.join(methods)
-
+                            for signature in method_signatures:
+                                params = ", ".join(signature["parameters"])
+                                return_type = signature["return_type"]
+                                print(f"\t{return_type} {method_name}({params})")
                     else:
-                        methods_display = "None"
-                    print(f"  Methods: {methods_display}")
+                        print(" Methods: None")
 
-        #SHOW CLASS
-        # Show the details of just one class
+                    print()  # Add blank line between classes
+
+        # SHOW CLASS
         elif (choice == "showclass"):
             print(Fore.YELLOW + "Please enter the name of the class you want to display:")
-            className = str(input().strip())
+            className = str(input()).strip()
 
-            #Checks user input for class exists (THOMAS CHANGED THIS)
+            # Checks user input for class exists
             if(controllerClassExists(className)== False):
                 print(Fore.RED + "Class " + className + " isn't in diagram")
                 continue
@@ -486,11 +911,11 @@ def menuCLI():
             print(Fore.MAGENTA + "         Details for Class")
             print("               " + Fore.MAGENTA + className)
             print(Fore.CYAN + "=" * 40)
-                
+
             details = diagramCopy[className]
             print(f"Class: {Fore.MAGENTA + className}")
 
-            #Extract and display fields default to empty
+            # Extract and display fields default to empty
             fields_dict = details.get('Fields', {})
             if fields_dict:
                 fields = ', '.join(f"{name}: {type_}" for name, type_ in fields_dict.items())
@@ -498,19 +923,19 @@ def menuCLI():
                 fields = "None"
             print(f"  Fields: {fields}")
 
-            #Extract and display methods defaulting to empty dictionary if not present
+            # Extract and display methods defaulting to empty dictionary if not present
             methods_dict = details.get('Methods', {})
             if methods_dict:
                 methods = []
                 for method_name, method_signatures in methods_dict.items():
-                    signatures = [", ".join(signature) for signature in method_signatures]
-                    methods.append(f"{method_name}({'; '.join(signatures)})")
-                    methods_display = ', '.join(methods)
-                else:
-                    methods_display = "None"
-                print(f"  Methods: {methods_display}")
+                    signatures = [", ".join(signature["parameters"]) + " -> " for signature in method_signatures]
+                    methods.append(signature["return_type"] + f"{method_name}({'; '.join(signatures)})")
+                methods_display = ', '.join(methods)
+            else:
+                methods_display = "None"
+            print(f"  Methods: {methods_display}")
 
-            #Display relationships
+            # Display relationships
             relations = details.get("Relations", {})
             connections = relations.get("associations", [])
             if connections:
@@ -518,9 +943,7 @@ def menuCLI():
             else:
                 print("  Associations: None")
 
-
-        #DISPLAY RELATIONSHIPS
-        #Lists relationships between all classes
+        # SHOW RELATIONSHIPS
         elif (choice == "showrelationships"):
             diagramCopy = controllerCopyData()
             print(Fore.CYAN + "\n" + "=" * 40)
@@ -540,32 +963,54 @@ def menuCLI():
             if not relationships_exist:
                 print(Fore.RED + "No relationships available.")
 
-        
-
-        
-        #SAVE AND LOAD
-        #WILL NEED TO BE UPDATED WITH INPUTS FOR UPDATED LOAD
-
-        # Save the diagram to json
+        # SAVE
         elif (choice == "save"):
-            controllerSave()
+            filename = input(Fore.YELLOW + "Enter filename to save (press Enter for default 'data.json'): ").strip()
+            if not filename:
+                filename = "data.json"
+            if not controllerSave(filename):
+                print(Fore.GREEN + "UML Saved Successfully!")
+            else:
+                print(Fore.RED + "File not Found!")
 
-        # Load a diagram 
+        # LOAD
         elif (choice == "load"):
-            controllerLoad()
+            while True:
+                response = input(Fore.YELLOW + "Do you want to save before you load? (Yes/No): ").strip().lower()
 
-        #GENERAL 
+                if response == "yes":
+                    filename = input(Fore.YELLOW + "Enter filename to save (press Enter for default 'data.json'): ").strip()
+                    if not filename:
+                        filename = "data.json"
 
-        # Print the Help menu
+                    if not controllerSave(filename):
+                        print(Fore.GREEN + "UML Saved Successfully!")
+                    else:
+                        print(Fore.RED + "File not Found!")
+
+                    response = "no"
+
+                # Check the response to decide whether to continue the loop
+                if response.lower() != "yes":
+                    break
+
+            filename = input(Fore.YELLOW + "Enter filename to load (press Enter for default 'data.json'): ").strip()
+            if not filename:
+                filename = "data.json"
+            if not controllerLoad(filename):
+                print(Fore.GREEN + "UML Saved Successfully!")
+            else:
+                print(Fore.RED + "File not Found!")
+
+        # HELP
         elif (choice == "help"):
             printHelpMenu()
 
-        # Quit the program 
+        # QUIT
         elif (choice == "quit"):
             print(Fore.YELLOW + "Have a nice day!")
             running = False
 
-        # If input isn't a command, reprompt
+        # INVALID INPUT
         else:
             print(Fore.RED + "Invalid Input, try again!")
-    
