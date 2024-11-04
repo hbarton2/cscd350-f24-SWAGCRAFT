@@ -295,9 +295,71 @@ def menuCLI():
                 print(Fore.RED + "Method " + methodName + " isn't in diagram")
 
         
-        #CHANGE METHOD TYPE
+        # CHANGE METHOD TYPE
         elif (choice == "changemethodtype"):
-            print("change method type in progress")
+            # Get and validate class name
+            print(Fore.YELLOW + "Input the class name: ")
+            className = str(input()).strip()
+
+            if not controllerClassExists(className):
+                print(Fore.RED + "Class " + className + " isn't in diagram")
+                continue
+
+            # Get and validate method name
+            print(Fore.YELLOW + "Input the method name: ")
+            methodName = str(input()).strip()
+
+            if not controllerMethodExists(className, methodName):
+                print(Fore.RED + "Method " + methodName + " isn't in diagram")
+                continue
+
+            # Handle overloaded methods
+            diagramCopy = controllerCopyData()
+            class_info = diagramCopy[className]
+            overload_index = None
+            if len(class_info['Methods'][methodName]) > 1:
+                # Display all overloaded versions
+                print(Fore.YELLOW + "\nThis method has multiple overloads:")
+                for idx, params in enumerate(class_info['Methods'][methodName]):
+                    params_str = ', '.join(params['parameters'])
+                    return_type = params['return_type']
+                    print(f"{idx}: {return_type} {methodName}({params_str})")
+
+                # Let user select which overload to modify
+                print(Fore.YELLOW + "\nEnter the overload index to modify (or 'all' to change all overloads): ")
+                overload_choice = str(input()).strip()
+
+                if overload_choice.lower() != 'all':
+                    try:
+                        overload_index = int(overload_choice)
+                        if overload_index < 0 or overload_index >= len(class_info['Methods'][methodName]):
+                            print(Fore.RED + "Invalid index")
+                            continue
+                    except ValueError:
+                        print(Fore.RED + "Invalid index")
+                        continue
+
+            # Get new return type
+            print(Fore.YELLOW + "Input the new return type: ")
+            newReturnType = str(input()).strip()
+
+            # Change method return type and provide feedback
+            if overload_index is not None:
+                if controllerChangeMethodType(className, methodName, newReturnType, overload_index):
+                    print(Fore.GREEN + f"Successfully changed return type of method {methodName} (version {overload_index}) to {newReturnType}")
+                else:
+                    print(Fore.RED + "An error occurred while changing the return type")
+            else:
+                all_successful = True
+                for i in range(len(class_info['Methods'][methodName])):
+                    if not controllerChangeMethodType(className, methodName, newReturnType, i):
+                        all_successful = False
+                        break
+                if all_successful:
+                    print(Fore.GREEN + f"Successfully changed return type of all overloads of method {methodName} to {newReturnType}")
+                else:
+                    print(Fore.RED + "An error occurred while changing the return type")
+
         
 
         #PARAMETERS
