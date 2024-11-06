@@ -3,8 +3,11 @@ from diagram import diagram
  
 class Field:
     def __init__(self, field_name, field_type):
+
         self.name = field_name
         self.fieldType = field_type
+
+# ------------------------------------------------------------------- #
 
 # FIELD_TYPES = ['int', 'double']
 
