@@ -1,6 +1,6 @@
 '''Checks if data exists'''
 
-from diagram import *
+from model import *
 
 def methodExists(class_name, method_name):
     """Returns false if the method doesn't exist, returns true otherwise."""

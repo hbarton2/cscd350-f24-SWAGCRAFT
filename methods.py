@@ -1,5 +1,5 @@
 from classes import *
-from diagram import diagram
+from model import diagram
 from colorama import init, Fore, Style
 
 def addMethod(class_name, method_name, parameters):

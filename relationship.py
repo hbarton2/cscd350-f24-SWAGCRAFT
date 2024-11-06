@@ -1,4 +1,4 @@
-from diagram import diagram
+from model import diagram
 
 def addRelationship(className1, className2, relationType):
     """

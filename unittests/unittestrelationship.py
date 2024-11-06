@@ -2,7 +2,7 @@ import unittest
 from io import StringIO
 import sys
 from relationship import addRelationship, deleteRelationship
-from diagram import diagram
+from model import diagram
 
 class TestRelationships(unittest.TestCase):
     '''

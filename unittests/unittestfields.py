@@ -2,7 +2,7 @@ import unittest
 from io import StringIO
 import sys
 from fields import addField, removeField, renameField
-from diagram import diagram
+from model import diagram
 
 class TestFields(unittest.TestCase):
     '''

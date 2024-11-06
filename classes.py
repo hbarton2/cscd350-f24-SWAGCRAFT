@@ -1,7 +1,7 @@
 '''Define root class'''
 
 #This imports the global dictionary from main
-from diagram import diagram
+from model import diagram
 
 def addClass(name):
     #checks if name is already in the diagram to avoid repeats returns False
