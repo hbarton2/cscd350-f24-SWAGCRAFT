@@ -2,6 +2,27 @@ from classes import *
 from diagram import diagram
 from colorama import init, Fore, Style
 
+class Method:
+    def __init__(self, name, returnType, params):
+        self.name = name
+        self.returnType = returnType
+        self.params = params
+
+    def getName(self):
+        return self.name
+    def setName(self, name):
+        self.name = name
+    
+    def getReturnType(self):
+        return self.returnType
+    def setReturnType(self, returnType):
+        self.returnType = returnType
+
+    def getParams(self):
+        return self.params
+    def setParams(self, params):
+        self.params = params
+
 def addMethod(class_name, method_name, method_signature):
     """
     Add a new method to a class in the diagram.
