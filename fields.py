@@ -2,7 +2,7 @@ from diagram import diagram
 
  
 class Field:
-    def __init__(self, field_name, field_type):
+    def __init__(self, field_name, field_type = None):
 
         self.name = field_name
         self.fieldType = field_type
