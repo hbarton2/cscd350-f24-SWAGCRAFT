@@ -3,6 +3,14 @@
 #This imports the global dictionary from main
 from diagram import diagram
 
+class Class:
+    
+    def __init__(self, name, Field, Method, Relationship):
+        self.name = name
+        self.Field = Field
+        self.Method = Method
+        self.Relationship = Relationship
+
 def addClass(name):
     #checks if name is already in the diagram to avoid repeats returns False
     if name in diagram:
