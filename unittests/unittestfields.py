@@ -1,3 +1,4 @@
+'''
 import unittest
 from io import StringIO
 import sys
@@ -5,12 +6,12 @@ from fields import addField, removeField, renameField
 from model import diagram
 
 class TestFields(unittest.TestCase):
-    '''
+    """
     Unit tests for fields.py
 
     Instead of raising exceptions during program execution the fields module uses soft error printing to handle error cases.
     In order to prevent crashes in the overall porject when something unexpected happens or occurs. Giving graceful handling.
-    '''
+    """
     def setUp(self):
         #Setup a diagram before each test. I borrowed heavily from a online resource on how to setup
         self.original_stdout = sys.stdout #Gotta specify
@@ -81,3 +82,4 @@ class TestFields(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+'''

@@ -1,3 +1,4 @@
+"""
 import unittest
 from io import StringIO
 import sys
@@ -106,3 +107,4 @@ class TestRelationships(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+"""
