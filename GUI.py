@@ -97,7 +97,22 @@ class UMLApp(ctk.CTk):
         self.drawFRAME.pack(side="right", fill="both", expand=True)
 
         self.canvas = tk.Canvas(self.drawFRAME, bg="white")  #drawing to canvas
-        self.canvas.pack(fill="both", expand=True)
+
+        #create horizontal and vertical scrollbars
+        hScroll = tk.Scrollbar(self.drawFRAME, orient="horizontal", command=self.canvas.xview)
+        vScroll = tk.Scrollbar(self.drawFRAME, orient="vertical", command=self.canvas.yview)
+
+        #config the canvas to use scroll
+        self.canvas.configure(xscrollcommand=hScroll.set, yscrollcommand=vScroll.set)
+
+        #layout the canvas and scroll
+        self.canvas.grid(row=0, column=0, sticky="nsew")
+        hScroll.grid(row=1, column=0, sticky="ew")
+        vScroll.grid(row=0, column=1, sticky="ns")
+
+        #configure the grid weights to make canvas expand wooo
+        self.drawFRAME.rowconfigure(0, weight=1)
+        self.drawFRAME.columnconfigure(0, weight=1)
 
         #binding clicking to giving options for the class instead of just deleting it like my previous vers
         self.canvas.bind("<Button-1>", self.onCanvasCLK)
@@ -129,7 +144,7 @@ class UMLApp(ctk.CTk):
         yOffST = 50
         xSpacing = maxWidth + 50  #base it on the widest class
         ySpacing = 150
-        maxRowWDTH = 2 #rechange for now
+        maxRowWDTH = 4 #rechange for now
 
         for idx, (className, classData) in enumerate(self.diagram.items()):#took too much effort but it looks amazing
             x = xOffST + (idx % maxRowWDTH) * xSpacing
@@ -148,6 +163,8 @@ class UMLApp(ctk.CTk):
 
         #draw color code reference in bottom right corner
         self.drawRelationshipLegend()
+        #update the scroll region
+        self.canvas.config(scrollregion=self.canvas.bbox("all"))
 
     def calculateClassDimensions(self, className, classData):
         width = 150  #minimum width
@@ -273,7 +290,8 @@ class UMLApp(ctk.CTk):
 
 
     def onCanvasCLK(self, event):
-        clickedItems = self.canvas.find_overlapping(event.x, event.y, event.x, event.y)
+        #find items at the adjusted coordinates
+        clickedItems = self.canvas.find_overlapping(self.canvas.canvasx(event.x), self.canvas.canvasy(event.y), self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)) #convert event coordinates to canvas coordinates...now it should register properly?
 
         for item in clickedItems:
             if item in self.classRects:
