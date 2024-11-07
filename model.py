@@ -1,5 +1,5 @@
 '''Creates the Model Class'''
-
+#adding comment for debugging conflict issue with this branch
 class Model:
     def __init__(self):
         self.classList = {}
