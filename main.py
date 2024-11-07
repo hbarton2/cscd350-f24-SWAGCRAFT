@@ -16,7 +16,7 @@ import sys
 
 
 def main():
-#GUI or CLI Mode?
+    Model()
 #Takes user input on initial run command and starts respective mode
     if len(sys.argv) > 1:
         mode = str(sys.argv[1])
