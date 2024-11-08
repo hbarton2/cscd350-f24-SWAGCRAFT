@@ -23,6 +23,20 @@ class Method:
     def setParams(self, params):
         self.params = params
 
+    def matches_signature(self, parameters):
+        """Check if parameter types match"""
+        # If parameters is None, convert to empty list
+        parameters = [] if parameters is None else parameters
+        # First check if the number of parameters match
+        if len(self.parameters) != len(parameters):
+            return False
+        # If both have no parameters, they match
+        if len(self.parameters) == 0 and len(parameters) == 0:
+            return True
+        # Compare each parameter type
+        return all(p1.type == p2.type for p1, p2 in zip(self.parameters, parameters))
+    
+
 def addMethod(class_name, method_name, method_signature):
     """
     Add a new method to a class in the diagram.
