@@ -1,9 +1,11 @@
 '''Define root class'''
 
+
 from relationship import Relationship
 from methods import Method
-from fields import Field
 from parameter import Parameter
+from fields import Field, FIELD_TYPES
+
 
 class Class:
     
@@ -16,17 +18,87 @@ class Class:
 
     # Field methods
 
-    def addField():
-        pass
+    def addField(self, field_name, field_type):
+        '''
+        Adds a new field to the class.
 
-    def removeField():
-        pass
+        Parameters: 
+            field_name (STR): The name of the field to add 
+            field_type (STR): The data type of the field.
 
-    def renameField():
-        pass
+        Returns:
+            bool: True if the field is added successfully, False otherwise.
+        '''
+        if field_type not in FIELD_TYPES:
+            return False
+        
+        for field in self.field:
+            if field.name == field_name:
+                return False
+            
+        new_field = Field(field_name, field_type)
+        self.field.appemd(new_field)
+        return True
+        
+    def removeField(self, field_name):
+        '''
+        Removes a specified field from the class.
 
-    def changeFieldDataType():
-        pass
+        Parameters:
+            field_name (STR): The name of the field to be removed.
+
+        Returns:
+            bool: True if the field is removed successfully, False otherwise.
+        '''
+
+        for field in self.field:
+            if field.name == field_name:
+                self.field.remove(field)
+                return True
+        return False
+
+    def renameField(self, old_field_name, new_field_name):
+        '''
+        Renames an existing field in the class.
+
+        Parameters:
+            old_field_name (STR): The current name of the field to be renamed.
+            new_field_name (STR): The new name for the field.
+
+        Returns:
+            bool: True if the field is renamed successfully, False otherwise.
+        '''
+
+        for field in self.field:
+            if field.name == old_field_name:
+                for exsiting_field in self.field:
+                    if exsiting_field.name == new_field_name:
+                        return False 
+                field.name = new_field_name
+                return True
+        return False
+        
+
+    def changeFieldDataType(self, field_name, new_field_type):
+        '''
+        Changes the data type of an existing field in the class.
+
+        Parameters:
+            field_name (STR): The name of the field whose type will be changed.
+            new_field_type (STR): The new data type for the field.
+
+        Returns:
+            bool: True if the field type is changed successfully, False otherwise.
+        '''
+
+        if new_field_type not in FIELD_TYPES:
+            return False
+
+        for field in self.field:
+            if field.name == field_name:
+                field.fieldType = new_field_type 
+                return True
+        return False       
 
     # Relationship methods
 
@@ -52,6 +124,7 @@ class Class:
                         return True
                 return False
         
+
 
      # Method methods
     def add_method(self, method_name, return_type, parameters):
