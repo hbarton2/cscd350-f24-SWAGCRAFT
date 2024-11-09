@@ -34,12 +34,23 @@ class Class:
         new_field = Field(field_name, field_type)
         self.field.appemd(new_field)
         return True
-
-
-            
         
-    def removeField():
-        pass
+    def removeField(self, field_name):
+        '''
+        Removes a specified field from the class.
+
+        Parameters:
+            field_name (STR): The name of the field to be removed.
+
+        Returns:
+            bool: True if the field is removed successfully, False otherwise.
+        '''
+
+        for field in self.field:
+            if field.name == field_name:
+                self.field.remove(field)
+                return True
+        return False
 
     def renameField():
         pass
