@@ -44,36 +44,36 @@ def controllerDeleteClass(unwantedClass):
 
 #Receives input from menu and calls method to add a method then returns True or False
 def controllerAddMethod(class_name, method_name, method_signature):
-    return addMethod(class_name, method_name, method_signature)
+    return Class.addMethod(class_name, method_name, method_signature)
 
 #Receives input from menu and calls method to rename a method then returns True or False
 def controllerRenameMethod(className, oldMethodName, newMethodName, overload_index):
-    return renameMethod(className, oldMethodName, newMethodName, overload_index)
+    return Class.renameMethod(className, oldMethodName, newMethodName, overload_index)
 
 #Receives input from menu and calls method to delete a method then returns True or False
 def controllerRemoveMethod(className, methodName, overloaded_index):
-    return removeMethod(className, methodName, overloaded_index)
+    return Class.removeMethod(className, methodName, overloaded_index)
 
 def controllerChangeMethodType(class_name, method_name, new_return_type, overload_index):
-    return changeMethodType(class_name, method_name, new_return_type, overload_index)
+    return Class.changeMethodDataType(class_name, method_name, new_return_type, overload_index)
 
 
 #PARAMETERS
 
 #Receives input from menu and calls method to add a parameter then returns True or False
 def controllerAddParameter(class_name, method_name, new_param_name, new_param_type, overload_index=0):
-    return addParameter(class_name, method_name, new_param_name, new_param_type, overload_index)
+    return Method.addParameter(class_name, method_name, new_param_name, new_param_type, overload_index)
 
 #Receives input from menu and calls method to delete a parameter then returns True or False
 def controllerRemoveParameter(className, methodName, parameterName, overloaded_index):
-    return removeParameter(className, methodName, parameterName, overloaded_index)
+    return Method.removeParameter(className, methodName, parameterName, overloaded_index)
 
 #Receives input from menu and calls method to change a parameter then returns True or False
 def controllerChangeParameter(className, methodName, oldParameterName, newParameterName, parameterType, overloadIndex):
-    return changeParameter(className, methodName, oldParameterName, newParameterName, parameterType, overloadIndex)
+    return Method.changeParameter(className, methodName, oldParameterName, newParameterName, parameterType, overloadIndex)
 
 def controllerChangeParameterType(className, methodName, parameterName, newType, overloadIndex):
-    return changeParameterType(className, methodName, parameterName, newType, overloadIndex)
+    return Method.changeParameterType(className, methodName, parameterName, newType, overloadIndex)
 
 
 #FIELDS
