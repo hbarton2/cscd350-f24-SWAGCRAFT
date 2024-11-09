@@ -9,6 +9,7 @@ from relationship import *
 from saveLoad import *
 from exists import *
 from copyDiagram import *
+from model import *
 
 #Controller takes input from view (menu) and preforms calls that modify data to adhere to MVC
 
@@ -28,15 +29,15 @@ def controllerFieldExists(className, fieldName):
 
 #Receives input from menu and calls method to create a class then returns True or False
 def controllerAddClass(className):
-    return addClass(className)
+    return Model.addClass(className)
 
 #Receives input from menu and calls method to rename a class then returns True or False
 def mainRenameClass(originalClassName, newClassName):
-    return renameClass(originalClassName, newClassName)
+    return Model.renameClass(originalClassName, newClassName)
 
 #Receives input from menu and calls method to delete a class then returns True or False
 def controllerDeleteClass(unwantedClass):
-    return deleteClass(unwantedClass)
+    return Model.deleteClass(unwantedClass)
 
 #METHODS
 
@@ -79,34 +80,34 @@ def controllerChangeParameterType(className, methodName, parameterName, newType,
 
 #Receives input from menu and calls method to add a field then returns True or False
 def controllerAddField(className, fieldName, fieldType):
-    return addField(className, fieldName, fieldType)
+    return Class.addField(className, fieldName, fieldType)
 
 #Receives input from menu and calls method to rename a field then returns True or False
 def controllerRenameField(className, oldFieldName, newFieldName):
-    return renameField(className, oldFieldName, newFieldName)
+    return Class.renameField(className, oldFieldName, newFieldName)
 
 #Receives input from menu and calls method to delete a field then returns True or False
 def controllerRemoveField(className, fieldName):
-    return removeField(className, fieldName)
+    return Class.removeField(className, fieldName)
 
 #Receives input from menu and calls method to change field type then returns True or False
 def controllerChangeFieldType(className, fieldName, newFieldType):
-    return changeFieldType(className, fieldName, newFieldType)
+    return Class.changeFieldType(className, fieldName, newFieldType)
 
 
 #RELATIONSHIPS
 
 #Receives input from menu and calls method to add a relationship then returns True or False
 def controllerAddRelationship(className1, className2, relationshipType):
-    return addRelationship(className1, className2, relationshipType)
+    return Class.addRelationship(className1, className2, relationshipType)
 
 #Receives input from menu and calls method to delete a relationship then returns True or False
 def controllerDeleteRelationship(className1, className2):
-    return deleteRelationship(className1, className2)
+    return Class.deleteRelationship(className1, className2)
 
 #Receives input from menu and calls method to change a type relationship then returns True or False
 def controllerChangeRelationType(className1, className2, newRelationType):
-    return changeRelationType(className1, className2, newRelationType)
+    return Class.changeRelationType(className1, className2, newRelationType)
 
 #COPY DATA (FOR DISPLAY) (THESE DO NOT WORK RIGHT NOW) - THOMAS
 
