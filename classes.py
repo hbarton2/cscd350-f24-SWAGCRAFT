@@ -52,8 +52,27 @@ class Class:
                 return True
         return False
 
-    def renameField():
-        pass
+    def renameField(self, old_field_name, new_field_name):
+        '''
+        Renames an existing field in the class.
+
+        Parameters:
+            old_field_name (STR): The current name of the field to be renamed.
+            new_field_name (STR): The new name for the field.
+
+        Returns:
+            bool: True if the field is renamed successfully, False otherwise.
+        '''
+
+        for field in self.field:
+            if field.name == old_field_name:
+                for exsiting_field in self.field:
+                    if exsiting_field.name == new_field_name:
+                        return False 
+                field.name = new_field_name
+                return True
+        return False
+        
 
     def changeFieldDataType():
         pass
