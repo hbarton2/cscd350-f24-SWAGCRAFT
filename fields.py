@@ -1,11 +1,12 @@
-from diagram import diagram
+from model import Model
 
- 
 class Field:
     def __init__(self, field_name, field_type = None):
 
         self.name = field_name
         self.fieldType = field_type
+
+FIELD_TYPES = ['int', 'float', 'str']
 
 # ------------------------------------------------------------------- #
 
