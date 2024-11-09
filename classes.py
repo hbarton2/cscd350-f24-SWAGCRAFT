@@ -33,7 +33,7 @@ class Class:
                 return False
             
         new_field = Field(field_name, field_type)
-        self.field.appemd(new_field)
+        self.field.append(new_field)
         return True
         
     def removeField(self, field_name):
@@ -100,7 +100,7 @@ class Class:
 
     def addRelationship(self, fromClass, toClass, relationType):
         newRelation = Relationship(fromClass, toClass, relationType)
-        self.relationship.apppend[newRelation]
+        self.relationship.append(newRelation)
 
     def deleteRelationship(self, fromClass, toClass, relationType):
         for relation in self.relationship:
