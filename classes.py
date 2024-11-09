@@ -1,5 +1,7 @@
 '''Define root class'''
 
+from fields import Field, FIELD_TYPES
+
 class Class:
     
     # Constructor
@@ -11,9 +13,31 @@ class Class:
 
     # Field methods
 
-    def addField():
-        pass
+    def addField(self, field_name, field_type):
+        '''
+        Adds a new field to the class.
 
+        Parameters: 
+            field_name (STR): The name of the field to add 
+            field_type (STR): The data type of the field.
+
+        Returns:
+            bool: True if the field is added successfully, False otherwise.
+        '''
+        if field_type not in FIELD_TYPES:
+            return False
+        
+        for field in self.field:
+            if field.name == field_name:
+                return False
+            
+        new_field = Field(field_name, field_type)
+        self.field.appemd(new_field)
+        return True
+
+
+            
+        
     def removeField():
         pass
 
