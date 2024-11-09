@@ -1,5 +1,6 @@
 '''Define root class'''
 
+
 from fields import Field, FIELD_TYPES
 
 class Class:
@@ -121,7 +122,6 @@ class Class:
         
 
     # Method methods
-
     def addMethod():
         pass
 
