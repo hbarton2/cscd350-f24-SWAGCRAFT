@@ -74,8 +74,26 @@ class Class:
         return False
         
 
-    def changeFieldDataType():
-        pass
+    def changeFieldDataType(self, field_name, new_field_type):
+        '''
+        Changes the data type of an existing field in the class.
+
+        Parameters:
+            field_name (STR): The name of the field whose type will be changed.
+            new_field_type (STR): The new data type for the field.
+
+        Returns:
+            bool: True if the field type is changed successfully, False otherwise.
+        '''
+
+        if new_field_type not in FIELD_TYPES:
+            return False
+
+        for field in self.field:
+            if field.name == field_name:
+                field.fieldType = new_field_type 
+                return True
+        return False       
 
     # Relationship methods
 
