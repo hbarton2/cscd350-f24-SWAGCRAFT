@@ -12,7 +12,8 @@ class Model:
     
     #adds the class if it is not in the class already returns True
         else:
-            self.classList.update({name: Class(name)})
+            newClass = Class(name)
+            self.classList.update({name: newClass})
             return True
 
     def renameClass(self, oldName, newName):

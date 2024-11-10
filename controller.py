@@ -8,8 +8,8 @@ from methods import *
 from relationship import *
 from saveLoad import *
 from exists import *
-from copyDiagram import *
 from model import *
+from main import *
 
 #Controller takes input from view (menu) and preforms calls that modify data to adhere to MVC
 
@@ -29,15 +29,15 @@ def controllerFieldExists(className, fieldName):
 
 #Receives input from menu and calls method to create a class then returns True or False
 def controllerAddClass(className):
-    return Model.addClass(className)
+    return myModel.addClass(className)
 
 #Receives input from menu and calls method to rename a class then returns True or False
 def mainRenameClass(originalClassName, newClassName):
-    return Model.renameClass(originalClassName, newClassName)
+    return myModel.renameClass(originalClassName, newClassName)
 
 #Receives input from menu and calls method to delete a class then returns True or False
 def controllerDeleteClass(unwantedClass):
-    return Model.deleteClass(unwantedClass)
+    return myModel.deleteClass(unwantedClass)
 
 #METHODS
 
