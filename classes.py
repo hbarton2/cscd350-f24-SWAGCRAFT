@@ -4,16 +4,16 @@
 from relationship import Relationship
 from methods import Method
 from parameter import Parameter
-from fields import Field, FIELD_TYPES
+from fields import Field #, FIELD_TYPES will be added later
 
 class Class:
     
     # Constructor
     def __init__(self, name, field = None, method = None, relationship = None):
         self.name = name
-        self.field = field
-        self.method = method
-        self.relationship = relationship
+        self.field = field if isinstance(field, list) else []  # Use the passed list or create an empty one
+        self.method = method if isinstance(method, list) else []  # Same for method
+        self.relationship = relationship if isinstance(relationship, list) else []  # Same for relationship
 
     # Field methods
 
@@ -28,13 +28,14 @@ class Class:
         Returns:
             bool: True if the field is added successfully, False otherwise.
         '''
-        if field_type not in FIELD_TYPES:
-            return False
-        
+
+       # if field_type not in FIELD_TYPES:
+          #  return False Will be addded later - thomas
+
         for field in self.field:
             if field.name == field_name:
-                return False
-            
+                return False  # Field with the same name already exists
+
         new_field = Field(field_name, field_type)
         self.field.append(new_field)
         return True
@@ -70,8 +71,8 @@ class Class:
 
         for field in self.field:
             if field.name == old_field_name:
-                for exsiting_field in self.field:
-                    if exsiting_field.name == new_field_name:
+                for existing_field in self.field:
+                    if existing_field.name == new_field_name:
                         return False 
                 field.name = new_field_name
                 return True
@@ -90,8 +91,8 @@ class Class:
             bool: True if the field type is changed successfully, False otherwise.
         '''
 
-        if new_field_type not in FIELD_TYPES:
-            return False
+       # if new_field_type not in FIELD_TYPES:
+            #return False will be added later - thomas
 
         for field in self.field:
             if field.name == field_name:
@@ -256,6 +257,24 @@ class Class:
 
         return changed
     
+            
+    def methodExists(self, method_name):
+        """Returns false if the method doesn't exist, returns true otherwise."""
+        # Check if the method exists in the class's methods
+        if method_name not in self.method.name:
+            return False
+        else:
+            return True
+
+    def fieldExists(self, field_name):
+        """Returns True if the field exists in the class, otherwise False."""
+        # Check if the field exists in the class's fields
+        for field in self.field:
+            if field_name == field.name:
+                return True
+        else:
+            return False
+        
 
 
 

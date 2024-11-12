@@ -140,7 +140,7 @@ def menuCLI():
 
             # Attempts to delete a class. True returns success message, False returns error message
             if(controllerDeleteClass(unwantedClass)):
-                print(Fore.GREEN + "Successfully deleted class" + unwantedClass)
+                print(Fore.GREEN + "Successfully deleted class: " + unwantedClass)
             else:
                 print(Fore.RED + "Class " + unwantedClass + " isn't in diagram")
 

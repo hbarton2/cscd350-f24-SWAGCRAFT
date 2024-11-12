@@ -4,7 +4,7 @@ class Field:
         self.name = field_name
         self.fieldType = field_type
 
-FIELD_TYPES = ['int', 'float', 'str']
+# FIELD_TYPES = ['int', 'float', 'str'] will be added later
 
 # ------------------------------------------------------------------- #
 

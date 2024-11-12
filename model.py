@@ -31,3 +31,9 @@ class Model:
             return True
         else:
             return False
+    
+    def classExists(self, className):
+        if (className not in self.classList):
+            return False
+        else:
+            return True
