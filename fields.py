@@ -1,5 +1,3 @@
-from model import Model
-
 class Field:
     def __init__(self, field_name, field_type = None):
 

@@ -1,5 +1,5 @@
 '''Creates the Model Class'''
-from classes import *
+from classes import Class
 
 class Model:
     def __init__(self):

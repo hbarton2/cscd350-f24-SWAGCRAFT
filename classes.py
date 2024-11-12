@@ -6,7 +6,6 @@ from methods import Method
 from parameter import Parameter
 from fields import Field, FIELD_TYPES
 
-
 class Class:
     
     # Constructor

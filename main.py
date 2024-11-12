@@ -10,6 +10,7 @@ from menu import *
 from methods import *
 from relationship import *
 from saveLoad import *
+from model import Model
 # from GUI import startGUI
 import sys
 myModel = Model()

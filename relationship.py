@@ -1,5 +1,3 @@
-from model import Model
-
 class Relationship:
     def __init__(self, className1, className2, relationType):
         self.className1 = className1
