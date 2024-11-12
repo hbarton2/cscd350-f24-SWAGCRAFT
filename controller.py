@@ -95,12 +95,12 @@ def controllerAddRelationship(className1, className2, relationshipType):
     return myModel.classList[className1].addRelationship(className1, className2, relationshipType)
 
 #Receives input from menu and calls method to delete a relationship then returns True or False
-def controllerDeleteRelationship(className1, className2):
-    return myModel.classList[className1].deleteRelationship(className1, className2)
+def controllerDeleteRelationship(className1, className2, relationshipType):
+    return myModel.classList[className1].deleteRelationship(className1, className2, relationshipType)
 
 #Receives input from menu and calls method to change a type relationship then returns True or False
-def controllerChangeRelationType(className1, className2, newRelationType):
-    return myModel.classList[className1].changeRelationType(className1, className2, newRelationType)
+def controllerChangeRelationType(className1, className2, oldRelationType, newRelationType):
+    return myModel.classList[className1].changeRelationType(className1, className2, oldRelationType, newRelationType)
 
 
 #SAVE AND LOAD

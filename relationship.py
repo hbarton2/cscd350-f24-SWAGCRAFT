@@ -1,5 +1,5 @@
 class Relationship:
-    def __init__(self, className1, className2, relationType):
-        self.className1 = className1
-        self.className2 = className2
+    def __init__(self, fromClass, toClass, relationType):
+        self.fromClass = fromClass
+        self.toClass = toClass
         self.relationType = relationType

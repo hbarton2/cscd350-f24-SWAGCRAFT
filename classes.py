@@ -105,6 +105,8 @@ class Class:
     def addRelationship(self, fromClass, toClass, relationType):
         newRelation = Relationship(fromClass, toClass, relationType)
         self.relationship.append(newRelation)
+        return True
+
 
     def deleteRelationship(self, fromClass, toClass, relationType):
         for relation in self.relationship:
@@ -120,7 +122,7 @@ class Class:
             if(relation.fromClass == fromClass):
                 if(relation.toClass == toClass):
                     if(relation.relationType == relationType):
-                        self.relationship.relationType = newRelationType
+                        relation.relationType = newRelationType
                         return True
                 return False
         

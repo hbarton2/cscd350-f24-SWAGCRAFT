@@ -821,8 +821,17 @@ def menuCLI():
                 print(Fore.RED + "Class " + className2 + " isn't in diagram")
                 continue
 
-            if(controllerDeleteRelationship(className1, className2)):
-                print(Fore.GREEN + "Successfully deleted the relationship between " + className1 + " and " + className2)
+            print(Fore.YELLOW + "Input the relationship type: ")
+            relationshipType = clean(input())
+            # Checks User Input for Type
+            while(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
+                if(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
+                    print(Fore.RED + "Incorrect relationship type, try again!")
+                    print(Fore.YELLOW + "Input the relationship type: ")
+                    relationshipType = clean(input())
+
+            if(controllerDeleteRelationship(className1, className2, relationshipType)):
+                print(Fore.GREEN + "Successfully deleted the relationship between " + className1 + " and " + className2 + " with type " + relationshipType)
             else:
                 print(Fore.RED + "An error has occurred")
 
@@ -844,18 +853,27 @@ def menuCLI():
                 print(Fore.RED + "Class " + className2 + " isn't in diagram")
                 continue
 
+            print(Fore.YELLOW + "Input the old relationship type: ")
+            relationshipType = clean(input())
+            # Checks User Input for old Type
+            while(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
+                if(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
+                    print(Fore.RED + "Incorrect relationship type, try again!")
+                    print(Fore.YELLOW + "Input the relationship type: ")
+                    relationshipType = clean(input())
+
             print(Fore.YELLOW + "Input the new relationship type: ")
             newRelationshipType = clean(input())
 
-            # Checks User Input for Type
+            # Checks User Input for  newType
             while(newRelationshipType != "aggregation" and newRelationshipType != "composition" and newRelationshipType !=  "generalization" and newRelationshipType != "realization"):
                 if(newRelationshipType != "aggregation" and newRelationshipType != "composition" and newRelationshipType !=  "generalization" and newRelationshipType != "realization"):
                     print(Fore.RED + "Incorrect relationship type, try again!")
                     print(Fore.YELLOW + "Input the relationship type: ")
                     newRelationshipType = clean(input())
 
-            if(controllerChangeRelationType(className1, className2, newRelationshipType)):
-                print(Fore.GREEN + "Successfully changed relationship type for " + className1 + " and " + className2 + " to new type " + newRelationshipType)
+            if(controllerChangeRelationType(className1, className2,relationshipType, newRelationshipType)):
+                print(Fore.GREEN + "Successfully changed relationship type for " + className1 + " and " + className2 + " with type " + relationshipType +  " to new type " + newRelationshipType)
             else:
                 print(Fore.RED + "An error has occurred")
 
