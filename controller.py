@@ -11,7 +11,7 @@ def controllerClassExists(className):
     return myModel.classExists(className)
 
 def controllerMethodExists(className, methodName):
-    return (myModel.classList[className].methodExists(methodName))
+    return not (myModel.classList[className].methodExists(methodName))
 
 
 def controllerFieldExists(className, fieldName):
@@ -34,39 +34,41 @@ def controllerDeleteClass(unwantedClass):
 
 #METHODS
 
+def controllerGetMethod(class_name, method_name):
+    return myModel.classList[class_name].getMethod(method_name)
 
 #Receives input from menu and calls method to add a method then returns True or False
-def controllerAddMethod(class_name, method_name, method_signature):
-    return myModel.classList[class_name].addMethod(method_name, method_signature)
+def controllerAddMethod(class_name, method_name, return_type, parameters):
+    return myModel.classList[class_name].addMethod(method_name, return_type, parameters)
 
 #Receives input from menu and calls method to rename a method then returns True or False
-def controllerRenameMethod(className, oldMethodName, newMethodName, overload_index):
-    return myModel.classList[className].renameMethod(oldMethodName, newMethodName, overload_index)
+def controllerRenameMethod(className, old_method_name, new_method_name, parameters=None):
+    return myModel.classList[className].renameMethod(old_method_name, new_method_name, parameters)
 
 #Receives input from menu and calls method to delete a method then returns True or False
-def controllerRemoveMethod(className, methodName, overloaded_index):
-    return myModel.classList[className].removeMethod(methodName, overloaded_index)
+def controllerRemoveMethod(className, method_name, parameters=None):
+    return myModel.classList[className].removeMethod(method_name, parameters)
 
-def controllerChangeMethodType(class_name, method_name, new_return_type, overload_index):
-    return myModel.classList[class_name].changeMethodDataType(method_name, new_return_type, overload_index)
+def controllerChangeMethodType(class_name, method_name, new_return_type, parameters=None):
+    return myModel.classList[class_name].changeMethodDataType(method_name, new_return_type, parameters)
 
 
 #PARAMETERS
 
 #Receives input from menu and calls method to add a parameter then returns True or False
-def controllerAddParameter(class_name, method_name, new_param_name, new_param_type, overload_index=0):
-    return myModel.classList[class_name].Method[method_name].addParameter(new_param_name, new_param_type, overload_index)
+def controllerAddParameter(class_name, method_name, param_type, param_name, parameters=None):
+    return myModel.classList[class_name].addParameter(method_name, param_type, param_name, parameters)
 
 #Receives input from menu and calls method to delete a parameter then returns True or False
-def controllerRemoveParameter(className, methodName, parameterName, overloaded_index):
-    return myModel.classList[className].Method[methodName].removeParameter(parameterName, overloaded_index)
+def controllerRemoveParameter(className, method_name, param_name, parameters=None):
+    return myModel.classList[className].removeParameter(method_name, param_name, parameters)
 
 #Receives input from menu and calls method to change a parameter then returns True or False
-def controllerChangeParameter(className, methodName, oldParameterName, newParameterName, parameterType, overloadIndex):
-    return myModel.classList[className].Method[methodName].changeParameter(oldParameterName, newParameterName, parameterType, overloadIndex)
+def controllerChangeParameter(className, method_name, old_param_name, new_param_name, param_type, parameters=None):
+    return myModel.classList[className].changeParameter(method_name, old_param_name, new_param_name, param_type, parameters)
 
-def controllerChangeParameterType(className, methodName, parameterName, newType, overloadIndex):
-    return myModel.classList[className].Method[methodName].changeParameterType(parameterName, newType, overloadIndex)
+def controllerChangeParameterType(className, method_name, param_name, new_type, parameters=None):
+    return myModel.classList[className].changeParameterType(method_name, param_name, new_type, parameters)
 
 
 #FIELDS
