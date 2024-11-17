@@ -3,7 +3,7 @@
 
 from relationship import Relationship
 from methods import Method
-from parameter import Parameter
+from parameters import Parameter
 from fields import Field #, FIELD_TYPES will be added later
 
 class Class:

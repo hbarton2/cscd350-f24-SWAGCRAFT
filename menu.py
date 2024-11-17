@@ -5,6 +5,7 @@
 # import colorama so the menu colors show up 
 from colorama import init, Fore, Style
 from controller import *
+from parameters import Parameter
 
 init(autoreset=True)
 
@@ -170,18 +171,12 @@ def menuCLI():
                 print(Fore.YELLOW + f"Parameter {param_count} type: ")
                 param_type = str(input()).strip()
 
-                parameters.append(f"{param_type} {param_name}")
+                parameters.append(Parameter(param_name, param_type))
                 param_count += 1
 
             # Get return type
             print(Fore.YELLOW + "Input the return type: ")
             return_type = str(input()).strip()
-
-            # Create method signature dict
-            method_signature = {
-                "parameters": parameters,
-                "return_type": return_type
-            }
 
             if controllerAddMethod(className, methodName, return_type, parameters):
                 print(Fore.GREEN + "Successfully created method " + methodName)
@@ -290,11 +285,11 @@ def menuCLI():
                 print(Fore.RED + f"Method '{methodName}' does not exist in class '{className}'.")
                 continue
 
-            print(Fore.YELLOW + "Input the parameter type: ")
-            paramType = str(input()).strip()
-
             print(Fore.YELLOW + "Input the parameter name: ")
             paramName = str(input()).strip()
+            
+            print(Fore.YELLOW + "Input the parameter type: ")
+            paramType = str(input()).strip()
 
             if controllerAddParameter(className, methodName, paramType, paramName):
                 print(Fore.GREEN + f"Parameter '{paramName}' added to method '{methodName}'.")

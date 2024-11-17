@@ -1,5 +1,5 @@
 #from classes import *
-from parameter import Parameter
+from parameters import Parameter
 from colorama import init, Fore, Style
 
 class Method:
