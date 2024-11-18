@@ -1,16 +1,10 @@
-'''
 import tkinter as tk
 import customtkinter as ctk
 from tkinter import messagebox
-from controller import diagram
-from controller import addClass, renameClass, deleteClass
-from controller import addField, removeField, renameField
-from controller import addMethod, removeMethod, renameMethod, addParameter, removeParameter, changeParameter
-from controller import addRelationship, deleteRelationship
-from controller import save, load
+from controller import *
 
 ctk.set_appearance_mode("Dark")
-ctk.set_default_color_theme("blue")  #blue is my favorite colon -cn
+ctk.set_default_color_theme("blue")  #blue is my favorite color -cn
 
 
 class UMLApp(ctk.CTk):
@@ -22,12 +16,15 @@ class UMLApp(ctk.CTk):
         self.geometry("1600x800")
         self.minsize(1600, 800)
 
-        self.diagram = diagram  #now instead using the imported diagram from diagram.py. trying to adhere to aiden's format.
+        self.diagram = controllerCopyData()  #now instead using the imported diagram from diagram.py. trying to adhere to aiden's format.
 
         #tracking pos for class frames
         self.classPos = {}
         self.classRects = {}
-        self.relationshipLines = []  #next phase in sprint will be making different types of relationships
+        self.relationshipLines = {} #changed overall
+        self.draggingClass = None
+        self.draggingData = None
+        self.autoOrientation = True
         self.createTBOX()
         self.createDrwArea()
         self.createStsBar()
@@ -65,7 +62,14 @@ class UMLApp(ctk.CTk):
         overallDiagramBTN = ctk.CTkButton(tboxFRAME, text="Overall Diagram", command=self.showOverallDiagram)
         overallDiagramBTN.pack(padx=10, pady=5)
 
-        #save and load button (no functionality attached yet. gonna chat with adrian)
+        #undo button waiting for momento creation
+        undoBTN = ctk.CTkButton(tboxFRAME, text="Undo")
+        undoBTN.pack(padx=10, pady=5)
+
+        #redo button
+        redoBTN = ctk.CTkButton(tboxFRAME, text="Redo")
+        redoBTN.pack(padx=10, pady=5)
+
         saveLoadBTN = ctk.CTkButton(tboxFRAME, text="Save/Load", command=self.saveLoad)  #no longer a placeholder ;)
         saveLoadBTN.pack(padx=10, pady=5)
 
@@ -79,7 +83,17 @@ class UMLApp(ctk.CTk):
             destination = dialogue.get_input().strip()
 
             if(destination):
-                if(deleteRelationship(source, destination) == True):
+                dialogue = ctk.CTkInputDialog(text="Enter the relationship type (aggregation, composition, generalization, realization):", title="Delete Relationship")
+                relationshipType = dialogue.get_input().strip().lower()
+
+                validTypes = ["aggregation", "composition", "generalization", "realization"]
+                if relationshipType not in validTypes:
+                    self.statLabel.configure(text="Status: Invalid relationship type given")
+                    return
+
+                success = controllerDeleteRelationship(source, destination, relationshipType)  # Use controller to delete the relationship
+                if(success):
+                    self.diagram = controllerCopyData()
                     self.drawDiagram()
                     self.statLabel.configure(text = f"Status: Relationship between {source} and {destination} deleted")
 
@@ -98,10 +112,39 @@ class UMLApp(ctk.CTk):
         self.drawFRAME.pack(side="right", fill="both", expand=True)
 
         self.canvas = tk.Canvas(self.drawFRAME, bg="white")  #drawing to canvas
-        self.canvas.pack(fill="both", expand=True)
+
+        #create horizontal and vertical scrollbars
+        hScroll = tk.Scrollbar(self.drawFRAME, orient="horizontal", command=self.canvas.xview)
+        vScroll = tk.Scrollbar(self.drawFRAME, orient="vertical", command=self.canvas.yview)
+
+        #config the canvas to use scroll
+        self.canvas.configure(xscrollcommand=hScroll.set, yscrollcommand=vScroll.set)
+
+        #layout the canvas and scroll
+        self.canvas.grid(row=0, column=0, sticky="nsew")
+        hScroll.grid(row=1, column=0, sticky="ew")
+        vScroll.grid(row=0, column=1, sticky="ns")
+
+        #configure the grid weights to make canvas expand wooo
+        self.drawFRAME.rowconfigure(0, weight=1)
+        self.drawFRAME.columnconfigure(0, weight=1)
 
         #binding clicking to giving options for the class instead of just deleting it like my previous vers
         self.canvas.bind("<Button-1>", self.onCanvasCLK)
+
+
+        self.toggleButton = ctk.CTkButton(self.drawFRAME, text="Auto Orientation: ON", command=self.toggleAutoOrientation)
+        self.toggleButton.place(relx=0.0, rely=0.0, anchor='nw')
+
+
+    def toggleAutoOrientation(self):
+        self.autoOrientation = not self.autoOrientation #toggle
+        if self.autoOrientation:
+            self.toggleButton.configure(text="Auto Orientation: ON")
+            self.drawDiagram()
+        else:
+            self.toggleButton.configure(text="Auto Orientation: OFF")
+            self.drawDiagram()
 
 
     def createStsBar(self):
@@ -114,41 +157,59 @@ class UMLApp(ctk.CTk):
 
     def drawDiagram(self):
         self.canvas.delete("all")
-        self.classPos.clear()
+        if self.autoOrientation:
+            self.classPos.clear()
+
         self.classRects.clear()  #clear canvas of everything
         self.relationshipLines.clear()  #clear the old relationship lines
 
-        #calculate the max width of all classes to determine spacing
-        maxWidth = 150  #default min width
-        for className, classData in self.diagram.items():
-            width, bruh = self.calculateClassDimensions(className, classData)
-            if width > maxWidth:
-                maxWidth = width
+        if self.autoOrientation:
+            #calculate the max width of all classes to determine spacing
+            maxWidth = 150  #default min width
+            for className, classData in self.diagram.items():
+                width, bruh = self.calculateClassDimensions(className, classData)
+                if width > maxWidth:
+                    maxWidth = width
 
-        #adjust space based on the max width
-        xOffST = 50
-        yOffST = 50
-        xSpacing = maxWidth + 50  #base it on the widest class
-        ySpacing = 150
-        maxRowWDTH = 2 #rechange for now
+            #adjust space based on the max width
+            xOffST = 50
+            yOffST = 50
+            xSpacing = maxWidth + 50  #base it on the widest class
+            ySpacing = 150
+            maxRowWDTH = 4 #rechange for now
 
-        for idx, (className, classData) in enumerate(self.diagram.items()):#took too much effort but it looks amazing
-            x = xOffST + (idx % maxRowWDTH) * xSpacing
-            y = yOffST + (idx // maxRowWDTH) * ySpacing
-            width, height = self.calculateClassDimensions(className, classData)
-            self.classPos[className] = (x, y)
-            self.drawClass(className, x, y, width, height)
+            for idx, (className, classData) in enumerate(self.diagram.items()):#took too much effort but it looks amazing
+                x = xOffST + (idx % maxRowWDTH) * xSpacing
+                y = yOffST + (idx // maxRowWDTH) * ySpacing
+                width, height = self.calculateClassDimensions(className, classData)
+                self.classPos[className] = (x, y)
+                self.drawClass(className, x, y, width, height)
+
+        else:
+            for className, classData in self.diagram.items(): #positions in self.classPos
+                if className in self.classPos:
+                    x, y = self.classPos[className]
+                else:
+                    x, y = 50, 50
+                    self.classPos[className] = (x, y)
+                width, height = self.calculateClassDimensions(className, classData)
+                self.drawClass(className, x, y, width, height)
 
         #now to actually draw the relationships
         for className, classData in self.diagram.items():
-            if "relationships" in classData:
-                connections = classData["relationships"].get("connections", [])
-                for connectedClass, relationType in connections:
-                    if connectedClass in self.classPos:
-                        self.drawRelationship(className, connectedClass, relationType)
+            if "Relationships" in classData:
+                for relationship in classData["Relationships"]:
+                    fromClass = relationship.get("fromClass")
+                    toClass = relationship.get("toClass")
+                    relationType = relationship.get("relationType")
+                    if fromClass and toClass and relationType:
+                        if toClass in self.classPos and fromClass in self.classPos:
+                            self.drawRelationship(fromClass, toClass, relationType)
 
         #draw color code reference in bottom right corner
         self.drawRelationshipLegend()
+        #update the scroll region
+        self.canvas.config(scrollregion=self.canvas.bbox("all"))
 
     def calculateClassDimensions(self, className, classData):
         width = 150  #minimum width
@@ -158,12 +219,12 @@ class UMLApp(ctk.CTk):
         #calculate width based on text length to prevent overflow
         classNameLength = len(className)
 
-        fieldLen = [len(f"+{field_name}: {field_type}") for field_name, field_type in classData.get("Fields", {}).items()]  #calc max length of each field line
+        fieldLen = [len(f"+{fieldNM}: {fieldTYP}") for fieldNM, fieldTYP in classData.get("Fields", {}).items()]  #calc max length of each field line
         maxFieldLen = max(fieldLen, default=0)  #def 0 in case empty fields
 
         #calc max length of each method line
         methodLen = [  #calc max length of each method line
-            len(f"+{methodName}({', '.join(params['parameters'])}): {params.get('return_type', 'void')}") #join em
+            len(f"+{methodName}({', '.join(params['parameters'])}): {params.get('return_type', '')}") #join em
             for methodName, methodDetails in classData.get("Methods", {}).items()
             for params in methodDetails
         ]
@@ -181,54 +242,140 @@ class UMLApp(ctk.CTk):
     def drawClass(self, className, x0, y0, width, height):
         x1 = x0 + width
         y1 = y0 + height  #class dims
-        rectID = self.canvas.create_rectangle(x0, y0, x1, y0 + 20, fill="cyan", outline="black")  #header with class name
-        self.canvas.create_rectangle(x0, y0 + 20, x1, y1, fill="white", outline="black")  #box for fields and methods
+        classTag = f"class_{className}"
+        rectIDHead = self.canvas.create_rectangle(x0, y0, x1, y0 + 20, fill="cyan", outline="black", tags=(classTag,))  #header with class name
+        rectIDBdy = self.canvas.create_rectangle(x0, y0 + 20, x1, y1, fill="white", outline="black", tags=(classTag,))  #box for fields and methods
 
-        self.classRects[rectID] = className  #id
-        self.canvas.create_text((x0 + x1) // 2, y0 + 10, text=className, font=("Arial", 12, "bold"))  #the actual name of the class
+
+        self.classRects[className] = [rectIDHead, rectIDBdy] #map classTag to a list of all item IDs for class
+
+        textIDHead = self.canvas.create_text((x0 + x1) // 2, y0 + 10, text=className, font=("Arial", 12, "bold"), tags=(classTag,))  #the actual name of the class
+        self.classRects[className].append(textIDHead)
 
         #display fields and methods
         classData = self.diagram[className]
         yText = y0 + 30
         if classData.get('Fields'):
             for fieldName, fieldType in classData['Fields'].items():
-                self.canvas.create_text((x0 + x1) // 2, yText, text=f"+{fieldName}: {fieldType}", font=("Arial", 10))
+                textIDField = self.canvas.create_text((x0 + x1) // 2, yText, text=f"+{fieldName}: {fieldType}", font=("Arial", 10), tags=(classTag,))
+                self.classRects[className].append(textIDField)
                 yText += 15
 
         if classData.get('Methods'):
             for methodName, methodDetails in classData['Methods'].items():
                 for params in methodDetails:
                     paramStr = ', '.join(params["parameters"])
-                    returnType = params.get("return_type", "void")
-                    self.canvas.create_text((x0 + x1) // 2, yText, text=f"+{methodName}({paramStr}): {returnType}", font=("Arial", 10, "italic"))
+                    returnType = params.get("return_type", "void") #default void now
+                    textIDMeth = self.canvas.create_text((x0 + x1) // 2, yText, text=f"+{methodName}({paramStr}): {returnType}", font=("Arial", 10, "italic"), tags=(classTag,)) #now adding tags for easier use
+                    self.classRects[className].append(textIDMeth)
                     yText += 20
 
+
+        if not self.autoOrientation: #bind events for dragging when toggle false
+            self.canvas.tag_bind(classTag, "<ButtonPress-1>", self.onClassPress)
+            self.canvas.tag_bind(classTag, "<B1-Motion>", self.onClassMotion)
+            self.canvas.tag_bind(classTag, "<ButtonRelease-1>", self.onClassRelease)
+
     def drawRelationship(self, className1, className2, relType):
+        relKey = (className1, className2, relType)
+
+        #remove existing relationship lines only for this rel
+        if relKey in self.relationshipLines:
+            for lineID in self.relationshipLines[relKey]:
+                self.canvas.delete(lineID)
+            del self.relationshipLines[relKey]
+
+        #time for some math
         x1, y1 = self.classPos[className1]
         x2, y2 = self.classPos[className2]
         width1, height1 = self.calculateClassDimensions(className1, self.diagram[className1])
         width2, height2 = self.calculateClassDimensions(className2, self.diagram[className2])
 
-        x1 += width1 // 2
-        y1 += height1 // 2
-        x2 += width2 // 2
-        y2 += height2 // 2
+
+        centerX1 = x1 + width1 // 2 #get centers
+        centerY1 = y1 + height1 // 2
+        centerX2 = x2 + width2 // 2
+        centerY2 = y2 + height2 // 2
 
         #determine line color based on relationship type
-        lineColor = "black"
-        if relType == "aggregation":
-            lineColor = "blue"
-        elif relType == "composition":
-            lineColor = "green"
-        elif relType == "generalization":
-            lineColor = "red"
-        elif relType == "realization":
-            lineColor = "orange"
+        lineColor = {
+            "aggregation": "blue",
+            "composition": "green",
+            "generalization": "red",
+            "realization": "orange"
+        }.get(relType, "black")  #adding this to default to black in case something errors out (soft error)
 
-        lineID = self.canvas.create_line(x1, y1, x2, y2, fill=lineColor, width=2)
-        self.relationshipLines.append(lineID)
+        #init line points w/start
+        linePoints = [(centerX1, centerY1)]
+
+        currX, currY = centerX1, centerY1
+        endX, endY = centerX2, centerY2
+
+        collision = False
+
+        #check collision horizon
+        for otherClass in self.diagram:
+            if otherClass in (className1, className2):
+                continue
+            otherClassX, otherClassY = self.classPos[otherClass]
+            otherClassWdth, otherClassHght = self.calculateClassDimensions(otherClass, self.diagram[otherClass])
+
+
+            if otherClassY <= currY <= otherClassY + otherClassHght: #horizontal line from currX to endX crosses other frame
+                if (currX < otherClassX < endX or currX < otherClassX + otherClassWdth < endX) if endX > currX else (
+                        endX < otherClassX < currX or endX < otherClassX + otherClassWdth < currX):
+                    collision = True
+                    break
+
+        if collision:
+            #vertical avoid collision
+            vertOffset = -50 if currY > endY else 50
+            currY += vertOffset
+            linePoints.append((currX, currY))
+
+            #move horizontally to endX ;D
+            currX = endX
+            linePoints.append((currX, currY))
+        else:
+            #no collision so I can move directly horizontal to endX
+            currX = endX
+            linePoints.append((currX, currY))
+
+
+        currY = endY #move vert to endy
+        linePoints.append((currX, currY))
+
+        lineCoords = []
+        for point in linePoints:
+            for coord in point:
+                lineCoords.append(coord)
+
+        #time to draw
+        lineID = self.canvas.create_line(lineCoords, fill=lineColor, width=2, arrow=tk.LAST)
+        self.relationshipLines[relKey] = [lineID]
+
+    def updateRelationships(self):
+        #going to ref, delete lines
+        for lineIDs in self.relationshipLines.values():
+            for lineID in lineIDs:
+                self.canvas.delete(lineID)
+
+
+        self.relationshipLines.clear()
+
+        for className, classData in self.diagram.items():
+            if "Relationships" in classData:
+                for relationship in classData["Relationships"]:
+                    fromClass = relationship.get("fromClass")
+                    toClass = relationship.get("toClass")
+                    relationType = relationship.get("relationType")
+                    if fromClass and toClass and relationType:
+                        if fromClass in self.classPos and toClass in self.classPos:
+                            self.drawRelationship(fromClass, toClass, relationType)
 
     def drawRelationshipLegend(self):
+        self.update_idletasks()#added to make it load after canvas render
+
         #draw legend in bottom right corner
         legendRelColor = {
             "Aggregation": "blue",
@@ -242,7 +389,7 @@ class UMLApp(ctk.CTk):
         y = y0  #da start y position
 
         for text, color in legendRelColor.items():
-            self.canvas.create_line(x0, y, x0 + 20, y, fill=color, width=2)
+            self.canvas.create_line(x0, y, x0 + 20, y, fill=color, width=2, arrow=tk.LAST)
             self.canvas.create_text(x0 + 30, y, anchor="w", text=text, font=("Arial", 10))
             y += 20  #spacing next item
 
@@ -250,9 +397,14 @@ class UMLApp(ctk.CTk):
         className = self.promptClassNM()  #pop up like one of those scam popup's on tabloid sites
 
         if className:
-            addClass(className)  #now uses the addclass function from classes.py
-            self.drawDiagram()
-            self.statLabel.configure(text=f"Status: Class '{className}' added")
+            success = controllerAddClass(className)
+
+            if success:
+                self.diagram = controllerCopyData()
+                self.drawDiagram()
+                self.statLabel.configure(text=f"Status: Class '{className}' added")
+            else:
+                self.statLabel.configure(text=f"Status: Class '{className}' already exists")
 
     def renameClass(self):
         #first prompt
@@ -264,44 +416,112 @@ class UMLApp(ctk.CTk):
             newClassName = dialog.get_input()
 
             if newClassName:
-                renameClass(existingClassName, newClassName)
-                self.drawDiagram()
-                self.statLabel.configure(text=f"Status: Class '{existingClassName}' renamed to '{newClassName}'")
+                success = mainRenameClass(existingClassName, newClassName)  # Use controller to rename the class
+                if success:
+                    self.diagram = controllerCopyData()
+                    self.drawDiagram()
+                    self.statLabel.configure(text=f"Status: Class '{existingClassName}' renamed to '{newClassName}'")
+                else:
+                    self.statLabel.configure(text=f"Status: Failed to rename class '{existingClassName}'")
 
     def promptClassNM(self):
         dialog = ctk.CTkInputDialog(text="Enter new class name:", title="Add Class")
         return dialog.get_input()
 
 
-    def onCanvasCLK(self, event):
-        clickedItems = self.canvas.find_overlapping(event.x, event.y, event.x, event.y)
+    def onCanvasCLK(self, event): #reimplementing to fit drag implementation
+        if not self.autoOrientation: #dragging is handled elsewhere
+            return
 
-        for item in clickedItems:
-            if item in self.classRects:
-                className = self.classRects[item]
-                self.classOptions(className) #new handler instead of just prompting to delete.
-                break
+        #get item under cursor
+        item = self.canvas.find_withtag("current")
+        if item:
+            tags = self.canvas.gettags(item[0])
+            for tag in tags:
+                if tag.startswith("class_"):
+                    className = tag[6:]
+                    self.classOptions(className) #new handler instead of just prompting to delete.
+                    break
+
+    def onClassPress(self, event): #looked this up
+        item = self.canvas.find_withtag("current") #item under cursor
+        if item:
+            tags = self.canvas.gettags(item[0])
+            for tag in tags:
+                if tag.startswith("class_"):
+                    className = tag[6:]
+                    break
+            else:
+                className = None
+
+
+            if className:
+                self.draggingClass = className
+                #record the offst between the mouse position and the item's position
+                x, y = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
+                itemX, itemY = self.classPos[className]
+                self.draggingData = (x - itemX, y - itemY)
+                #bring item to front
+                classTag = f"class_{className}"
+                self.canvas.tag_raise(classTag)
+
+    def onClassMotion(self, event):
+
+        if self.draggingClass: #handle mouse motion event for dragging a class
+            x, y = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
+            newOffsetX, newOffsetY = self.draggingData
+            #calc new pos for the class
+            newx = x - newOffsetX
+            newY = y - newOffsetY
+            changeX = newx - self.classPos[self.draggingClass][0] #change in position for dragged class
+            changeY = newY - self.classPos[self.draggingClass][1]
+
+            className = self.draggingClass #move class items
+            classTag = f"class_{className}"
+            self.canvas.move(classTag, changeX, changeY)
+            #update the pos in self.classPos
+            self.classPos[className] = (newx, newY)
+
+            self.updateRelationships() #refresh
+
+    def onClassRelease(self, event):
+        #mouse release event after dragging a class rect
+        self.draggingClass = None
+        self.draggingData = None
 
     def classOptions(self, className):
-        option = messagebox.askquestion("Class Options", f"What do you want to do with class '{className}'?", icon='question', type='yesnocancel', detail='Yes: Edit, No: Delete, Cancel: Cancel')
+        def handleOption(option):
+            optionWin.destroy()
+            if option == "edit":
+                self.editClass(className)
+            elif option == "delete":
+                #to delete or not to delete that is the question. prompts to confirm delete.
+                confirm = messagebox.askyesno("Delete Class", f"Do you want to delete class '{className}'?")
+                if confirm:
+                    success = controllerDeleteClass(className)
+                    if success:
+                        self.diagram = controllerCopyData()
+                        self.drawDiagram()
+                        self.statLabel.configure(text=f"Status: Class '{className}' deleted.")
+                    else:
+                        self.statLabel.configure(text=f"Status: Failed to delete class '{className}'.")
 
-        if option == 'yes':
-            self.editClass(className)
+            elif option == "cancel":
+                return
 
-        elif option == 'no':
-            #to delete or not to delete that is the question. prompts to confirm delete.
-            confirm = messagebox.askyesno("Delete Class", f"Do you want to delete class '{className}'? Pretty please?")
+        #revision made to popup window. No longer a question box.
+        optionWin = ctk.CTkToplevel(self)
+        optionWin.title(f"Options for {className}")
+        optionWin.geometry("300x170")
+        label = ctk.CTkLabel(optionWin, text=f"What would you like to do with '{className}'?")
+        label.pack(pady=10)
 
-            if confirm:
-
-                #remove all the relationships involving the class to be deleted. basically converting a relationship into a friendzone
-                for otherClass, classData in self.diagram.items():
-                    if className in classData.get("relationships", {}).get("connections", []):
-                        classData["relationships"]["connections"].remove(className)
-
-                deleteClass(className)  #outsourcing to classes.py for this operation.
-                self.drawDiagram()
-                self.statLabel.configure(text=f"Status: Class '{className}' deleted.")
+        editButton = ctk.CTkButton(optionWin, text="Edit", command=lambda: handleOption("edit"))
+        editButton.pack(pady=5)
+        deleteButton = ctk.CTkButton(optionWin, text="Delete", command=lambda: handleOption("delete"))
+        deleteButton.pack(pady=5)
+        cancelButton = ctk.CTkButton(optionWin, text="Cancel", command=lambda: handleOption("cancel"))
+        cancelButton.pack(pady=5)
 
     def editClass(self, className):
         editWin = tk.Toplevel(self)
@@ -314,32 +534,48 @@ class UMLApp(ctk.CTk):
             fieldType = fieldTypeEntry.get().strip()
 
             if fieldName and fieldType:
-                addField(className, fieldName, fieldType)
-                self.drawDiagram()
-                self.statLabel.configure(text=f"Status: Field '{fieldName}' added to class '{className}'")
+                success = controllerAddField(className, fieldName, fieldType)
+                if success:
+                    self.diagram = controllerCopyData()
+                    self.drawDiagram()
+                    self.statLabel.configure(text=f"Status: Field '{fieldName}' added to class '{className}'")
+                else:
+                    self.statLabel.configure(text=f"Status: Failed to add field '{fieldName}' to class '{className}'")
 
 
         def removeFieldHandler():
             fieldName = fieldRemoveEntry.get().strip()
             if fieldName:
-                removeField(className, fieldName)
-                self.drawDiagram()
-                self.statLabel.configure(text=f"Status: Field '{fieldName}' removed from class '{className}'")
+                success = controllerRemoveField(className, fieldName)
+                if success:
+                    self.diagram = controllerCopyData()
+                    self.drawDiagram()
+                    self.statLabel.configure(text=f"Status: Field '{fieldName}' removed from class '{className}'")
+                else:
+                    self.statLabel.configure(
+                        text=f"Status: Failed to remove field '{fieldName}' from class '{className}'")
 
 
         def renameFieldHandler():
             oldFieldName = fieldRenameOldEntry.get().strip()
             newFieldName = fieldRenameNewEntry.get().strip()
             if oldFieldName and newFieldName:
-                renameField(className, oldFieldName, newFieldName)
-                self.drawDiagram()
-                self.statLabel.configure(text=f"Status: Field '{oldFieldName}' renamed to '{newFieldName}' in class '{className}'")
+                success = controllerRenameField(className, oldFieldName, newFieldName)
+                if success:
+                    self.diagram = controllerCopyData()
+                    self.drawDiagram()
+                    self.statLabel.configure(
+                        text=f"Status: Field '{oldFieldName}' renamed to '{newFieldName}' in class '{className}'")
+                else:
+                    self.statLabel.configure(text=f"Status: Failed to rename field '{oldFieldName}' in class '{className}'")
 
 
         def addMethodHandler():
             methodName = methodEntry.get().strip()
             paramEntryGet = paramEntry.get().strip()
             params = []
+            returnType = returnTypeEntry.get().strip() or "void"
+
             if paramEntryGet:
                 paramList = [param.strip() for param in paramEntryGet.split(',')]
                 for param in paramList:
@@ -347,30 +583,35 @@ class UMLApp(ctk.CTk):
                         paramName, paramType = param.split(':')
                         paramName = paramName.strip()
                         paramType = paramType.strip()
-                        params.append(f"{paramType} {paramName}")
+                        params.append(Parameter(paramName, paramType))
                     else:
-                        params.append(param.strip())
+                        paramName = param.strip()
+                        paramType = "void"
+                        params.append(Parameter(paramName, paramType))
 
             if methodName:
-                methodSig = {
-                    "parameters": params,
-                    "return_type": "void"  #default return typefor now. Later I will modify it to accept user input with edit class.
-                }
-                success = addMethod(className, methodName, methodSig) #use addMethod from methods class
+                success = controllerAddMethod(className, methodName, returnType, params)
                 if success:
+                    self.diagram = controllerCopyData()
                     self.drawDiagram()
                     self.statLabel.configure(text=f"Status: Method '{methodName}' added to class '{className}'")
                 else:
-                    self.statLabel.configure(text=f"Status: Method '{methodName}' already exists in class '{className}'")
+                    self.statLabel.configure(
+                        text=f"Status: Method '{methodName}' already exists in class '{className}'")
             else:
                 self.statLabel.configure(text="Status: Please provide a method name.")
 
         def removeMethodHandler():
             methodName = methodRemoveEntry.get().strip()
             if methodName:
-                removeMethod(className, methodName)
-                self.drawDiagram()
-                self.statLabel.configure(text=f"Status: Method '{methodName}' removed from class '{className}'")
+                success = controllerRemoveMethod(className, methodName)
+                if success:
+                    self.diagram = controllerCopyData()
+                    self.drawDiagram()
+                    self.statLabel.configure(text=f"Status: Method '{methodName}' removed from class '{className}'")
+                else:
+                    self.statLabel.configure(
+                        text=f"Status: Failed to remove method '{methodName}' from class '{className}'")
 
         def addParameterHandler():
             methodName = addParamMethodEntry.get().strip() #same old same old. get and strip
@@ -378,12 +619,15 @@ class UMLApp(ctk.CTk):
             paramType = addParamTypeENT.get().strip()
 
             if methodName and paramName and paramType:
-                success = addParameter(className, methodName, paramType, paramName, overload_index=0)
+                success = controllerAddParameter(className, methodName, paramType, paramName)
                 if success:
+                    self.diagram = controllerCopyData()
                     self.drawDiagram()
-                    self.statLabel.configure(text=f"Status: Parameter '{paramName}' added to method '{methodName}' in class '{className}'")
+                    self.statLabel.configure(
+                        text=f"Status: Parameter '{paramName}' added to method '{methodName}' in class '{className}'")
                 else:
-                    self.statLabel.configure(text=f"Status: Failed to add parameter '{paramName}' to method '{methodName}' in class '{className}'")
+                    self.statLabel.configure(
+                        text=f"Status: Failed to add parameter '{paramName}' to method '{methodName}' in class '{className}'")
             else:
                 self.statLabel.configure(text="Status: Please provide method name, parameter name, and parameter type.")
 
@@ -391,12 +635,15 @@ class UMLApp(ctk.CTk):
             methodName = removeParamMethodEntry.get().strip()
             paramName = removeParamNameEntry.get().strip()
             if methodName and paramName:
-                success = removeParameter(className, methodName, paramName, overload_index=0)
+                success = controllerRemoveParameter(className, methodName, paramName)
                 if success:
+                    self.diagram = controllerCopyData()
                     self.drawDiagram()
-                    self.statLabel.configure(text=f"Status: Parameter '{paramName}' removed from method '{methodName}' in class '{className}'")
+                    self.statLabel.configure(
+                        text=f"Status: Parameter '{paramName}' removed from method '{methodName}' in class '{className}'")
                 else:
-                    self.statLabel.configure(text=f"Status: Failed to remove parameter '{paramName}' from method '{methodName}' in class '{className}'")
+                    self.statLabel.configure(
+                        text=f"Status: Failed to remove parameter '{paramName}' from method '{methodName}' in class '{className}'")
             else:
                 self.statLabel.configure(text="Status: Please provide method name and parameter name.")
 
@@ -437,6 +684,12 @@ class UMLApp(ctk.CTk):
         paramEntry.pack(pady=5)
         paramEntry.insert(0, "param1: type1, param2: type2") #worked hard on this
         addMethodBTN = tk.Button(editWin, text="Add Method", command=addMethodHandler)
+
+        tk.Label(editWin, text="Method Return Type:").pack(pady=5)
+        returnTypeEntry = tk.Entry(editWin)
+        returnTypeEntry.pack(pady=5)
+        returnTypeEntry.insert(0, "void")
+
         addMethodBTN.pack(pady=5)
 
         tk.Label(editWin, text="Remove Method: (name)").pack(pady=5)
@@ -518,9 +771,13 @@ class UMLApp(ctk.CTk):
                     messagebox.showerror("Error", "One or both classes do not exist.")
                     return
 
-                addRelationship(source, dest, relationType) #use addRelationship
-                self.drawDiagram()
-                self.statLabel.configure(text=f"Status: Relationship added between '{source}' and '{dest}' as '{relationType}'.")  #congratulations to the couple <3
+                success = controllerAddRelationship(source, dest, relationType)  # Use controller to add relationship
+                if success:
+                    self.diagram = controllerCopyData()
+                    self.drawDiagram()
+                    self.statLabel.configure(text=f"Status: Relationship added between '{source}' and '{dest}' as '{relationType}'.")
+                else:
+                    self.statLabel.configure(text=f"Status: Failed to add relationship between '{source}' and '{dest}'.")
 
         addRelBTN = tk.Button(relWin, text="Add Relationship", command=addRelHandler)
         addRelBTN.pack(pady=10)
@@ -552,7 +809,7 @@ class UMLApp(ctk.CTk):
         #handler for save action
         def saveHandler():
             fileName = fileEntry.get().strip() or "data.json"  #default to data.json if empty
-            if save(fileName):  #call save function
+            if controllerSave(fileName):  #call save function
                 self.statLabel.configure(text=f"Status: The diagram was saved as '{fileName}'")
             else:
                 self.statLabel.configure(text="Status: Error when saving diagram")
@@ -562,7 +819,8 @@ class UMLApp(ctk.CTk):
         def loadHandler():
             fileName = fileEntry.get().strip() or "data.json"  #default to data.json if empty
 
-            if load(fileName):  #call load function
+            if controllerLoad(fileName):  #call load function
+                self.diagram = controllerCopyData()
                 self.drawDiagram()  #update GUI with loaded data
                 self.statLabel.configure(text=f"Status: Diagram loaded from '{fileName}'")
             else:
@@ -583,5 +841,3 @@ class UMLApp(ctk.CTk):
 def startGUI():
     GUI = UMLApp()
     GUI.mainloop()
-
-'''

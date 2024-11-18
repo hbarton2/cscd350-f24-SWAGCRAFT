@@ -114,3 +114,18 @@ def controllerSave(filename):
 
 def controllerLoad(filename):
     load(filename)
+
+def controllerCopyData():
+    data = {}
+    for className, classSect in myModel.classList.items():
+        classData = {"Fields": {field.name: field.fieldType for field in classSect.field},"Methods": {}}
+
+        for method in classSect.method:
+            methodSigs = [{"parameters": [f"{param.type} {param.name}" for param in method.parameters],"return_type": method.returnType}]
+
+            classData["Methods"][method.name] = methodSigs
+
+        classData["Relationships"] = [{"fromClass": relationship.fromClass,"toClass": relationship.toClass, "relationType": relationship.relationType} for relationship in classSect.relationship]
+
+        data[className] = classData
+    return data
