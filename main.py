@@ -30,5 +30,4 @@ def main():
         print("Usage: python3 main.py [CLI or GUI]")
 
 if __name__=="__main__":
-    menuCLI()
     main()
