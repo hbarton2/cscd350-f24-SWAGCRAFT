@@ -116,11 +116,11 @@ def controllerChangeRelationType(className1, className2, oldRelationType, newRel
 #WILL NEED TO BE UPDATED WITH INPUTS FOR UPDATED LOAD
 
 
-def controllerSave(filename):
-    save(filename)
+def controllerSave(filename, positions=None):
+    save(filename, positions)
 
-def controllerLoad(filename):
-    load(filename)
+def controllerLoad(filename, positions=None):
+    load(filename, positions)
 
 def controllerCopyData():
     data = {}

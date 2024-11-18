@@ -797,7 +797,7 @@ class UMLApp(ctk.CTk):
         #create a new dialog for save/load actions
         dialogWin = tk.Toplevel(self)
         dialogWin.title("Save or Load Diagram")
-        dialogWin.geometry("400x200")
+        dialogWin.geometry("400x250")
 
         #entry field for the file name. All this drive to use customtkinter and I've been neglecting to use it for parts
         fileLbl = ctk.CTkLabel(dialogWin, text="Enter file name (optional):", text_color="black")
@@ -806,13 +806,27 @@ class UMLApp(ctk.CTk):
         fileEntry = ctk.CTkEntry(dialogWin)
         fileEntry.pack(pady=5)
 
+        #check to see if they want to save auto orient POS
+        self.savePosVar = tk.BooleanVar(value=False)
+        savePosChk = ctk.CTkCheckBox(dialogWin, text="Save/Load Class Positions", text_color = "black", variable=self.savePosVar)
+        savePosChk.pack(pady=5)
+
         #handler for save action
         def saveHandler():
             fileName = fileEntry.get().strip() or "data.json"  #default to data.json if empty
-            if controllerSave(fileName):  #call save function
-                self.statLabel.configure(text=f"Status: The diagram was saved as '{fileName}'")
+            positions = self.classPos
+
+            if self.savePosVar.get():
+                if controllerSave(fileName, positions):
+                    self.statLabel.configure(text=f"Status: The diagram was saved as '{fileName}. Orientation of frames stored.'")
+                else:
+                    self.statLabel.configure(text="Status: Error when saving diagram")
             else:
-                self.statLabel.configure(text="Status: Error when saving diagram")
+                if controllerSave(fileName):  #call save function
+                    self.statLabel.configure(text=f"Status: The diagram was saved as '{fileName}'")
+                else:
+                    self.statLabel.configure(text="Status: Error when saving diagram")
+
             dialogWin.destroy()  #close the dialog
 
         #handler for load action

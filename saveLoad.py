@@ -9,7 +9,7 @@ from parameters import Parameter
 from fields import Field
 from resources import myModel
 
-def save(filename):
+def save(filename, positions=None):
     """
     Saves the model to a JSON file.
     
@@ -71,6 +71,12 @@ def save(filename):
             
             model_dict["classList"][class_name] = class_dict
         
+        if positions is not None:
+            model_dict["classPositions"] = {}
+            for classNm, pos in positions.items():
+                model_dict["classPositions"][classNm] = {"x": pos[0], "y": pos[1]}
+
+
         # Write to file
         with open(filename, 'w') as f:
             json.dump(model_dict, f, indent=4)
@@ -81,7 +87,7 @@ def save(filename):
         print(f"Error saving model: {str(e)}")
         return False
 
-def load(filename):
+def load(filename, positions=None):
     """
     Loads a model from a JSON file and updates the global model state.
     
@@ -126,7 +132,12 @@ def load(filename):
                     rel_data["toClass"],
                     rel_data["relationType"]
                 )
-        
+
+        if positions is not None and "classPositions" in model_dict:
+            positions.clear() #clear alla dat
+            for classNm, pos in model_dict["classPositions"].items():
+                positions[classNm] = (pos["x"], pos["y"])
+
         return True
         
     except Exception as e:
