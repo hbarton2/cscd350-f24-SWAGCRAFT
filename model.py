@@ -1,4 +1,5 @@
 '''Creates the Model Class'''
+from classes import Class
 
 class Model:
     def __init__(self):
@@ -11,7 +12,8 @@ class Model:
     
     #adds the class if it is not in the class already returns True
         else:
-            self.classList.update({name: Class(name)})
+            newClass = Class(name)
+            self.classList.update({name: newClass})
             return True
 
     def renameClass(self, oldName, newName):
@@ -29,3 +31,9 @@ class Model:
             return True
         else:
             return False
+    
+    def classExists(self, className):
+        if (className not in self.classList):
+            return False
+        else:
+            return True

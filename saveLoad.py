@@ -1,7 +1,7 @@
 '''Import and Export diagram'''
 
 import json
-from diagram import diagram
+
 def save(filename="data.json"):
     if not filename.endswith(".json"):
         filename += ".json"  # Append .json if missing

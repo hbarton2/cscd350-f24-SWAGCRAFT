@@ -10,13 +10,12 @@ from menu import *
 from methods import *
 from relationship import *
 from saveLoad import *
-from diagram import diagram
+from model import Model
 from GUI import startGUI
 import sys
 
-
 def main():
-#GUI or CLI Mode?
+    
 #Takes user input on initial run command and starts respective mode
     if len(sys.argv) > 1:
         mode = str(sys.argv[1])
