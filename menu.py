@@ -722,7 +722,7 @@ def menuCLI():
             if not filename:
                 filename = "data.json"
             if not controllerLoad(filename):
-                print(Fore.GREEN + "UML Saved Successfully!")
+                print(Fore.GREEN + "UML Loaded Successfully!")
             else:
                 print(Fore.RED + "File not Found!")
 

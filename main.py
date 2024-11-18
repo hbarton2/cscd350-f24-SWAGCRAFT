@@ -9,7 +9,7 @@ from fields import *
 from menu import *
 from methods import *
 from relationship import *
-from saveLoad import *
+from saveLoad import save, load
 from model import Model
 from GUI import startGUI
 import sys
@@ -30,4 +30,5 @@ def main():
         print("Usage: python3 main.py [CLI or GUI]")
 
 if __name__=="__main__":
+    menuCLI()
     main()
