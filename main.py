@@ -11,9 +11,8 @@ from methods import *
 from relationship import *
 from saveLoad import *
 from model import Model
-# from GUI import startGUI
+from GUI import startGUI
 import sys
-myModel = Model()
 
 def main():
     
@@ -21,8 +20,7 @@ def main():
     if len(sys.argv) > 1:
         mode = str(sys.argv[1])
         if mode.lower() == "gui":
-            # startGUI()
-            pass
+            startGUI()
         elif mode.lower() == "cli":
             menuCLI()
         else:
@@ -32,5 +30,4 @@ def main():
         print("Usage: python3 main.py [CLI or GUI]")
 
 if __name__=="__main__":
-    menuCLI()
     main()

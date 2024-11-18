@@ -2,7 +2,14 @@
 # Import all other python files and colorama for colors
 from colorama import init, Fore, Style
 from menu import *
-from main import * 
+from model import Model
+from classes import *
+from fields import *
+from methods import *
+from relationship import *
+from saveLoad import *
+
+myModel = Model()
 
 #Controller takes input from view (menu) and preforms calls that modify data to adhere to MVC
 
