@@ -10,7 +10,7 @@ from relationship import *
 from saveLoad import save, load
 from model import Model
 from resources import myModel
-
+from resources import caretaker
 #Controller takes input from view (menu) and preforms calls that modify data to adhere to MVC
 
 #EXISTS
@@ -29,34 +29,42 @@ def controllerFieldExists(className, fieldName):
 
 #Receives input from menu and calls method to create a class then returns True or False
 def controllerAddClass(className):
+    caretaker.backup()
     return myModel.addClass(className)
 
 #Receives input from menu and calls method to rename a class then returns True or False
 def mainRenameClass(originalClassName, newClassName):
+    caretaker.backup()
     return myModel.renameClass(originalClassName, newClassName)
 
 #Receives input from menu and calls method to delete a class then returns True or False
 def controllerDeleteClass(unwantedClass):
+    caretaker.backup()
     return myModel.deleteClass(unwantedClass)
 
 #METHODS
 
 def controllerGetMethod(class_name, method_name):
+    caretaker.backup()
     return myModel.classList[class_name].getMethod(method_name)
 
 #Receives input from menu and calls method to add a method then returns True or False
 def controllerAddMethod(class_name, method_name, return_type, parameters):
+    caretaker.backup()
     return myModel.classList[class_name].addMethod(method_name, return_type, parameters)
 
 #Receives input from menu and calls method to rename a method then returns True or False
 def controllerRenameMethod(className, old_method_name, new_method_name, parameters=None):
+    caretaker.backup()
     return myModel.classList[className].renameMethod(old_method_name, new_method_name, parameters)
 
 #Receives input from menu and calls method to delete a method then returns True or False
 def controllerRemoveMethod(className, method_name, parameters=None):
+    caretaker.backup()
     return myModel.classList[className].removeMethod(method_name, parameters)
 
 def controllerChangeMethodType(class_name, method_name, new_return_type, parameters=None):
+    caretaker.backup()
     return myModel.classList[class_name].changeMethodDataType(method_name, new_return_type, parameters)
 
 
@@ -64,17 +72,21 @@ def controllerChangeMethodType(class_name, method_name, new_return_type, paramet
 
 #Receives input from menu and calls method to add a parameter then returns True or False
 def controllerAddParameter(class_name, method_name, param_type, param_name, parameters=None):
+    caretaker.backup()
     return myModel.classList[class_name].addParameter(method_name, param_type, param_name, parameters)
 
 #Receives input from menu and calls method to delete a parameter then returns True or False
 def controllerRemoveParameter(className, method_name, param_name, parameters=None):
+    caretaker.backup()
     return myModel.classList[className].removeParameter(method_name, param_name, parameters)
 
 #Receives input from menu and calls method to change a parameter then returns True or False
 def controllerChangeParameter(className, method_name, old_param_name, new_param_name, param_type, parameters=None):
+    caretaker.backup()
     return myModel.classList[className].changeParameter(method_name, old_param_name, new_param_name, param_type, parameters)
 
 def controllerChangeParameterType(className, method_name, param_name, new_type, parameters=None):
+    caretaker.backup()
     return myModel.classList[className].changeParameterType(method_name, param_name, new_type, parameters)
 
 
@@ -82,18 +94,22 @@ def controllerChangeParameterType(className, method_name, param_name, new_type, 
 
 #Receives input from menu and calls method to add a field then returns True or False
 def controllerAddField(className, fieldName, fieldType):
+    caretaker.backup()
     return myModel.classList[className].addField(fieldName, fieldType)
 
 #Receives input from menu and calls method to rename a field then returns True or False
 def controllerRenameField(className, oldFieldName, newFieldName):
+    caretaker.backup()
     return myModel.classList[className].renameField(oldFieldName, newFieldName)
 
 #Receives input from menu and calls method to delete a field then returns True or False
 def controllerRemoveField(className, fieldName):
+    caretaker.backup()
     return myModel.classList[className].removeField(fieldName)
 
 #Receives input from menu and calls method to change field type then returns True or False
 def controllerChangeFieldType(className, fieldName, newFieldType):
+    caretaker.backup()
     return myModel.classList[className].changeFieldDataType(fieldName, newFieldType)
 
 
@@ -101,14 +117,17 @@ def controllerChangeFieldType(className, fieldName, newFieldType):
 
 #Receives input from menu and calls method to add a relationship then returns True or False
 def controllerAddRelationship(className1, className2, relationshipType):
+    caretaker.backup()
     return myModel.classList[className1].addRelationship(className1, className2, relationshipType)
 
 #Receives input from menu and calls method to delete a relationship then returns True or False
 def controllerDeleteRelationship(className1, className2, relationshipType):
+    caretaker.backup()
     return myModel.classList[className1].deleteRelationship(className1, className2, relationshipType)
 
 #Receives input from menu and calls method to change a type relationship then returns True or False
 def controllerChangeRelationType(className1, className2, oldRelationType, newRelationType):
+    caretaker.backup()
     return myModel.classList[className1].changeRelationType(className1, className2, oldRelationType, newRelationType)
 
 
@@ -121,6 +140,14 @@ def controllerSave(filename):
 
 def controllerLoad(filename):
     load(filename)
+
+
+def controllerUndo():
+    return caretaker.undo()
+
+def controllerRedo():
+    return caretaker.redo()
+
 
 def controllerCopyData():
     data = {}
