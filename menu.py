@@ -40,6 +40,8 @@ def printCommands():
     print(Fore.MAGENTA + " | Change Relation Type  | Quit                      |")
     print(Fore.MAGENTA + " |                       | Save                      |")
     print(Fore.MAGENTA + " |                       | Load                      |")
+    print(Fore.MAGENTA + " |                       | Undo                      |")
+    print(Fore.MAGENTA + " |                       | Redo                      |")
     print(Fore.CYAN + " +-----------------------+---------------------------+")
 
 def printHelpMenu():
@@ -76,6 +78,8 @@ How to Use the CLI Application:""")
 - Load                |   : Load the diagram.
 - Help                |   : Display this help menu.
 - Exit                |   : Exit the program gracefully.
+- Undo                |   : Will Undo the most recent change to the model
+- Redo                |   : Will Redo the most recent undo command
 ----------------------------------------------------------------------------------------------
     """)
 
@@ -725,6 +729,14 @@ def menuCLI():
                 print(Fore.GREEN + "UML Loaded Successfully!")
             else:
                 print(Fore.RED + "File not Found!")
+
+        # Undo
+        elif (choice == "undo"):
+            controllerUndo()
+
+        # Redo
+        elif (choice == "redo"):
+            controllerRedo()
 
         # HELP
         elif (choice == "help"):
