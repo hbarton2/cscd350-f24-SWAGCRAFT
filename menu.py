@@ -732,11 +732,17 @@ def menuCLI():
 
         # Undo
         elif (choice == "undo"):
-            controllerUndo()
+            if(controllerUndo()):
+                print("\n" + Fore.GREEN + "Undo has been completed succesfully \n")
+            else:
+                print(Fore.RED + "Nothing to Undo")
 
         # Redo
         elif (choice == "redo"):
-            controllerRedo()
+            if(controllerRedo()):
+                print("\n" + Fore.GREEN + "Redo has been completed succesfully \n")
+            else:
+                print(Fore.RED + "Nothing to Redo")
 
         # HELP
         elif (choice == "help"):

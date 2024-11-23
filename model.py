@@ -73,17 +73,17 @@ class Caretaker:
     def undo(self):
         """Restores the previous state from the undo stack."""
         if not self._undo_stack:
-            print("Nothing to undo.")
-            return
+            return False
         memento = self._undo_stack.pop()
         self._redo_stack.append(self._originator.create_memento())
         self._originator.restore(memento)
+        return True
 
     def redo(self):
         """Restores the state from the redo stack."""
         if not self._redo_stack:
-            print("Nothing to redo.")
-            return
+            return False
         memento = self._redo_stack.pop()
         self._undo_stack.append(self._originator.create_memento())
         self._originator.restore(memento)
+        return True

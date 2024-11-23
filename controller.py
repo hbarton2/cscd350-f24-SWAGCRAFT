@@ -143,10 +143,10 @@ def controllerLoad(filename):
 
 
 def controllerUndo():
-    caretaker.undo()
+    return caretaker.undo()
 
 def controllerRedo():
-    caretaker.redo()
+    return caretaker.redo()
 
 
 def controllerCopyData():
