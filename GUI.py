@@ -1,7 +1,9 @@
 import tkinter as tk
 import customtkinter as ctk
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
+from PIL import Image
 from controller import *
+import io
 
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")  #blue is my favorite color -cn
@@ -20,6 +22,7 @@ class UMLApp(ctk.CTk):
 
         #tracking pos for class frames
         self.classPos = {}
+        self.classPosManual = {}
         self.classRects = {}
         self.relationshipLines = {} #changed overall
         self.draggingClass = None
@@ -63,15 +66,34 @@ class UMLApp(ctk.CTk):
         overallDiagramBTN.pack(padx=10, pady=5)
 
         #undo button waiting for momento creation
-        undoBTN = ctk.CTkButton(tboxFRAME, text="Undo")
+        undoBTN = ctk.CTkButton(tboxFRAME, text="Undo", command=self.undo)
         undoBTN.pack(padx=10, pady=5)
 
         #redo button
-        redoBTN = ctk.CTkButton(tboxFRAME, text="Redo")
+        redoBTN = ctk.CTkButton(tboxFRAME, text="Redo", command=self.redo)
         redoBTN.pack(padx=10, pady=5)
 
         saveLoadBTN = ctk.CTkButton(tboxFRAME, text="Save/Load", command=self.saveLoad)  #no longer a placeholder ;)
         saveLoadBTN.pack(padx=10, pady=5)
+
+        printScreenBTN = ctk.CTkButton(tboxFRAME, text="Print Screen", command=self.exportCanvas)
+        printScreenBTN.pack(padx=10, pady=5)
+
+    def undo(self):
+        if controllerUndo():
+            self.diagram = controllerCopyData()
+            self.drawDiagram()
+            self.statLabel.configure(text="Status: Undo operation successful")
+        else:
+            self.statLabel.configure(text="Status: Nothing to undo")
+
+    def redo(self):
+        if controllerRedo():
+            self.diagram = controllerCopyData()
+            self.drawDiagram()
+            self.statLabel.configure(text="Status: Redo operation successful")
+        else:
+            self.statLabel.configure(text="Status: Nothing to redo")
 
     def deleteRelationship(self):
         """Function to call the controller to have it delete a relationship"""
@@ -141,10 +163,9 @@ class UMLApp(ctk.CTk):
         self.autoOrientation = not self.autoOrientation #toggle
         if self.autoOrientation:
             self.toggleButton.configure(text="Auto Orientation: ON")
-            self.drawDiagram()
         else:
             self.toggleButton.configure(text="Auto Orientation: OFF")
-            self.drawDiagram()
+        self.drawDiagram()
 
 
     def createStsBar(self):
@@ -157,13 +178,14 @@ class UMLApp(ctk.CTk):
 
     def drawDiagram(self):
         self.canvas.delete("all")
-        if self.autoOrientation:
-            self.classPos.clear()
-
         self.classRects.clear()  #clear canvas of everything
         self.relationshipLines.clear()  #clear the old relationship lines
 
         if self.autoOrientation:
+            #overwrite self.classPos with new positions
+            self.classPosManual = self.classPos.copy()
+            self.classPos.clear()
+
             #calculate the max width of all classes to determine spacing
             maxWidth = 150  #default min width
             for className, classData in self.diagram.items():
@@ -186,12 +208,13 @@ class UMLApp(ctk.CTk):
                 self.drawClass(className, x, y, width, height)
 
         else:
+            for className in self.diagram.keys():
+                if className not in self.classPosManual:
+                    self.classPosManual[className] = (50 + len(self.classPosManual) * 200, 50)
+            self.classPos = self.classPosManual.copy()
+
             for className, classData in self.diagram.items(): #positions in self.classPos
-                if className in self.classPos:
-                    x, y = self.classPos[className]
-                else:
-                    x, y = 50, 50
-                    self.classPos[className] = (x, y)
+                x, y = self.classPos[className]
                 width, height = self.calculateClassDimensions(className, classData)
                 self.drawClass(className, x, y, width, height)
 
@@ -275,6 +298,10 @@ class UMLApp(ctk.CTk):
             self.canvas.tag_bind(classTag, "<ButtonPress-1>", self.onClassPress)
             self.canvas.tag_bind(classTag, "<B1-Motion>", self.onClassMotion)
             self.canvas.tag_bind(classTag, "<ButtonRelease-1>", self.onClassRelease)
+        else:
+            self.canvas.tag_unbind(classTag, "<ButtonPress-1>")
+            self.canvas.tag_unbind(classTag, "<B1-Motion>")
+            self.canvas.tag_unbind(classTag, "<ButtonRelease-1>")
 
     def drawRelationship(self, className1, className2, relType):
         relKey = (className1, className2, relType)
@@ -400,11 +427,36 @@ class UMLApp(ctk.CTk):
             success = controllerAddClass(className)
 
             if success:
+                if not self.autoOrientation:
+                    self.classPosManual[className] = (50 + len(self.classPosManual) * 200, 50)
+                else:
+                    pass
                 self.diagram = controllerCopyData()
                 self.drawDiagram()
                 self.statLabel.configure(text=f"Status: Class '{className}' added")
             else:
                 self.statLabel.configure(text=f"Status: Class '{className}' already exists")
+
+    def exportCanvas(self):
+        fileTypes = [('PNG Image', '*.png'), ('JPEG Image', '*.jpg'), ('Bitmap Image', '*.bmp')] #borrowed stuff from stackoverflow but it works. you would not believe the amount of cursing I did figuring this out:D
+        fileName = filedialog.asksaveasfilename(defaultextension='.png', filetypes=fileTypes)
+        if fileName:
+            self.canvas.update()
+            bbox = self.canvas.bbox('all') #important: get the canvas's scroll region
+            if bbox:
+                x0, y0, x1, y1 = bbox
+                width = x1 - x0
+                height = y1 - y0
+            else:
+                x0 = 0
+                y0 = 0
+                width = self.canvas.winfo_width()
+                height = self.canvas.winfo_height()
+
+            psStuff = self.canvas.postscript(colormode='color', x=x0, y=y0, width=width, height=height)
+            renderedIMG = Image.open(io.BytesIO(psStuff.encode('utf-8')))
+            renderedIMG.save(fileName)
+            self.statLabel.configure(text=f"Status: Canvas exported to '{fileName}'")
 
     def renameClass(self):
         #first prompt
@@ -418,6 +470,11 @@ class UMLApp(ctk.CTk):
             if newClassName:
                 success = mainRenameClass(existingClassName, newClassName)  # Use controller to rename the class
                 if success:
+                    #update positions
+                    if existingClassName in self.classPos:
+                        self.classPos[newClassName] = self.classPos.pop(existingClassName)
+                    if existingClassName in self.classPosManual:
+                        self.classPosManual[newClassName] = self.classPosManual.pop(existingClassName)
                     self.diagram = controllerCopyData()
                     self.drawDiagram()
                     self.statLabel.configure(text=f"Status: Class '{existingClassName}' renamed to '{newClassName}'")
@@ -444,45 +501,55 @@ class UMLApp(ctk.CTk):
                     break
 
     def onClassPress(self, event): #looked this up
-        item = self.canvas.find_withtag("current") #item under cursor
-        if item:
-            tags = self.canvas.gettags(item[0])
-            for tag in tags:
-                if tag.startswith("class_"):
-                    className = tag[6:]
-                    break
-            else:
-                className = None
+        if not self.autoOrientation:
+            item = self.canvas.find_withtag("current") #item under cursor
+            if item:
+                tags = self.canvas.gettags(item[0])
+                for tag in tags:
+                    if tag.startswith("class_"):
+                        className = tag[6:]
+                        break
+                else:
+                    className = None
 
-
-            if className:
-                self.draggingClass = className
-                #record the offst between the mouse position and the item's position
-                x, y = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
-                itemX, itemY = self.classPos[className]
-                self.draggingData = (x - itemX, y - itemY)
-                #bring item to front
-                classTag = f"class_{className}"
-                self.canvas.tag_raise(classTag)
+                if className and className in self.classPos:
+                    self.draggingClass = className
+                    #record the offst between the mouse position and the item's position
+                    x, y = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
+                    itemX, itemY = self.classPos[className]
+                    self.draggingData = (x - itemX, y - itemY)
+                    #bring item to front
+                    classTag = f"class_{className}"
+                    self.canvas.tag_raise(classTag)
+                else:
+                    self.draggingClass = None
+                    self.draggingData = None
+        else:
+            self.draggingClass = None
+            self.draggingData = None
 
     def onClassMotion(self, event):
-
-        if self.draggingClass: #handle mouse motion event for dragging a class
+        if not self.autoOrientation and self.draggingClass: #handle mouse motion event for dragging a class
             x, y = self.canvas.canvasx(event.x), self.canvas.canvasy(event.y)
-            newOffsetX, newOffsetY = self.draggingData
-            #calc new pos for the class
-            newx = x - newOffsetX
-            newY = y - newOffsetY
-            changeX = newx - self.classPos[self.draggingClass][0] #change in position for dragged class
-            changeY = newY - self.classPos[self.draggingClass][1]
+            if self.draggingData:
+                newOffsetX, newOffsetY = self.draggingData
+                #calc new pos for the class
+                newx = x - newOffsetX
+                newY = y - newOffsetY
+                changeX = newx - self.classPos[self.draggingClass][0] #change in position for dragged class
+                changeY = newY - self.classPos[self.draggingClass][1]
 
-            className = self.draggingClass #move class items
-            classTag = f"class_{className}"
-            self.canvas.move(classTag, changeX, changeY)
-            #update the pos in self.classPos
-            self.classPos[className] = (newx, newY)
+                className = self.draggingClass #move class items
+                classTag = f"class_{className}"
+                self.canvas.move(classTag, changeX, changeY)
+                #update the pos in self.classPos
+                self.classPos[className] = (newx, newY)
+                self.classPosManual[className] = (newx, newY)
 
-            self.updateRelationships() #refresh
+                self.updateRelationships() #refresh
+        else:
+            self.draggingClass = None
+            self.draggingData = None
 
     def onClassRelease(self, event):
         #mouse release event after dragging a class rect
@@ -500,6 +567,10 @@ class UMLApp(ctk.CTk):
                 if confirm:
                     success = controllerDeleteClass(className)
                     if success:
+                        if className in self.classPos:
+                            del self.classPos[className]
+                        if className in self.classPosManual:
+                            del self.classPosManual[className]
                         self.diagram = controllerCopyData()
                         self.drawDiagram()
                         self.statLabel.configure(text=f"Status: Class '{className}' deleted.")
@@ -797,7 +868,7 @@ class UMLApp(ctk.CTk):
         #create a new dialog for save/load actions
         dialogWin = tk.Toplevel(self)
         dialogWin.title("Save or Load Diagram")
-        dialogWin.geometry("400x200")
+        dialogWin.geometry("400x280")
 
         #entry field for the file name. All this drive to use customtkinter and I've been neglecting to use it for parts
         fileLbl = ctk.CTkLabel(dialogWin, text="Enter file name (optional):", text_color="black")
@@ -806,10 +877,20 @@ class UMLApp(ctk.CTk):
         fileEntry = ctk.CTkEntry(dialogWin)
         fileEntry.pack(pady=5)
 
+        #checkbox to decide whether to save positions
+        savePositionsVar = tk.BooleanVar(value=False)
+        savePositionsCheckbox = ctk.CTkCheckBox(dialogWin, text="Save Positions", variable=savePositionsVar, text_color="black")
+        savePositionsCheckbox.pack(pady=5)
+        loadPositionsVar = tk.BooleanVar(value=False)
+        loadPositionsCheckbox = ctk.CTkCheckBox(dialogWin, text="Load Positions", variable=loadPositionsVar, text_color="black")
+        loadPositionsCheckbox.pack(pady=5)
+
         #handler for save action
         def saveHandler():
             fileName = fileEntry.get().strip() or "data.json"  #default to data.json if empty
-            if controllerSave(fileName):  #call save function
+            savePositions = savePositionsVar.get()
+            positions = self.classPosManual if savePositions else None
+            if controllerSave(fileName, positions):  #call save function
                 self.statLabel.configure(text=f"Status: The diagram was saved as '{fileName}'")
             else:
                 self.statLabel.configure(text="Status: Error when saving diagram")
@@ -818,10 +899,20 @@ class UMLApp(ctk.CTk):
         #handler for load action
         def loadHandler():
             fileName = fileEntry.get().strip() or "data.json"  #default to data.json if empty
+            loadPositions = loadPositionsVar.get()
+            if loadPositions:
+                success, positions = controllerLoad(fileName, return_positions=True)
+            else:
+                success = controllerLoad(fileName)
+                positions = None
 
-            if controllerLoad(fileName):  #call load function
+            if success: #call load function
                 self.diagram = controllerCopyData()
-                self.drawDiagram()  #update GUI with loaded data
+                if loadPositions and positions: #update GUI with loaded data
+                    self.classPosManual = positions
+                    self.autoOrientation = False  #switch to manual mode to reflect loaded positions
+                    self.toggleButton.configure(text="Auto Orientation: OFF")
+                self.drawDiagram()
                 self.statLabel.configure(text=f"Status: Diagram loaded from '{fileName}'")
             else:
                 self.statLabel.configure(text="Status: Error loading diagram")
