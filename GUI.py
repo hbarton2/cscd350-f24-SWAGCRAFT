@@ -5,20 +5,33 @@ from PIL import Image
 from controller import *
 import io
 
-ctk.set_appearance_mode("Dark")
-ctk.set_default_color_theme("blue")  #blue is my favorite color -cn
 
 
 class UMLApp(ctk.CTk):
-    def __init__(self):
+    def __init__(self, exportMode=False):
         super().__init__()
+        self.exportMode = exportMode
+        if not self.exportMode:
+            ctk.set_appearance_mode("Dark")
+            ctk.set_default_color_theme("blue")  #blue is my favorite color -cn
 
-        #config window
-        self.title("UML Diagram Application")
-        self.geometry("1600x800")
-        self.minsize(1600, 800)
+            #config window
+            self.title("UML Diagram Application")
+            self.geometry("1600x800")
+            self.minsize(1600, 800)
 
-        self.diagram = controllerCopyData()  #now instead using the imported diagram from diagram.py. trying to adhere to aiden's format.
+            self.mainFRAME = ctk.CTkFrame(self)
+            self.mainFRAME.pack(side="top", fill="both", expand=True)
+
+            self.createTBOX()
+            self.createDrwArea()
+            self.createStsBar()
+        else:
+            self.canvas = tk.Canvas(self, bg="white")
+            self.canvas.pack(fill="both", expand=True)
+
+
+        self.diagram = controllerCopyData() #now instead using the imported diagram from diagram.py. trying to adhere to aiden's format.
 
         #tracking pos for class frames
         self.classPos = {}
@@ -28,15 +41,15 @@ class UMLApp(ctk.CTk):
         self.draggingClass = None
         self.draggingData = None
         self.autoOrientation = True
-        self.createTBOX()
-        self.createDrwArea()
-        self.createStsBar()
-        self.drawDiagram()
+
+
+        if not self.exportMode:
+            self.drawDiagram()
 
 
     def createTBOX(self):
         #da frame
-        tboxFRAME = ctk.CTkFrame(self, width=150) #updated size a lil
+        tboxFRAME = ctk.CTkFrame(self.mainFRAME, width=150) #updated size a lil
         tboxFRAME.pack(side="left", fill="y", padx=5, pady=5)
         tboxLABEL = ctk.CTkLabel(tboxFRAME, text="Toolbox", font=ctk.CTkFont(size=16, weight="bold"))
         tboxLABEL.pack(pady=(10, 5))
@@ -130,7 +143,7 @@ class UMLApp(ctk.CTk):
 
     def createDrwArea(self):
         #create area frame
-        self.drawFRAME = ctk.CTkFrame(master=self)
+        self.drawFRAME = ctk.CTkFrame(master=self.mainFRAME)
         self.drawFRAME.pack(side="right", fill="both", expand=True)
 
         self.canvas = tk.Canvas(self.drawFRAME, bg="white")  #drawing to canvas
@@ -319,12 +332,49 @@ class UMLApp(ctk.CTk):
         width2, height2 = self.calculateClassDimensions(className2, self.diagram[className2])
 
 
-        centerX1 = x1 + width1 // 2 #get centers
-        centerY1 = y1 + height1 // 2
-        centerX2 = x2 + width2 // 2
-        centerY2 = y2 + height2 // 2
+        classARect = (x1, y1, x1 + width1, y1 + height1)
+        classBRect = (x2, y2, x2 + width2, y2 + height2)
 
-        #determine line color based on relationship type
+        overlap = not (classARect[2] <= classBRect[0] or classARect[0] >= classBRect[2] or classARect[3] <= classBRect[1] or classARect[1] >= classBRect[3])
+
+        if overlap:
+            return
+
+        centerX1 = x1 + width1 / 2
+        centerY1 = y1 + height1 / 2
+        centerX2 = x2 + width2 / 2
+        centerY2 = y2 + height2 / 2
+
+        deltaX = centerX2 - centerX1
+        deltaY = centerY2 - centerY1
+
+        if abs(deltaX) > abs(deltaY):
+            if deltaX > 0:
+                startPoint = (x1 + width1, centerY1)
+                endPoint = (x2, centerY2)
+                primaryDirection = 'horizontal'
+                direction = 1
+            else:
+                startPoint = (x1, centerY1)
+                endPoint = (x2 + width2, centerY2)
+                primaryDirection = 'horizontal'
+                direction = -1
+        else:
+            if deltaY > 0:
+                startPoint = (centerX1, y1 + height1)
+                endPoint = (centerX2, y2)
+                primaryDirection = 'vertical'
+                direction = 1
+            else:
+                startPoint = (centerX1, y1)
+                endPoint = (centerX2, y2 + height2)
+                primaryDirection = 'vertical'
+                direction = -1
+
+        currX, currY = startPoint
+        endX, endY = endPoint
+
+
         lineColor = {
             "aggregation": "blue",
             "composition": "green",
@@ -332,50 +382,81 @@ class UMLApp(ctk.CTk):
             "realization": "orange"
         }.get(relType, "black")  #adding this to default to black in case something errors out (soft error)
 
-        #init line points w/start
-        linePoints = [(centerX1, centerY1)]
 
-        currX, currY = centerX1, centerY1
-        endX, endY = centerX2, centerY2
+        linePoints = [(currX, currY)]
+        edgeOffST = 20
+
+
+        if primaryDirection == 'horizontal':
+            currX += direction * edgeOffST
+        else:
+            currY += direction * edgeOffST
+        linePoints.append((currX, currY))
+
+
+        if primaryDirection == 'horizontal':
+            preEndX = endX - direction * edgeOffST
+            preEndY = currY
+        else:
+            preEndX = currX
+            preEndY = endY - direction * edgeOffST
+
 
         collision = False
-
-        #check collision horizon
         for otherClass in self.diagram:
             if otherClass in (className1, className2):
                 continue
-            otherClassX, otherClassY = self.classPos[otherClass]
-            otherClassWdth, otherClassHght = self.calculateClassDimensions(otherClass, self.diagram[otherClass])
+            otherX, otherY = self.classPos[otherClass]
+            otherWidth, otherHeight = self.calculateClassDimensions(otherClass, self.diagram[otherClass])
+
+            otherLeft = otherX
+            otherRight = otherX + otherWidth
+            otherTop = otherY
+            otherBottom = otherY + otherHeight
 
 
-            if otherClassY <= currY <= otherClassY + otherClassHght: #horizontal line from currX to endX crosses other frame
-                if (currX < otherClassX < endX or currX < otherClassX + otherClassWdth < endX) if endX > currX else (
-                        endX < otherClassX < currX or endX < otherClassX + otherClassWdth < currX):
+            if primaryDirection == 'horizontal':
+
+                minX = min(currX, preEndX)
+                maxX = max(currX, preEndX)
+                if otherTop <= currY <= otherBottom and not (otherRight < minX or otherLeft > maxX):
+                    collision = True
+                    break
+            else:
+
+                minY = min(currY, preEndY)
+                maxY = max(currY, preEndY)
+                if otherLeft <= currX <= otherRight and not (otherBottom < minY or otherTop > maxY):
                     collision = True
                     break
 
         if collision:
-            #vertical avoid collision
-            vertOffset = -50 if currY > endY else 50
-            currY += vertOffset
-            linePoints.append((currX, currY))
 
-            #move horizontally to endX ;D
-            currX = endX
+            if primaryDirection == 'horizontal':
+                adjustY = -50 if currY > centerY2 else 50
+                currY += adjustY
+                linePoints.append((currX, currY))
+            else:
+                adjustX = -50 if currX > centerX2 else 50
+                currX += adjustX
+                linePoints.append((currX, currY))
+
+        if primaryDirection == 'horizontal':
+            currX = preEndX
             linePoints.append((currX, currY))
+            if currY != endY:
+                currY = endY
+                linePoints.append((currX, currY))
         else:
-            #no collision so I can move directly horizontal to endX
-            currX = endX
+            currY = preEndY
             linePoints.append((currX, currY))
+            if currX != endX:
+                currX = endX
+                linePoints.append((currX, currY))
 
+        linePoints.append((endX, endY))
 
-        currY = endY #move vert to endy
-        linePoints.append((currX, currY))
-
-        lineCoords = []
-        for point in linePoints:
-            for coord in point:
-                lineCoords.append(coord)
+        lineCoords = [coord for point in linePoints for coord in point]
 
         #time to draw
         lineID = self.canvas.create_line(lineCoords, fill=lineColor, width=2, arrow=tk.LAST)
@@ -437,9 +518,10 @@ class UMLApp(ctk.CTk):
             else:
                 self.statLabel.configure(text=f"Status: Class '{className}' already exists")
 
-    def exportCanvas(self):
+    def exportCanvas(self, fileName=None):
         fileTypes = [('PNG Image', '*.png'), ('JPEG Image', '*.jpg'), ('Bitmap Image', '*.bmp')] #borrowed stuff from stackoverflow but it works. you would not believe the amount of cursing I did figuring this out:D
-        fileName = filedialog.asksaveasfilename(defaultextension='.png', filetypes=fileTypes)
+        if fileName is None:
+            fileName = filedialog.asksaveasfilename(defaultextension='.png', filetypes=fileTypes)
         if fileName:
             self.canvas.update()
             bbox = self.canvas.bbox('all') #important: get the canvas's scroll region
@@ -456,7 +538,8 @@ class UMLApp(ctk.CTk):
             psStuff = self.canvas.postscript(colormode='color', x=x0, y=y0, width=width, height=height)
             renderedIMG = Image.open(io.BytesIO(psStuff.encode('utf-8')))
             renderedIMG.save(fileName)
-            self.statLabel.configure(text=f"Status: Canvas exported to '{fileName}'")
+            if not self.exportMode:
+                self.statLabel.configure(text=f"Status: Canvas exported to '{fileName}'")
 
     def renameClass(self):
         #first prompt
@@ -594,10 +677,7 @@ class UMLApp(ctk.CTk):
         cancelButton = ctk.CTkButton(optionWin, text="Cancel", command=lambda: handleOption("cancel"))
         cancelButton.pack(pady=5)
 
-    def editClass(self, className):
-        editWin = tk.Toplevel(self)
-        editWin.title(f"Edit Class '{className}'")
-        editWin.geometry("500x1000")
+    def editClass(self, className): #now using CTK as I should have from the start
 
 
         def addFieldHandler():
@@ -718,82 +798,144 @@ class UMLApp(ctk.CTk):
             else:
                 self.statLabel.configure(text="Status: Please provide method name and parameter name.")
 
-        #fields section
-        tk.Label(editWin, text="Add Field: (name and type)").pack(pady=5)
-        fieldEntry = tk.Entry(editWin)
+        editWin = ctk.CTkToplevel(self)
+        editWin.title(f"Edit Class '{className}'")
+        editWin.geometry("500x700")
+
+        self.sectionStates = {
+            "Add": True,
+            "Remove": False,
+            "Rename": False
+        } #state track
+
+        def toggleSection(sectionName): #logic is per toggle one collapsable should be seen at a time
+            for key in self.sectionStates.keys():
+                self.sectionStates[key] = False
+            self.sectionStates[sectionName] = True
+            updateSections()
+
+        def updateSections():
+            addFrame.pack_forget()
+            removeFrame.pack_forget()
+            renameFrame.pack_forget()
+
+            if self.sectionStates["Add"]:
+                addFrame.pack(fill="x", padx=10, pady=5)
+                addButton.configure(text="▼ Add")
+            else:
+                addButton.configure(text="► Add")
+
+            if self.sectionStates["Remove"]:
+                removeFrame.pack(fill="x", padx=10, pady=5)
+                removeButton.configure(text="▼ Remove")
+            else:
+                removeButton.configure(text="► Remove")
+
+            if self.sectionStates["Rename"]:
+                renameFrame.pack(fill="x", padx=10, pady=5)
+                renameButton.configure(text="▼ Rename")
+            else:
+                renameButton.configure(text="► Rename")
+
+        #full on revision time
+        addButton = ctk.CTkButton(editWin, text="▼ Add", width=200, command=lambda: toggleSection("Add"))
+        addButton.pack(fill="x")
+
+        addFrame = ctk.CTkFrame(editWin)
+
+        removeButton = ctk.CTkButton(editWin, text="► Remove", width=200, command=lambda: toggleSection("Remove"))
+        removeButton.pack(fill="x")
+
+        removeFrame = ctk.CTkFrame(editWin)
+
+        renameButton = ctk.CTkButton(editWin, text="► Rename", width=200, command=lambda: toggleSection("Rename"))
+        renameButton.pack(fill="x")
+
+        renameFrame = ctk.CTkFrame(editWin)
+
+
+        updateSections()
+
+        #add options section
+        addFieldLabel = ctk.CTkLabel(addFrame, text="Add Field: (name and type)")
+        addFieldLabel.pack(pady=5)
+        fieldEntry = ctk.CTkEntry(addFrame)
         fieldEntry.pack(pady=5)
-        fieldEntry.insert(0, "field_name") #inserting placeholder text so user knows which is which
-        fieldTypeEntry = tk.Entry(editWin)
+        fieldEntry.insert(0, "field_name")
+        fieldTypeEntry = ctk.CTkEntry(addFrame)
         fieldTypeEntry.pack(pady=5)
         fieldTypeEntry.insert(0, "field_type")
-        addFieldBTN = tk.Button(editWin, text="Add Field", command=addFieldHandler)
+        addFieldBTN = ctk.CTkButton(addFrame, text="Add Field", command=addFieldHandler)
         addFieldBTN.pack(pady=5)
 
-        tk.Label(editWin, text="Remove Field: (name)").pack(pady=5)
-        fieldRemoveEntry = tk.Entry(editWin)
-        fieldRemoveEntry.pack(pady=5)
-        fieldRemoveEntry.insert(0, "field_name")
-        removeFieldBTN = tk.Button(editWin, text="Remove Field", command=removeFieldHandler)
-        removeFieldBTN.pack(pady=5)
-
-        tk.Label(editWin, text="Rename Field: (old name and new name)").pack(pady=5)
-        fieldRenameOldEntry = tk.Entry(editWin)
-        fieldRenameOldEntry.pack(pady=5)
-        fieldRenameOldEntry.insert(0, "old_field_name")
-        fieldRenameNewEntry = tk.Entry(editWin)
-        fieldRenameNewEntry.pack(pady=5)
-        fieldRenameNewEntry.insert(0, "new_field_name")
-        renameFieldBTN = tk.Button(editWin, text="Rename Field", command=renameFieldHandler)
-        renameFieldBTN.pack(pady=5)
-
-        #methods sect
-        tk.Label(editWin, text="Add Method: (name and parameters)").pack(pady=5)
-        methodEntry = tk.Entry(editWin)
+        addMethodLabel = ctk.CTkLabel(addFrame, text="Add Method: (name and parameters)")
+        addMethodLabel.pack(pady=5)
+        methodEntry = ctk.CTkEntry(addFrame)
         methodEntry.pack(pady=5)
         methodEntry.insert(0, "method_name")
-        paramEntry = tk.Entry(editWin)
+        paramEntry = ctk.CTkEntry(addFrame)
         paramEntry.pack(pady=5)
-        paramEntry.insert(0, "param1: type1, param2: type2") #worked hard on this
-        addMethodBTN = tk.Button(editWin, text="Add Method", command=addMethodHandler)
-
-        tk.Label(editWin, text="Method Return Type:").pack(pady=5)
-        returnTypeEntry = tk.Entry(editWin)
+        paramEntry.insert(0, "param1: type1, param2: type2")
+        returnTypeEntry = ctk.CTkEntry(addFrame)
         returnTypeEntry.pack(pady=5)
         returnTypeEntry.insert(0, "void")
-
+        addMethodBTN = ctk.CTkButton(addFrame, text="Add Method", command=addMethodHandler)
         addMethodBTN.pack(pady=5)
 
-        tk.Label(editWin, text="Remove Method: (name)").pack(pady=5)
-        methodRemoveEntry = tk.Entry(editWin)
-        methodRemoveEntry.pack(pady=5)
-        methodRemoveEntry.insert(0, "method_name")
-        removeMethodBTN = tk.Button(editWin, text="Remove Method", command=removeMethodHandler)
-        removeMethodBTN.pack(pady=5)
-
-        #parameters section...scuffed but will do
-        tk.Label(editWin, text="Add Parameter to Method: (method, parameter name, type)").pack(pady=5)
-        addParamMethodEntry = tk.Entry(editWin)
+        addParamLabel = ctk.CTkLabel(addFrame, text="Add Parameter to Method: (method, parameter name, type)")
+        addParamLabel.pack(pady=5)
+        addParamMethodEntry = ctk.CTkEntry(addFrame)
         addParamMethodEntry.pack(pady=5)
-        addParamMethodEntry.insert(0, "method_name") #more placeholder text to autofill.
-        addParamNameEntry = tk.Entry(editWin)
+        addParamMethodEntry.insert(0, "method_name")
+        addParamNameEntry = ctk.CTkEntry(addFrame)
         addParamNameEntry.pack(pady=5)
         addParamNameEntry.insert(0, "param_name")
-        addParamTypeENT = tk.Entry(editWin)
+        addParamTypeENT = ctk.CTkEntry(addFrame)
         addParamTypeENT.pack(pady=5)
         addParamTypeENT.insert(0, "param_type")
-        addParamBTN = tk.Button(editWin, text="Add Parameter", command=addParameterHandler) #call my new handler
+        addParamBTN = ctk.CTkButton(addFrame, text="Add Parameter", command=addParameterHandler)
         addParamBTN.pack(pady=5)
 
-        #new addition. actually being able to remove parameters
-        tk.Label(editWin, text="Remove Parameter from Method: (method, parameter name)").pack(pady=5) #labels
-        removeParamMethodEntry = tk.Entry(editWin)
+        #remove section
+        removeFieldLabel = ctk.CTkLabel(removeFrame, text="Remove Field: (name)")
+        removeFieldLabel.pack(pady=5)
+        fieldRemoveEntry = ctk.CTkEntry(removeFrame)
+        fieldRemoveEntry.pack(pady=5)
+        fieldRemoveEntry.insert(0, "field_name")
+        removeFieldBTN = ctk.CTkButton(removeFrame, text="Remove Field", command=removeFieldHandler)
+        removeFieldBTN.pack(pady=5)
+
+
+        removeMethodLabel = ctk.CTkLabel(removeFrame, text="Remove Method: (name)")
+        removeMethodLabel.pack(pady=5)
+        methodRemoveEntry = ctk.CTkEntry(removeFrame)
+        methodRemoveEntry.pack(pady=5)
+        methodRemoveEntry.insert(0, "method_name")
+        removeMethodBTN = ctk.CTkButton(removeFrame, text="Remove Method", command=removeMethodHandler)
+        removeMethodBTN.pack(pady=5)
+
+        removeParamLabel = ctk.CTkLabel(removeFrame, text="Remove Parameter from Method: (method, parameter name)")
+        removeParamLabel.pack(pady=5)
+        removeParamMethodEntry = ctk.CTkEntry(removeFrame)
         removeParamMethodEntry.pack(pady=5)
         removeParamMethodEntry.insert(0, "method_name")
-        removeParamNameEntry = tk.Entry(editWin)
+        removeParamNameEntry = ctk.CTkEntry(removeFrame)
         removeParamNameEntry.pack(pady=5)
         removeParamNameEntry.insert(0, "param_name")
-        removeParamBTN = tk.Button(editWin, text="Remove Parameter", command=removeParameterHandler)
+        removeParamBTN = ctk.CTkButton(removeFrame, text="Remove Parameter", command=removeParameterHandler)
         removeParamBTN.pack(pady=5)
+
+        #rename section
+        renameFieldLabel = ctk.CTkLabel(renameFrame, text="Rename Field: (old name and new name)")
+        renameFieldLabel.pack(pady=5)
+        fieldRenameOldEntry = ctk.CTkEntry(renameFrame)
+        fieldRenameOldEntry.pack(pady=5)
+        fieldRenameOldEntry.insert(0, "old_field_name")
+        fieldRenameNewEntry = ctk.CTkEntry(renameFrame)
+        fieldRenameNewEntry.pack(pady=5)
+        fieldRenameNewEntry.insert(0, "new_field_name")
+        renameFieldBTN = ctk.CTkButton(renameFrame, text="Rename Field", command=renameFieldHandler)
+        renameFieldBTN.pack(pady=5)
 
     def listClasses(self):
         classListWin = tk.Toplevel(self)
@@ -806,52 +948,64 @@ class UMLApp(ctk.CTk):
             tk.Label(classListWin, text=f"{className}", font=("Arial", 12)).pack(anchor="w", padx=10)
 
     def addRelationship(self):
-        relWin = tk.Toplevel(self)
+        relWin = ctk.CTkToplevel(self)
         relWin.title("Add Relationship")
-        relWin.geometry("600x300")
+        relWin.geometry("200x450")
 
-        tk.Label(relWin, text="Enter Source Class:").pack(pady=5)
-        sourceEntry = tk.Entry(relWin)
+        ctk.CTkLabel(relWin, text="Enter Source Class:").pack(pady=5)
+        sourceEntry = ctk.CTkEntry(relWin)
         sourceEntry.pack(pady=5)
 
-        tk.Label(relWin, text="Enter Destination Class:").pack(pady=5)
-        destEntry = tk.Entry(relWin)
+        ctk.CTkLabel(relWin, text="Enter Destination Class:").pack(pady=5)
+        destEntry = ctk.CTkEntry(relWin)
         destEntry.pack(pady=5)
 
-        tk.Label(relWin, text="Enter Relationship Type (aggregation, composition, generalization, realization):").pack(pady=5)
-        typeEntry = tk.Entry(relWin)
-        typeEntry.pack(pady=5)
+        ctk.CTkLabel(relWin, text="Select Relationship Type:").pack(pady=10)
 
-        def addRelHandler():
+        def addRelHandler(relationType):
             source = sourceEntry.get().strip()
             dest = destEntry.get().strip()
-            relationType = typeEntry.get().strip().lower()
+            relationType = relationType.strip().lower()
 
-            validTypes = ["aggregation", "composition", "generalization", "realization"]
-
-            if source and dest and relationType:
-                if relationType not in validTypes:
-                    self.statLabel.configure(text="Status: Invalid relationship type given")
-                    return
-
+            if source and dest:
                 if source == dest:
-                    messagebox.showerror("Error", "Cannot create a relationship with the same class. silly.")
+                    ctk.messagebox.showerror("Error", "Cannot create a relationship with the same class. silly.")
                     return
 
                 if source not in self.diagram or dest not in self.diagram:
-                    messagebox.showerror("Error", "One or both classes do not exist.")
+                    ctk.messagebox.showerror("Error", "One or both classes do not exist.")
                     return
 
                 success = controllerAddRelationship(source, dest, relationType)  # Use controller to add relationship
                 if success:
                     self.diagram = controllerCopyData()
                     self.drawDiagram()
-                    self.statLabel.configure(text=f"Status: Relationship added between '{source}' and '{dest}' as '{relationType}'.")
+                    self.statLabel.configure(text=f"Status: Relationship '{relationType}' added between '{source}' and '{dest}'.") #I made a small change in how it is said, as saying it out loud it felt improper
+                    relWin.destroy()
                 else:
                     self.statLabel.configure(text=f"Status: Failed to add relationship between '{source}' and '{dest}'.")
+            else:
+                self.statLabel.configure(text="Status: Please enter both source and destination classes.")
 
-        addRelBTN = tk.Button(relWin, text="Add Relationship", command=addRelHandler)
-        addRelBTN.pack(pady=10)
+
+        buttonFrame = ctk.CTkFrame(relWin)
+        buttonFrame.pack(pady=10)
+
+        aggregationButton = ctk.CTkButton(buttonFrame, text="Aggregation", command=lambda: addRelHandler("aggregation"))
+        aggregationButton.pack(pady=5)
+
+        compositionButton = ctk.CTkButton(buttonFrame, text="Composition", command=lambda: addRelHandler("composition"))
+        compositionButton.pack(pady=5)
+
+        generalizationButton = ctk.CTkButton(buttonFrame, text="Generalization", command=lambda: addRelHandler("generalization"))
+        generalizationButton.pack(pady=5)
+
+        realizationButton = ctk.CTkButton(buttonFrame, text="Realization", command=lambda: addRelHandler("realization"))
+        realizationButton.pack(pady=5)
+
+
+        cancelButton = ctk.CTkButton(relWin, text="Cancel", command=relWin.destroy)
+        cancelButton.pack(pady=10)
 
     def showOverallDiagram(self):
         diagramWin = tk.Toplevel(self)
@@ -932,3 +1086,12 @@ class UMLApp(ctk.CTk):
 def startGUI():
     GUI = UMLApp()
     GUI.mainloop()
+
+
+def exportDiagramImage(filename=None):
+    app = UMLApp(exportMode=True)
+    app.withdraw()
+    app.update()
+    app.drawDiagram()
+    app.exportCanvas(filename=filename)
+    app.destroy()

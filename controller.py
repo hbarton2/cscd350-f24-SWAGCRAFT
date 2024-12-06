@@ -163,3 +163,17 @@ def controllerCopyData():
 
         data[className] = classData
     return data
+
+def controllerExportDiagram(filename=None):
+    from multiprocessing import Process
+    from GUI import exportDiagramImage
+
+    def worker():
+        try:
+            exportDiagramImage(filename)
+        except Exception as e:
+            print(f"An error occurred during export: {e}")
+
+    p = Process(target=worker)
+    p.start()
+    p.join()

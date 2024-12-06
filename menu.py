@@ -42,6 +42,7 @@ def printCommands():
     print(Fore.MAGENTA + " |                       | Load                      |")
     print(Fore.MAGENTA + " |                       | Undo                      |")
     print(Fore.MAGENTA + " |                       | Redo                      |")
+    print(Fore.MAGENTA + " |                       | Export Diagram            |")
     print(Fore.CYAN + " +-----------------------+---------------------------+")
 
 def printHelpMenu():
@@ -586,6 +587,10 @@ def menuCLI():
                 print(Fore.GREEN + "Successfully changed relationship type for " + className1 + " and " + className2 + " with type " + relationshipType +  " to new type " + newRelationshipType)
             else:
                 print(Fore.RED + "An error has occurred")
+        elif choice == "exportdiagram":
+            print(Fore.YELLOW + "Exporting diagram as image...")
+            controllerExportDiagram()
+            print(Fore.GREEN + "Diagram export completed.")
 
         # LIST CLASSES
         elif choice == "listclasses":
