@@ -1,1 +1,4 @@
 pytest
+colorama
+tkinter
+customtkinter
