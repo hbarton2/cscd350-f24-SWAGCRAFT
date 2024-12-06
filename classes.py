@@ -103,9 +103,26 @@ class Class:
     # Relationship methods
 
     def addRelationship(self, fromClass, toClass, relationType):
-        newRelation = Relationship(fromClass, toClass, relationType)
-        self.relationship.append(newRelation)
+        """
+        Add a relationship to the class.
+        Args:
+            fromClass (str): The name of the class where the relationship starts.
+            toClass (str): The name of the class where the relationship ends.
+            relationType (str): The type of relationship (e.g., association, aggregation).
+        Returns:
+            bool: True if the relationship was added, False if it already exists.
+        """
+        # Check for duplicate relationships
+        for relationship in self.relationship:
+            if (relationship.fromClass == fromClass and
+                    relationship.toClass == toClass and
+                    relationship.relationType == relationType):
+                return False  # Relationship already exists
+
+        # Add the new relationship
+        self.relationship.append(Relationship(fromClass, toClass, relationType))
         return True
+
 
 
     def deleteRelationship(self, fromClass, toClass, relationType):
