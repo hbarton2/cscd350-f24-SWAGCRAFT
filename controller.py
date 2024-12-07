@@ -135,11 +135,11 @@ def controllerChangeRelationType(className1, className2, oldRelationType, newRel
 #WILL NEED TO BE UPDATED WITH INPUTS FOR UPDATED LOAD
 
 
-def controllerSave(filename):
-    save(filename)
+def controllerSave(filename, positions=None):
+    return save(filename, positions)
 
-def controllerLoad(filename):
-    load(filename)
+def controllerLoad(filename, return_positions=False):
+    return load(filename, return_positions)
 
 
 def controllerUndo():
@@ -163,3 +163,17 @@ def controllerCopyData():
 
         data[className] = classData
     return data
+
+def controllerExportDiagram(filename=None):
+    from multiprocessing import Process
+    from GUI import exportDiagramImage
+
+    def worker():
+        try:
+            exportDiagramImage(filename)
+        except Exception as e:
+            print(f"An error occurred during export: {e}")
+
+    p = Process(target=worker)
+    p.start()
+    p.join()

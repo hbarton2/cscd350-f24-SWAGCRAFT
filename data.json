@@ -1,60 +1,57 @@
 {
     "classList": {
-        "tester": {
-            "name": "tester",
+        "coolclass1": {
+            "name": "coolclass1",
             "fields": [],
-            "methods": [
+            "methods": [],
+            "relationships": [
                 {
-                    "name": "testing",
-                    "return_type": "void",
-                    "parameters": [
-                        {
-                            "name": "p1",
-                            "type": "int"
-                        }
-                    ]
+                    "fromClass": "coolclass1",
+                    "toClass": "coolclass4",
+                    "relationType": "composition"
                 },
                 {
-                    "name": "testeringer",
-                    "return_type": "PVOID",
-                    "parameters": [
-                        {
-                            "name": "p1",
-                            "type": "int"
-                        },
-                        {
-                            "name": "p2",
-                            "type": "bool"
-                        },
-                        {
-                            "name": "p3",
-                            "type": "double"
-                        },
-                        {
-                            "name": "p4",
-                            "type": "float"
-                        }
-                    ]
+                    "fromClass": "coolclass1",
+                    "toClass": "coolclass3",
+                    "relationType": "aggregation"
                 }
-            ],
+            ]
+        },
+        "coolclass2": {
+            "name": "coolclass2",
+            "fields": [],
+            "methods": [],
             "relationships": []
         },
-        "class2": {
-            "name": "class2",
+        "coolclass3": {
+            "name": "coolclass3",
             "fields": [],
-            "methods": [
-                {
-                    "name": "m1",
-                    "return_type": "lol",
-                    "parameters": [
-                        {
-                            "name": "int",
-                            "type": "bool"
-                        }
-                    ]
-                }
-            ],
+            "methods": [],
+            "relationships": []
+        },
+        "coolclass4": {
+            "name": "coolclass5",
+            "fields": [],
+            "methods": [],
             "relationships": []
         }
+    },
+    "positions": {
+        "coolclass1": [
+            50,
+            50
+        ],
+        "coolclass2": [
+            129.0,
+            293.0
+        ],
+        "coolclass3": [
+            250.0,
+            151.0
+        ],
+        "coolclass4": [
+            1047.0,
+            367.0
+        ]
     }
 }
