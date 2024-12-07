@@ -1,5 +1,6 @@
 '''Creates the Model Class'''
-from classes import Class
+from classes import Class, ClassFactory
+from factory_classes import FieldFactory, MethodFactory, ParameterFactory, RelationshipFactory
 
 class Memento:
     """The Memento class stores the internal state of the Model."""
@@ -21,7 +22,7 @@ class Model:
     
     #adds the class if it is not in the class already returns True
         else:
-            newClass = Class(name)
+            newClass = ClassFactory.create_class(name)
             self.classList.update({name: newClass})
             return True
 

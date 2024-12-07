@@ -5,6 +5,12 @@ from relationship import Relationship
 from methods import Method
 from parameters import Parameter
 from fields import Field #, FIELD_TYPES will be added later
+from factory_classes import FieldFactory, MethodFactory, ParameterFactory, RelationshipFactory
+
+class ClassFactory:
+    @staticmethod
+    def create_class(name):
+        return Class(name)
 
 class Class:
     
@@ -36,7 +42,7 @@ class Class:
             if field.name == field_name:
                 return False  # Field with the same name already exists
 
-        new_field = Field(field_name, field_type)
+        new_field = FieldFactory.create_field(field_name, field_type)
         self.field.append(new_field)
         return True
         
@@ -120,7 +126,7 @@ class Class:
                 return False  # Relationship already exists
 
         # Add the new relationship
-        self.relationship.append(Relationship(fromClass, toClass, relationType))
+        self.relationship.append(RelationshipFactory.create_relationship(fromClass, toClass, relationType))
         return True
 
 
@@ -154,7 +160,7 @@ class Class:
         for method in self.method:
             if method.name == method_name and method.matches_signature(parameters):
                 return False  # Method with same signature already exists
-        self.method.append(Method(method_name, return_type, parameters))
+        self.method.append(MethodFactory.create_method(method_name, return_type, parameters))
         return True
 
     def renameMethod(self, old_method_name, new_method_name, parameters=None):
@@ -310,7 +316,7 @@ class Class:
                     should_add = True
 
                 if should_add:
-                    new_param = Parameter(param_name, param_type)
+                    new_param = ParameterFactory.create_parameter(param_name, param_type)
                     for param in method.parameters:
                         if param.getName() == param_name or param.getType() == param_type:
                             return False
