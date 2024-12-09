@@ -1,6 +1,8 @@
 import unittest
 from model import Model
+from parameters import ParameterAbstraction, ParameterImplementation
 
+# To run: python3 -m unittest discover -s test -p "*.py"
 
 class TestModel(unittest.TestCase):
     def setUp(self):
@@ -127,6 +129,147 @@ class TestModel(unittest.TestCase):
         self.assertTrue(result)
         self.assertEqual(test_class.relationship[0].relationType, "aggregation")
 
+# Parameter Tests
+    def test_add_parameter(self):
+        self.model.addClass("TestClass")
+        test_class = self.model.classList["TestClass"]
+        result = test_class.addMethod("testMethod", "void", [])
+        self.assertTrue(result)
+
+        result = test_class.addParameter("testMethod", "int", "param1")
+        self.assertTrue(result)
+
+    def test_add_duplicate_parameter(self):
+        self.model.addClass("TestClass")
+        test_class = self.model.classList["TestClass"]
+        test_class.addMethod("testMethod", "void", [])
+        test_class.addParameter("testMethod", "int", "param1")
+
+        result = test_class.addParameter("testMethod", "int", "param1")
+        self.assertFalse(result)
+
+    def test_remove_parameter(self):
+        self.model.addClass("TestClass")
+        test_class = self.model.classList["TestClass"]
+        test_class.addMethod("testMethod", "void", [])
+        test_class.addParameter("testMethod", "int", "param1")
+
+        result = test_class.removeParameter("testMethod", "param1")
+        self.assertTrue(result)
+
+    def test_remove_nonexistent_parameter(self):
+        self.model.addClass("TestClass")
+        test_class = self.model.classList["TestClass"]
+        test_class.addMethod("testMethod", "void", [])
+
+        result = test_class.removeParameter("testMethod", "nonexistentParam")
+        self.assertFalse(result)
+
+    def test_change_parameter(self):
+        self.model.addClass("TestClass")
+        test_class = self.model.classList["TestClass"]
+        test_class.addMethod("testMethod", "void", [])
+        test_class.addParameter("testMethod", "int", "param1")
+
+        result = test_class.changeParameter("testMethod", "param1", "newParam", "float")
+        self.assertTrue(result)
+
+    def test_change_nonexistent_parameter(self):
+        self.model.addClass("TestClass")
+        test_class = self.model.classList["TestClass"]
+        test_class.addMethod("testMethod", "void", [])
+
+        result = test_class.changeParameter("testMethod", "nonexistentParam", "newParam", "float")
+        self.assertFalse(result)
+
+    def test_change_parameter_type(self):
+        self.model.addClass("TestClass")
+        test_class = self.model.classList["TestClass"]
+        test_class.addMethod("testMethod", "void", [])
+        test_class.addParameter("testMethod", "int", "param1")
+
+        result = test_class.changeParameterType("testMethod", "param1", "float")
+        self.assertTrue(result)
+
+    def test_change_nonexistent_parameter_type(self):
+        self.model.addClass("TestClass")
+        test_class = self.model.classList["TestClass"]
+        test_class.addMethod("testMethod", "void", [])
+
+        result = test_class.changeParameterType("testMethod", "nonexistentParam", "float")
+        self.assertFalse(result)
+
+# Method Tests
+    def test_add_method(self):
+        self.model.addClass("TestClass")
+        test_class = self.model.classList["TestClass"]
+
+        result = test_class.addMethod("testMethod", "void", [])
+        self.assertTrue(result)
+
+    def test_add_duplicate_method(self):
+        self.model.addClass("TestClass")
+        test_class = self.model.classList["TestClass"]
+
+        test_class.addMethod("testMethod", "void", [])
+        result = test_class.addMethod("testMethod", "void", [])
+        self.assertFalse(result)
+
+    def test_remove_method(self):
+        self.model.addClass("TestClass")
+        test_class = self.model.classList["TestClass"]
+
+        test_class.addMethod("testMethod", "void", [])
+        result = test_class.removeMethod("testMethod", [])
+        self.assertTrue(result)
+
+    def test_remove_nonexistent_method(self):
+        self.model.addClass("TestClass")
+        test_class = self.model.classList["TestClass"]
+
+        result = test_class.removeMethod("nonexistentMethod", [])
+        self.assertFalse(result)
+
+    def test_rename_method(self):
+        self.model.addClass("TestClass")
+        test_class = self.model.classList["TestClass"]
+
+        test_class.addMethod("testMethod", "void", [])
+        result = test_class.renameMethod("testMethod", "renamedMethod", [])
+        self.assertTrue(result)
+
+    def test_rename_nonexistent_method(self):
+        self.model.addClass("TestClass")
+        test_class = self.model.classList["TestClass"]
+
+        result = test_class.renameMethod("nonexistentMethod", "renamedMethod", [])
+        self.assertFalse(result)
+
+    def test_change_method_data_type(self):
+        self.model.addClass("TestClass")
+        test_class = self.model.classList["TestClass"]
+
+        test_class.addMethod("testMethod", "int", [])
+        result = test_class.changeMethodDataType("testMethod", "void", [])
+        self.assertTrue(result)
+
+    def test_change_nonexistent_method_data_type(self):
+        self.model.addClass("TestClass")
+        test_class = self.model.classList["TestClass"]
+
+        result = test_class.changeMethodDataType("nonexistentMethod", "void", [])
+        self.assertFalse(result)
+
+    def test_add_method_with_parameters(self):
+        self.model.addClass("TestClass")
+        test_class = self.model.classList["TestClass"]
+
+        parameters = [
+            ParameterAbstraction(ParameterImplementation("param1", "int")),
+            ParameterAbstraction(ParameterImplementation("param2", "string"))
+        ]
+        result = test_class.addMethod("methodWithParams", "void", parameters)
+        self.assertTrue(result)
 
 if __name__ == "__main__":
     unittest.main()
