@@ -9,7 +9,7 @@ Singleton:
     resources.py line 4 for class "Model"
 
 Momento:
-    undo/redo 
+    model.py line 5 for Undo/Redo implementation
 
 Bridge: 
     relationship.py
