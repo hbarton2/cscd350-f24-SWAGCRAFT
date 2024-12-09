@@ -6,7 +6,6 @@
 from colorama import init, Fore, Style
 from controller import *
 from parameters import Parameter
-from factory_classes import ParameterFactory
 
 init(autoreset=True)
 
@@ -177,7 +176,7 @@ def menuCLI():
                 print(Fore.YELLOW + f"Parameter {param_count} type: ")
                 param_type = str(input()).strip()
 
-                parameters.append(ParameterFactory.create_parameter(param_name, param_type))
+                parameters.append(Parameter(param_name, param_type))
                 param_count += 1
 
             # Get return type
@@ -702,7 +701,7 @@ def menuCLI():
             filename = input(Fore.YELLOW + "Enter filename to save (press Enter for default 'data.json'): ").strip()
             if not filename:
                 filename = "data.json"
-            if controllerSave(filename):
+            if not controllerSave(filename):
                 print(Fore.GREEN + "UML Saved Successfully!")
             else:
                 print(Fore.RED + "File not Found!")
@@ -731,7 +730,7 @@ def menuCLI():
             filename = input(Fore.YELLOW + "Enter filename to load (press Enter for default 'data.json'): ").strip()
             if not filename:
                 filename = "data.json"
-            if controllerLoad(filename):
+            if not controllerLoad(filename):
                 print(Fore.GREEN + "UML Loaded Successfully!")
             else:
                 print(Fore.RED + "File not Found!")
