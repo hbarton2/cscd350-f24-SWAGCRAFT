@@ -1,6 +1,6 @@
 from methods import Method
-from parameters import Parameter
-from fields import Field
+from parameters import ParameterImplementation, ParameterAbstraction
+from fields import FieldAbstraction, FieldImplementation
 from relationship import Relationship
 
 class MethodFactory:
@@ -10,13 +10,15 @@ class MethodFactory:
 
 class ParameterFactory:
     @staticmethod
-    def create_parameter(name, param_type):
-        return Parameter(name, param_type)
+    def create_parameter(param_name, param_type):
+        param_impl = ParameterImplementation(param_name, param_type)
+        return ParameterAbstraction(param_impl)
 
 class FieldFactory:
     @staticmethod
-    def create_field(name, field_type):
-        return Field(name, field_type)
+    def create_field(field_name, field_type):
+        field_impl = FieldImplementation(field_name, field_type)
+        return FieldAbstraction(field_impl)
 
 class RelationshipFactory:
     @staticmethod

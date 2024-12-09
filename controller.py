@@ -152,17 +152,37 @@ def controllerRedo():
 def controllerCopyData():
     data = {}
     for className, classSect in myModel.classList.items():
-        classData = {"Fields": {field.name: field.fieldType for field in classSect.field},"Methods": {}}
+        # Handle fields using abstraction methods
+        classData = {
+            "Fields": {
+                field.getName(): field.getType() for field in classSect.field
+            },
+            "Methods": {}
+        }
 
+        # Handle methods and parameters using abstraction methods
         for method in classSect.method:
-            methodSigs = [{"parameters": [f"{param.type} {param.name}" for param in method.parameters],"return_type": method.returnType}]
+            methodSigs = [{
+                "parameters": [f"{param.getType()} {param.getName()}" for param in method.parameters],
+                "return_type": method.returnType
+            }]
 
             classData["Methods"][method.name] = methodSigs
 
-        classData["Relationships"] = [{"fromClass": relationship.fromClass,"toClass": relationship.toClass, "relationType": relationship.relationType} for relationship in classSect.relationship]
+        # Handle relationships directly
+        classData["Relationships"] = [
+            {
+                "fromClass": relationship.fromClass,
+                "toClass": relationship.toClass,
+                "relationType": relationship.relationType
+            }
+            for relationship in classSect.relationship
+        ]
 
         data[className] = classData
+
     return data
+
 
 def controllerExportDiagram(filename=None):
     from multiprocessing import Process

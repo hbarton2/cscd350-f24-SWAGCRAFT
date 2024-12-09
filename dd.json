@@ -2,20 +2,19 @@
     "classList": {
         "tester": {
             "name": "tester",
-            "fields": [
-                {
-                    "name": "field1",
-                    "fieldType": "void"
-                }
-            ],
+            "fields": [],
             "methods": [
                 {
                     "name": "testing",
                     "return_type": "void",
                     "parameters": [
                         {
+                            "name": "p1",
+                            "type": "int"
+                        },
+                        {
                             "name": "p2",
-                            "type": "float"
+                            "type": "bool"
                         }
                     ]
                 },
