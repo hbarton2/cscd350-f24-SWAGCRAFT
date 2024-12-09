@@ -1102,5 +1102,5 @@ def exportDiagramImage(filename=None):
     app.withdraw()
     app.update()
     app.drawDiagram()
-    app.exportCanvas(filename=filename)
+    app.exportCanvas(fileName=filename)
     app.destroy()
