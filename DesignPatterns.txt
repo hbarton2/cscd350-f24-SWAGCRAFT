@@ -12,10 +12,10 @@ Momento:
     model.py line 5 for Undo/Redo implementation
 
 Bridge: 
-    relationship.py
-    methods.py
-    parameters.py
-    fields.py
+    parameters.py line 1 for abstracting class "Parameter"
+    parameters.py line 17 for abstracting class "Parameter"
+    fields.py line 1 for abstracting class "Field"
+    fields.py line 18 for abstracting class "Field"
 
 Factory: 
     classes.py line 10 for class "Class"
