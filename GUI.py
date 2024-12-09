@@ -118,10 +118,10 @@ class UMLApp(ctk.CTk):
             destination = dialogue.get_input().strip()
 
             if(destination):
-                dialogue = ctk.CTkInputDialog(text="Enter the relationship type (aggregation, composition, generalization, realization):", title="Delete Relationship")
+                dialogue = ctk.CTkInputDialog(text="Enter the relationship type (aggregation, composition, generalization, realization, dependency, association):", title="Delete Relationship")
                 relationshipType = dialogue.get_input().strip().lower()
 
-                validTypes = ["aggregation", "composition", "generalization", "realization"]
+                validTypes = ["aggregation", "composition", "generalization", "realization", "dependency", "association"]
                 if relationshipType not in validTypes:
                     self.statLabel.configure(text="Status: Invalid relationship type given")
                     return
@@ -379,7 +379,9 @@ class UMLApp(ctk.CTk):
             "aggregation": "blue",
             "composition": "green",
             "generalization": "red",
-            "realization": "orange"
+            "realization": "orange",
+            "dependency": "purple",
+            "association": "pink"
         }.get(relType, "black")  #adding this to default to black in case something errors out (soft error)
 
 
@@ -489,7 +491,9 @@ class UMLApp(ctk.CTk):
             "Aggregation": "blue",
             "Composition": "green",
             "Generalization": "red",
-            "Realization": "orange"
+            "Realization": "orange",
+            "Dependency": "purple",
+            "Association": "pink"
         }
 
         x0 = self.canvas.winfo_width() - 250
@@ -950,7 +954,7 @@ class UMLApp(ctk.CTk):
     def addRelationship(self):
         relWin = ctk.CTkToplevel(self)
         relWin.title("Add Relationship")
-        relWin.geometry("200x450")
+        relWin.geometry("200x500")
 
         ctk.CTkLabel(relWin, text="Enter Source Class:").pack(pady=5)
         sourceEntry = ctk.CTkEntry(relWin)
@@ -969,11 +973,11 @@ class UMLApp(ctk.CTk):
 
             if source and dest:
                 if source == dest:
-                    ctk.messagebox.showerror("Error", "Cannot create a relationship with the same class. silly.")
+                    self.statLabel.configure(text = "Error: Cannot create a relationship with the same class. silly.")
                     return
 
                 if source not in self.diagram or dest not in self.diagram:
-                    ctk.messagebox.showerror("Error", "One or both classes do not exist.")
+                    self.statLabel.configure(text = "Error: One or both classes do not exist.")
                     return
 
                 success = controllerAddRelationship(source, dest, relationType)  # Use controller to add relationship
@@ -1002,6 +1006,11 @@ class UMLApp(ctk.CTk):
 
         realizationButton = ctk.CTkButton(buttonFrame, text="Realization", command=lambda: addRelHandler("realization"))
         realizationButton.pack(pady=5)
+        realizationButton = ctk.CTkButton(buttonFrame, text="Dependency", command=lambda: addRelHandler("dependency"))
+        realizationButton.pack(pady=5)
+        realizationButton = ctk.CTkButton(buttonFrame, text="Association", command=lambda: addRelHandler("association"))
+        realizationButton.pack(pady=5)
+
 
 
         cancelButton = ctk.CTkButton(relWin, text="Cancel", command=relWin.destroy)

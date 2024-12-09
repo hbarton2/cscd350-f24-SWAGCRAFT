@@ -503,8 +503,8 @@ def menuCLI():
             print(Fore.YELLOW + "Input the relationship type: ")
             relationshipType = clean(input())
             # Checks User Input for Type
-            while(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
-                if(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
+            while(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization" and relationshipType != "dependency" and relationshipType != "association"):
+                if(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization" and relationshipType != "dependency" and relationshipType != "association"):
                     print(Fore.RED + "Incorrect relationship type, try again!")
                     print(Fore.YELLOW + "Input the relationship type: ")
                     relationshipType = clean(input())
@@ -535,8 +535,8 @@ def menuCLI():
             print(Fore.YELLOW + "Input the relationship type: ")
             relationshipType = clean(input())
             # Checks User Input for Type
-            while(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
-                if(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
+            while(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization" and relationshipType != "dependency" and relationshipType != "association"):
+                if(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization" and relationshipType != "dependency" and relationshipType != "association"):
                     print(Fore.RED + "Incorrect relationship type, try again!")
                     print(Fore.YELLOW + "Input the relationship type: ")
                     relationshipType = clean(input())
@@ -567,8 +567,8 @@ def menuCLI():
             print(Fore.YELLOW + "Input the old relationship type: ")
             relationshipType = clean(input())
             # Checks User Input for old Type
-            while(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
-                if(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
+            while(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization" and relationshipType != "dependency" and relationshipType != "association"):
+                if(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization" and relationshipType != "dependency" and relationshipType != "association"):
                     print(Fore.RED + "Incorrect relationship type, try again!")
                     print(Fore.YELLOW + "Input the relationship type: ")
                     relationshipType = clean(input())
@@ -577,8 +577,8 @@ def menuCLI():
             newRelationshipType = clean(input())
 
             # Checks User Input for  newType
-            while(newRelationshipType != "aggregation" and newRelationshipType != "composition" and newRelationshipType !=  "generalization" and newRelationshipType != "realization"):
-                if(newRelationshipType != "aggregation" and newRelationshipType != "composition" and newRelationshipType !=  "generalization" and newRelationshipType != "realization"):
+            while(newRelationshipType != "aggregation" and newRelationshipType != "composition" and newRelationshipType !=  "generalization" and newRelationshipType != "realization" and relationshipType != "dependency" and relationshipType != "association"):
+                if(newRelationshipType != "aggregation" and newRelationshipType != "composition" and newRelationshipType !=  "generalization" and newRelationshipType != "realization" and relationshipType != "dependency" and relationshipType != "association"):
                     print(Fore.RED + "Incorrect relationship type, try again!")
                     print(Fore.YELLOW + "Input the relationship type: ")
                     newRelationshipType = clean(input())
