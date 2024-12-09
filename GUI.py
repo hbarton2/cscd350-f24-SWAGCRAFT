@@ -738,11 +738,11 @@ class UMLApp(ctk.CTk):
                         paramName, paramType = param.split(':')
                         paramName = paramName.strip()
                         paramType = paramType.strip()
-                        params.append(Parameter(paramName, paramType))
+                        params.append(ParameterFactory.create_parameter(paramName, paramType))
                     else:
                         paramName = param.strip()
                         paramType = "void"
-                        params.append(Parameter(paramName, paramType))
+                        params.append(ParameterFactory.create_parameter(paramName, paramType))
 
             if methodName:
                 success = controllerAddMethod(className, methodName, returnType, params)
