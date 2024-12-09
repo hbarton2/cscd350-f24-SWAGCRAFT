@@ -1,60 +1,1091 @@
 {
     "classList": {
-        "tester": {
-            "name": "tester",
-            "fields": [],
+        "UMLApp": {
+            "name": "UMLApp",
+            "fields": [
+                {
+                    "name": "exportMode",
+                    "fieldType": "bool"
+                },
+                {
+                    "name": "mainFRAME",
+                    "fieldType": "CTkFrame"
+                },
+                {
+                    "name": "canvas",
+                    "fieldType": "tk.Canvas"
+                },
+                {
+                    "name": "diagram",
+                    "fieldType": "dict"
+                },
+                {
+                    "name": "classPos",
+                    "fieldType": "dict"
+                },
+                {
+                    "name": "autoOrientation",
+                    "fieldType": "bool"
+                },
+                {
+                    "name": "statLabel",
+                    "fieldType": "CTkLabel"
+                },
+                {
+                    "name": "toggleButton",
+                    "fieldType": "CTkButton"
+                }
+            ],
             "methods": [
                 {
-                    "name": "testing",
+                    "name": "__init__",
+                    "return_type": "void",
+                    "parameters": []
+                },
+                {
+                    "name": "createTBOX",
+                    "return_type": "void",
+                    "parameters": []
+                },
+                {
+                    "name": "drawDiagram",
+                    "return_type": "void",
+                    "parameters": []
+                },
+                {
+                    "name": "addClass",
+                    "return_type": "void",
+                    "parameters": []
+                },
+                {
+                    "name": "exportCanvas",
                     "return_type": "void",
                     "parameters": [
                         {
-                            "name": "p1",
-                            "type": "int"
+                            "name": "fileName",
+                            "type": "string"
                         }
                     ]
                 },
                 {
-                    "name": "testeringer",
-                    "return_type": "PVOID",
+                    "name": "renameClass",
+                    "return_type": "void",
+                    "parameters": []
+                }
+            ],
+            "relationships": [
+                {
+                    "fromClass": "UMLApp",
+                    "toClass": "Controller",
+                    "relationType": "association"
+                },
+                {
+                    "fromClass": "UMLApp",
+                    "toClass": "Model",
+                    "relationType": "dependency"
+                }
+            ]
+        },
+        "MenuCLI": {
+            "name": "MenuCLI",
+            "fields": [],
+            "methods": [
+                {
+                    "name": "menuCLI",
+                    "return_type": "void",
+                    "parameters": []
+                },
+                {
+                    "name": "printCommands",
+                    "return_type": "void",
+                    "parameters": []
+                },
+                {
+                    "name": "printHelpMenu",
+                    "return_type": "void",
+                    "parameters": []
+                }
+            ],
+            "relationships": [
+                {
+                    "fromClass": "MenuCLI",
+                    "toClass": "Controller",
+                    "relationType": "association"
+                }
+            ]
+        },
+        "Controller": {
+            "name": "Controller",
+            "fields": [],
+            "methods": [
+                {
+                    "name": "controllerAddClass",
+                    "return_type": "bool",
                     "parameters": [
                         {
-                            "name": "p1",
-                            "type": "int"
+                            "name": "className",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "mainRenameClass",
+                    "return_type": "bool",
+                    "parameters": [
+                        {
+                            "name": "originalClassName",
+                            "type": "string"
                         },
                         {
-                            "name": "p2",
-                            "type": "bool"
+                            "name": "newClassName",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "controllerDeleteClass",
+                    "return_type": "bool",
+                    "parameters": [
+                        {
+                            "name": "unwantedClass",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "controllerAddMethod",
+                    "return_type": "bool",
+                    "parameters": [
+                        {
+                            "name": "class_name",
+                            "type": "string"
                         },
                         {
-                            "name": "p3",
-                            "type": "double"
+                            "name": "method_name",
+                            "type": "string"
                         },
                         {
-                            "name": "p4",
-                            "type": "float"
+                            "name": "return_type",
+                            "type": "string"
+                        },
+                        {
+                            "name": "parameters",
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "name": "controllerExportDiagram",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "filename",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
+            "relationships": [
+                {
+                    "fromClass": "Controller",
+                    "toClass": "Model",
+                    "relationType": "association"
+                },
+                {
+                    "fromClass": "Controller",
+                    "toClass": "Caretaker",
+                    "relationType": "association"
+                }
+            ]
+        },
+        "Model": {
+            "name": "Model",
+            "fields": [
+                {
+                    "name": "classList",
+                    "fieldType": "dict"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "__init__",
+                    "return_type": "void",
+                    "parameters": []
+                },
+                {
+                    "name": "addClass",
+                    "return_type": "bool",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "renameClass",
+                    "return_type": "bool",
+                    "parameters": [
+                        {
+                            "name": "oldName",
+                            "type": "string"
+                        },
+                        {
+                            "name": "newName",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "deleteClass",
+                    "return_type": "bool",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "create_memento",
+                    "return_type": "Memento",
+                    "parameters": []
+                },
+                {
+                    "name": "restore",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "memento",
+                            "type": "Memento"
+                        }
+                    ]
+                }
+            ],
+            "relationships": [
+                {
+                    "fromClass": "Model",
+                    "toClass": "Class",
+                    "relationType": "composition"
+                },
+                {
+                    "fromClass": "Model",
+                    "toClass": "Memento",
+                    "relationType": "dependency"
+                }
+            ]
+        },
+        "Caretaker": {
+            "name": "Caretaker",
+            "fields": [
+                {
+                    "name": "_originator",
+                    "fieldType": "Model"
+                },
+                {
+                    "name": "_undo_stack",
+                    "fieldType": "list"
+                },
+                {
+                    "name": "_redo_stack",
+                    "fieldType": "list"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "__init__",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "originator",
+                            "type": "Model"
+                        }
+                    ]
+                },
+                {
+                    "name": "backup",
+                    "return_type": "void",
+                    "parameters": []
+                },
+                {
+                    "name": "undo",
+                    "return_type": "bool",
+                    "parameters": []
+                },
+                {
+                    "name": "redo",
+                    "return_type": "bool",
+                    "parameters": []
+                }
+            ],
+            "relationships": [
+                {
+                    "fromClass": "Caretaker",
+                    "toClass": "Model",
+                    "relationType": "association"
+                },
+                {
+                    "fromClass": "Caretaker",
+                    "toClass": "Memento",
+                    "relationType": "composition"
+                }
+            ]
+        },
+        "Memento": {
+            "name": "Memento",
+            "fields": [
+                {
+                    "name": "_state",
+                    "fieldType": "dict"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "__init__",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "state",
+                            "type": "dict"
+                        }
+                    ]
+                },
+                {
+                    "name": "get_state",
+                    "return_type": "dict",
+                    "parameters": []
+                }
+            ],
+            "relationships": []
+        },
+        "Class": {
+            "name": "Class",
+            "fields": [
+                {
+                    "name": "name",
+                    "fieldType": "string"
+                },
+                {
+                    "name": "field",
+                    "fieldType": "list"
+                },
+                {
+                    "name": "method",
+                    "fieldType": "list"
+                },
+                {
+                    "name": "relationship",
+                    "fieldType": "list"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "__init__",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "name": "field",
+                            "type": "list"
+                        },
+                        {
+                            "name": "method",
+                            "type": "list"
+                        },
+                        {
+                            "name": "relationship",
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "name": "addField",
+                    "return_type": "bool",
+                    "parameters": [
+                        {
+                            "name": "field_name",
+                            "type": "string"
+                        },
+                        {
+                            "name": "field_type",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "addMethod",
+                    "return_type": "bool",
+                    "parameters": [
+                        {
+                            "name": "method_name",
+                            "type": "string"
+                        },
+                        {
+                            "name": "return_type",
+                            "type": "string"
+                        },
+                        {
+                            "name": "parameters",
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "name": "addRelationship",
+                    "return_type": "bool",
+                    "parameters": [
+                        {
+                            "name": "fromClass",
+                            "type": "string"
+                        },
+                        {
+                            "name": "toClass",
+                            "type": "string"
+                        },
+                        {
+                            "name": "relationType",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
+            "relationships": [
+                {
+                    "fromClass": "Class",
+                    "toClass": "FieldAbstraction",
+                    "relationType": "composition"
+                },
+                {
+                    "fromClass": "Class",
+                    "toClass": "Method",
+                    "relationType": "composition"
+                },
+                {
+                    "fromClass": "Class",
+                    "toClass": "Relationship",
+                    "relationType": "composition"
+                },
+                {
+                    "fromClass": "Class",
+                    "toClass": "FieldFactory",
+                    "relationType": "dependency"
+                },
+                {
+                    "fromClass": "Class",
+                    "toClass": "MethodFactory",
+                    "relationType": "dependency"
+                },
+                {
+                    "fromClass": "Class",
+                    "toClass": "ParameterFactory",
+                    "relationType": "dependency"
+                },
+                {
+                    "fromClass": "Class",
+                    "toClass": "RelationshipFactory",
+                    "relationType": "dependency"
+                },
+                {
+                    "fromClass": "Class",
+                    "toClass": "ClassFactory",
+                    "relationType": "dependency"
+                }
+            ]
+        },
+        "Method": {
+            "name": "Method",
+            "fields": [
+                {
+                    "name": "name",
+                    "fieldType": "string"
+                },
+                {
+                    "name": "returnType",
+                    "fieldType": "string"
+                },
+                {
+                    "name": "parameters",
+                    "fieldType": "list"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "__init__",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "name": "returnType",
+                            "type": "string"
+                        },
+                        {
+                            "name": "parameters",
+                            "type": "list"
+                        }
+                    ]
+                },
+                {
+                    "name": "matches_signature",
+                    "return_type": "bool",
+                    "parameters": [
+                        {
+                            "name": "parameters",
+                            "type": "list"
+                        }
+                    ]
+                }
+            ],
+            "relationships": [
+                {
+                    "fromClass": "Method",
+                    "toClass": "Parameter",
+                    "relationType": "composition"
+                }
+            ]
+        },
+        "Parameter": {
+            "name": "Parameter",
+            "fields": [
+                {
+                    "name": "name",
+                    "fieldType": "string"
+                },
+                {
+                    "name": "type",
+                    "fieldType": "string"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "__init__",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "name": "type",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "getName",
+                    "return_type": "string",
+                    "parameters": []
+                },
+                {
+                    "name": "setName",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "getType",
+                    "return_type": "string",
+                    "parameters": []
+                },
+                {
+                    "name": "setType",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "type",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
+            "relationships": [
+                {
+                    "fromClass": "Parameter",
+                    "toClass": "ParameterAbstraction",
+                    "relationType": "realization"
+                }
+            ]
+        },
+        "Relationship": {
+            "name": "Relationship",
+            "fields": [
+                {
+                    "name": "fromClass",
+                    "fieldType": "string"
+                },
+                {
+                    "name": "toClass",
+                    "fieldType": "string"
+                },
+                {
+                    "name": "relationType",
+                    "fieldType": "string"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "__init__",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "fromClass",
+                            "type": "string"
+                        },
+                        {
+                            "name": "toClass",
+                            "type": "string"
+                        },
+                        {
+                            "name": "relationType",
+                            "type": "string"
                         }
                     ]
                 }
             ],
             "relationships": []
         },
-        "class2": {
-            "name": "class2",
+        "ParameterFactory": {
+            "name": "ParameterFactory",
             "fields": [],
             "methods": [
                 {
-                    "name": "m1",
-                    "return_type": "lol",
+                    "name": "create_parameter",
+                    "return_type": "ParameterAbstraction",
                     "parameters": [
                         {
-                            "name": "int",
-                            "type": "bool"
+                            "name": "param_name",
+                            "type": "string"
+                        },
+                        {
+                            "name": "param_type",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
+            "relationships": [
+                {
+                    "fromClass": "ParameterFactory",
+                    "toClass": "ParameterAbstraction",
+                    "relationType": "association"
+                },
+                {
+                    "fromClass": "ParameterFactory",
+                    "toClass": "ParameterImplementation",
+                    "relationType": "association"
+                }
+            ]
+        },
+        "ParameterAbstraction": {
+            "name": "ParameterAbstraction",
+            "fields": [
+                {
+                    "name": "_implementation",
+                    "fieldType": "ParameterImplementation"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "__init__",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "implementation",
+                            "type": "ParameterImplementation"
+                        }
+                    ]
+                },
+                {
+                    "name": "getName",
+                    "return_type": "string",
+                    "parameters": []
+                },
+                {
+                    "name": "setName",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "getType",
+                    "return_type": "string",
+                    "parameters": []
+                },
+                {
+                    "name": "setType",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "type",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
+            "relationships": [
+                {
+                    "fromClass": "ParameterAbstraction",
+                    "toClass": "ParameterImplementation",
+                    "relationType": "dependency"
+                }
+            ]
+        },
+        "ParameterImplementation": {
+            "name": "ParameterImplementation",
+            "fields": [
+                {
+                    "name": "name",
+                    "fieldType": "string"
+                },
+                {
+                    "name": "type",
+                    "fieldType": "string"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "__init__",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "name": "param_type",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "getName",
+                    "return_type": "string",
+                    "parameters": []
+                },
+                {
+                    "name": "setName",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "getType",
+                    "return_type": "string",
+                    "parameters": []
+                },
+                {
+                    "name": "setType",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "param_type",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
+            "relationships": []
+        },
+        "MethodFactory": {
+            "name": "MethodFactory",
+            "fields": [],
+            "methods": [
+                {
+                    "name": "create_method",
+                    "return_type": "Method",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "type": "string"
+                        },
+                        {
+                            "name": "return_type",
+                            "type": "string"
+                        },
+                        {
+                            "name": "parameters",
+                            "type": "list"
+                        }
+                    ]
+                }
+            ],
+            "relationships": []
+        },
+        "FieldFactory": {
+            "name": "FieldFactory",
+            "fields": [],
+            "methods": [
+                {
+                    "name": "create_field",
+                    "return_type": "FieldAbstraction",
+                    "parameters": [
+                        {
+                            "name": "field_name",
+                            "type": "string"
+                        },
+                        {
+                            "name": "field_type",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
+            "relationships": []
+        },
+        "FieldAbstraction": {
+            "name": "FieldAbstraction",
+            "fields": [
+                {
+                    "name": "_implementation",
+                    "fieldType": "FieldImplementation"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "__init__",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "implementation",
+                            "type": "FieldImplementation"
+                        }
+                    ]
+                },
+                {
+                    "name": "getName",
+                    "return_type": "string",
+                    "parameters": []
+                },
+                {
+                    "name": "setName",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "getType",
+                    "return_type": "string",
+                    "parameters": []
+                },
+                {
+                    "name": "setType",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "field_type",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
+            "relationships": [
+                {
+                    "fromClass": "FieldAbstraction",
+                    "toClass": "FieldImplementation",
+                    "relationType": "dependency"
+                }
+            ]
+        },
+        "FieldImplementation": {
+            "name": "FieldImplementation",
+            "fields": [
+                {
+                    "name": "name",
+                    "fieldType": "string"
+                },
+                {
+                    "name": "fieldType",
+                    "fieldType": "string"
+                }
+            ],
+            "methods": [
+                {
+                    "name": "__init__",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "field_name",
+                            "type": "string"
+                        },
+                        {
+                            "name": "field_type",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "getName",
+                    "return_type": "string",
+                    "parameters": []
+                },
+                {
+                    "name": "setName",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "type": "string"
+                        }
+                    ]
+                },
+                {
+                    "name": "getType",
+                    "return_type": "string",
+                    "parameters": []
+                },
+                {
+                    "name": "setType",
+                    "return_type": "void",
+                    "parameters": [
+                        {
+                            "name": "field_type",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
+            "relationships": []
+        },
+        "ClassFactory": {
+            "name": "ClassFactory",
+            "fields": [],
+            "methods": [
+                {
+                    "name": "create_class",
+                    "return_type": "Class",
+                    "parameters": [
+                        {
+                            "name": "name",
+                            "type": "string"
+                        }
+                    ]
+                }
+            ],
+            "relationships": []
+        },
+        "RelationshipFactory": {
+            "name": "RelationshipFactory",
+            "fields": [],
+            "methods": [
+                {
+                    "name": "create_relationship",
+                    "return_type": "Relationship",
+                    "parameters": [
+                        {
+                            "name": "fromClass",
+                            "type": "string"
+                        },
+                        {
+                            "name": "toClass",
+                            "type": "string"
+                        },
+                        {
+                            "name": "relationType",
+                            "type": "string"
                         }
                     ]
                 }
             ],
             "relationships": []
         }
+    },
+    "positions": {
+        "UMLApp": [
+            50,
+            50
+        ],
+        "MenuCLI": [
+            123.0,
+            413.0
+        ],
+        "Controller": [
+            2286.0,
+            14.0
+        ],
+        "Model": [
+            3452.0,
+            175.0
+        ],
+        "Caretaker": [
+            711.0,
+            533.0
+        ],
+        "Memento": [
+            368.0,
+            350.0
+        ],
+        "Class": [
+            2304.0,
+            388.0
+        ],
+        "Method": [
+            2369.0,
+            689.0
+        ],
+        "Parameter": [
+            292.0,
+            801.0
+        ],
+        "Relationship": [
+            1401.0,
+            478.0
+        ],
+        "ParameterFactory": [
+            3296.0,
+            645.0
+        ],
+        "MethodFactory": [
+            3530.0,
+            448.0
+        ],
+        "FieldFactory": [
+            3208.0,
+            863.0
+        ],
+        "ClassFactory": [
+            3256.0,
+            738.0
+        ],
+        "ParameterAbstraction": [
+            4137.0,
+            960.0
+        ],
+        "ParameterImplementation": [
+            2589.0,
+            952.0
+        ],
+        "FieldAbstraction": [
+            4147.0,
+            737.0
+        ],
+        "FieldImplementation": [
+            4030.0,
+            37.0
+        ],
+        "RelationshipFactory": [
+            3487.0,
+            368.0
+        ]
     }
 }

@@ -5,7 +5,7 @@
 # import colorama so the menu colors show up 
 from colorama import init, Fore, Style
 from controller import *
-from parameters import Parameter
+from factory_classes import ParameterFactory
 
 init(autoreset=True)
 
@@ -40,6 +40,9 @@ def printCommands():
     print(Fore.MAGENTA + " | Change Relation Type  | Quit                      |")
     print(Fore.MAGENTA + " |                       | Save                      |")
     print(Fore.MAGENTA + " |                       | Load                      |")
+    print(Fore.MAGENTA + " |                       | Undo                      |")
+    print(Fore.MAGENTA + " |                       | Redo                      |")
+    print(Fore.MAGENTA + " |                       | Export Diagram            |")
     print(Fore.CYAN + " +-----------------------+---------------------------+")
 
 def printHelpMenu():
@@ -76,6 +79,8 @@ How to Use the CLI Application:""")
 - Load                |   : Load the diagram.
 - Help                |   : Display this help menu.
 - Exit                |   : Exit the program gracefully.
+- Undo                |   : Will Undo the most recent change to the model
+- Redo                |   : Will Redo the most recent undo command
 ----------------------------------------------------------------------------------------------
     """)
 
@@ -171,7 +176,7 @@ def menuCLI():
                 print(Fore.YELLOW + f"Parameter {param_count} type: ")
                 param_type = str(input()).strip()
 
-                parameters.append(Parameter(param_name, param_type))
+                parameters.append(ParameterFactory.create_parameter(param_name, param_type))
                 param_count += 1
 
             # Get return type
@@ -498,8 +503,8 @@ def menuCLI():
             print(Fore.YELLOW + "Input the relationship type: ")
             relationshipType = clean(input())
             # Checks User Input for Type
-            while(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
-                if(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
+            while(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization" and relationshipType != "dependency" and relationshipType != "association"):
+                if(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization" and relationshipType != "dependency" and relationshipType != "association"):
                     print(Fore.RED + "Incorrect relationship type, try again!")
                     print(Fore.YELLOW + "Input the relationship type: ")
                     relationshipType = clean(input())
@@ -530,8 +535,8 @@ def menuCLI():
             print(Fore.YELLOW + "Input the relationship type: ")
             relationshipType = clean(input())
             # Checks User Input for Type
-            while(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
-                if(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
+            while(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization" and relationshipType != "dependency" and relationshipType != "association"):
+                if(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization" and relationshipType != "dependency" and relationshipType != "association"):
                     print(Fore.RED + "Incorrect relationship type, try again!")
                     print(Fore.YELLOW + "Input the relationship type: ")
                     relationshipType = clean(input())
@@ -562,8 +567,8 @@ def menuCLI():
             print(Fore.YELLOW + "Input the old relationship type: ")
             relationshipType = clean(input())
             # Checks User Input for old Type
-            while(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
-                if(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization"):
+            while(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization" and relationshipType != "dependency" and relationshipType != "association"):
+                if(relationshipType != "aggregation" and relationshipType != "composition" and relationshipType !=  "generalization" and relationshipType != "realization" and relationshipType != "dependency" and relationshipType != "association"):
                     print(Fore.RED + "Incorrect relationship type, try again!")
                     print(Fore.YELLOW + "Input the relationship type: ")
                     relationshipType = clean(input())
@@ -572,8 +577,8 @@ def menuCLI():
             newRelationshipType = clean(input())
 
             # Checks User Input for  newType
-            while(newRelationshipType != "aggregation" and newRelationshipType != "composition" and newRelationshipType !=  "generalization" and newRelationshipType != "realization"):
-                if(newRelationshipType != "aggregation" and newRelationshipType != "composition" and newRelationshipType !=  "generalization" and newRelationshipType != "realization"):
+            while(newRelationshipType != "aggregation" and newRelationshipType != "composition" and newRelationshipType !=  "generalization" and newRelationshipType != "realization" and relationshipType != "dependency" and relationshipType != "association"):
+                if(newRelationshipType != "aggregation" and newRelationshipType != "composition" and newRelationshipType !=  "generalization" and newRelationshipType != "realization" and relationshipType != "dependency" and relationshipType != "association"):
                     print(Fore.RED + "Incorrect relationship type, try again!")
                     print(Fore.YELLOW + "Input the relationship type: ")
                     newRelationshipType = clean(input())
@@ -582,6 +587,10 @@ def menuCLI():
                 print(Fore.GREEN + "Successfully changed relationship type for " + className1 + " and " + className2 + " with type " + relationshipType +  " to new type " + newRelationshipType)
             else:
                 print(Fore.RED + "An error has occurred")
+        elif choice == "exportdiagram":
+            print(Fore.YELLOW + "Exporting diagram as image...")
+            controllerExportDiagram()
+            print(Fore.GREEN + "Diagram export completed.")
 
         # LIST CLASSES
         elif choice == "listclasses":
@@ -692,7 +701,7 @@ def menuCLI():
             filename = input(Fore.YELLOW + "Enter filename to save (press Enter for default 'data.json'): ").strip()
             if not filename:
                 filename = "data.json"
-            if not controllerSave(filename):
+            if controllerSave(filename):
                 print(Fore.GREEN + "UML Saved Successfully!")
             else:
                 print(Fore.RED + "File not Found!")
@@ -721,10 +730,24 @@ def menuCLI():
             filename = input(Fore.YELLOW + "Enter filename to load (press Enter for default 'data.json'): ").strip()
             if not filename:
                 filename = "data.json"
-            if not controllerLoad(filename):
+            if controllerLoad(filename):
                 print(Fore.GREEN + "UML Loaded Successfully!")
             else:
                 print(Fore.RED + "File not Found!")
+
+        # Undo
+        elif (choice == "undo"):
+            if(controllerUndo()):
+                print("\n" + Fore.GREEN + "Undo has been completed succesfully \n")
+            else:
+                print(Fore.RED + "Nothing to Undo")
+
+        # Redo
+        elif (choice == "redo"):
+            if(controllerRedo()):
+                print("\n" + Fore.GREEN + "Redo has been completed succesfully \n")
+            else:
+                print(Fore.RED + "Nothing to Redo")
 
         # HELP
         elif (choice == "help"):
