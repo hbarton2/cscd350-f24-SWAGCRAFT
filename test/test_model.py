@@ -78,7 +78,7 @@ class TestModel(unittest.TestCase):
         test_class.addField("field1", "int")
         result = test_class.renameField("field1", "field2")
         self.assertTrue(result)
-        self.assertEqual(test_class.field[0].name, "field2")
+        self.assertEqual(test_class.field[0].getName(), "field2")
 
     # Test deleting a field from a class
     def test_delete_field_from_class(self):
