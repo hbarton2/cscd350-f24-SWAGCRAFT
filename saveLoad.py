@@ -5,27 +5,20 @@ from model import Model
 from classes import Class
 from relationship import Relationship
 from methods import Method
-from parameters import Parameter
-from fields import Field
+from parameters import ParameterAbstraction, ParameterImplementation
+from fields import FieldAbstraction, FieldImplementation
+from factory_classes import FieldFactory, ParameterFactory
 from resources import myModel
 
 def save(filename, positions=None):
     """
     Saves the model to a JSON file.
-    
-    Parameters:
-        model (Model): The model to save
-        filename (str): The name of the file to save to
-        
-    Returns:
-        bool: True if save was successful, False otherwise
     """
     try:
         model_dict = {
             "classList": {}
         }
         
-        # Convert each class and its components to a dictionary
         for class_name, class_obj in myModel.classList.items():
             class_dict = {
                 "name": class_obj.name,
@@ -37,8 +30,8 @@ def save(filename, positions=None):
             # Save fields
             for field in class_obj.field:
                 field_dict = {
-                    "name": field.name,
-                    "fieldType": field.fieldType
+                    "name": field.getName(),
+                    "fieldType": field.getType()
                 }
                 class_dict["fields"].append(field_dict)
             
@@ -49,8 +42,6 @@ def save(filename, positions=None):
                     "return_type": method.returnType,
                     "parameters": []
                 }
-                
-                # Save parameters
                 for param in method.parameters:
                     param_dict = {
                         "name": param.getName(),
@@ -74,7 +65,6 @@ def save(filename, positions=None):
         if positions is not None:
             model_dict["positions"] = positions
 
-        # Write to file
         with open(filename, 'w') as f:
             json.dump(model_dict, f, indent=4)
         
@@ -84,42 +74,32 @@ def save(filename, positions=None):
         print(f"Error saving model: {str(e)}")
         return False
 
+
 def load(filename, return_positions=False):
     """
     Loads a model from a JSON file and updates the global model state.
-    
-    Parameters:
-        filename (str): The name of the file to load from
-        
-    Returns:
-        bool: True if load was successful, False otherwise
     """
     try:
         with open(filename, 'r') as f:
             model_dict = json.load(f)
         
-        # Clear existing model data
         myModel.classList.clear()
         
-        # Reconstruct each class and its components
         for class_name, class_data in model_dict["classList"].items():
-            # Create the class
             myModel.addClass(class_name)
             class_obj = myModel.classList[class_name]
             
             # Reconstruct fields
             for field_data in class_data["fields"]:
-                class_obj.addField(field_data["name"], field_data["fieldType"])
+                field = FieldFactory.create_field(field_data["name"], field_data["fieldType"])
+                class_obj.field.append(field)
             
             # Reconstruct methods and their parameters
             for method_data in class_data["methods"]:
-                # Create parameters list
-                parameters = []
-                for param_data in method_data["parameters"]:
-                    param = Parameter(param_data["name"], param_data["type"])
-                    parameters.append(param)
-                
-                # Add method with parameters
+                parameters = [
+                    ParameterFactory.create_parameter(param["name"], param["type"])
+                    for param in method_data["parameters"]
+                ]
                 class_obj.addMethod(method_data["name"], method_data["return_type"], parameters)
             
             # Reconstruct relationships

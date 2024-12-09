@@ -1,8 +1,37 @@
-class Field:
-    def __init__(self, field_name, field_type = None):
+class FieldAbstraction:
+    def __init__(self, implementation):
+        self._implementation = implementation
 
+    def getName(self):
+        return self._implementation.getName()
+
+    def setName(self, name):
+        self._implementation.setName(name)
+
+    def getType(self):
+        return self._implementation.getType()
+
+    def setType(self, field_type):
+        self._implementation.setType(field_type)
+
+
+class FieldImplementation:
+    def __init__(self, field_name, field_type=None):
         self.name = field_name
         self.fieldType = field_type
+
+    def getName(self):
+        return self.name
+
+    def setName(self, name):
+        self.name = name
+
+    def getType(self):
+        return self.fieldType
+
+    def setType(self, field_type):
+        self.fieldType = field_type
+
 
 # FIELD_TYPES = ['int', 'float', 'str'] will be added later
 

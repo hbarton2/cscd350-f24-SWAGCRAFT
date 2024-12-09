@@ -3,8 +3,8 @@
 
 from relationship import Relationship
 from methods import Method
-from parameters import Parameter
-from fields import Field #, FIELD_TYPES will be added later
+from parameters import ParameterAbstraction, ParameterImplementation
+from fields import FieldAbstraction, FieldImplementation #, FIELD_TYPES will be added later
 from factory_classes import FieldFactory, MethodFactory, ParameterFactory, RelationshipFactory
 
 class ClassFactory:
@@ -24,27 +24,14 @@ class Class:
     # Field methods
 
     def addField(self, field_name, field_type):
-        '''
-        Adds a new field to the class.
-
-        Parameters: 
-            field_name (STR): The name of the field to add 
-            field_type (STR): The data type of the field.
-
-        Returns:
-            bool: True if the field is added successfully, False otherwise.
-        '''
-
-       # if field_type not in FIELD_TYPES:
-          #  return False Will be addded later - thomas
-
         for field in self.field:
-            if field.name == field_name:
+            if field.getName() == field_name:
                 return False  # Field with the same name already exists
 
         new_field = FieldFactory.create_field(field_name, field_type)
         self.field.append(new_field)
         return True
+
         
     def removeField(self, field_name):
         '''
@@ -58,7 +45,7 @@ class Class:
         '''
 
         for field in self.field:
-            if field.name == field_name:
+            if field.getName() == field_name:
                 self.field.remove(field)
                 return True
         return False
@@ -76,11 +63,11 @@ class Class:
         '''
 
         for field in self.field:
-            if field.name == old_field_name:
+            if field.getName() == old_field_name:
                 for existing_field in self.field:
-                    if existing_field.name == new_field_name:
+                    if existing_field.getName() == new_field_name:
                         return False 
-                field.name = new_field_name
+                field.setName(new_field_name)
                 return True
         return False
         
@@ -101,8 +88,8 @@ class Class:
             #return False will be added later - thomas
 
         for field in self.field:
-            if field.name == field_name:
-                field.fieldType = new_field_type 
+            if field.getName() == field_name:
+                field.setType(new_field_type)
                 return True
         return False       
 
@@ -287,42 +274,31 @@ class Class:
     
     #METHODS Parameters
     def addParameter(self, method_name, param_type, param_name, parameters=None):
-        """
-        Adds a parameter to a method.
-
-        Args:
-            method_name (str): The name of the method to which the parameter will be added.
-            param_type (str): The type of the parameter to be added.
-            param_name (str): The name of the parameter to be added.
-            parameters (list, optional): A list of parameters to match the method signature. Defaults to None.
-
-        Returns:
-            bool: True if the parameter was successfully added, False otherwise.
-        """
         for method in self.method:
             if method.name == method_name:
                 should_add = False
 
-                # Case 1: parameters is None - add to all methods with this name
+                # Case 1: Add to all methods with this name
                 if parameters is None:
                     should_add = True
 
-                # Case 2: empty parameters list - only add to no-parameter method
+                # Case 2: Add to no-parameter methods
                 elif len(parameters) == 0 and len(method.parameters) == 0:
                     should_add = True
 
-                # Case 3: specific parameters - add to matching method
+                # Case 3: Add to matching method
                 elif parameters and method.matches_signature(parameters):
                     should_add = True
 
                 if should_add:
                     new_param = ParameterFactory.create_parameter(param_name, param_type)
                     for param in method.parameters:
-                        if param.getName() == param_name or param.getType() == param_type:
+                        if param.getName() == param_name:
                             return False
                     method.parameters.append(new_param)
                     return True
         return False
+
 
     def removeParameter(self, method_name, param_name, parameters=None):
         """
@@ -398,40 +374,18 @@ class Class:
         return False
 
     def changeAllParameters(self, method_name, param_names, param_types, parameters=None):
-        """
-        Changes all parameters of a method.
-
-        Args:
-            method_name (str): The name of the method whose parameters will be changed.
-            param_names (list): A list of new parameter names.
-            param_types (list): A list of new parameter types.
-            parameters (list, optional): A list of parameters to match the method signature. Defaults to None.
-
-        Returns:
-            bool: True if the parameters were successfully changed, False otherwise.
-        """
         for method in self.method:
             if method.name == method_name:
-                should_change = False
-
-                # Case 1: parameters is None - change in all methods with this name
-                if parameters is None:
-                    should_change = True
-
-                # Case 2: empty parameters list - only change in no-parameter method
-                elif len(parameters) == 0 and len(method.parameters) == 0:
-                    should_change = True
-
-                # Case 3: specific parameters - change in matching method
-                elif parameters and method.matches_signature(parameters):
-                    should_change = True
-
-                if should_change:
+                if parameters is None or method.matches_signature(parameters):
                     if len(param_names) != len(param_types):
                         return False
-                    method.parameters = [Parameter(name, type_) for name, type_ in zip(param_names, param_types)]
+                    method.parameters = [
+                        ParameterFactory.create_parameter(name, type_)
+                        for name, type_ in zip(param_names, param_types)
+                    ]
                     return True
         return False
+
 
     def changeParameterType(self, method_name, param_name, new_type, parameters=None):
         """
@@ -482,7 +436,7 @@ class Class:
         """Returns True if the field exists in the class, otherwise False."""
         # Check if the field exists in the class's fields
         for field in self.field:
-            if field_name == field.name:
+            if field_name == field.getName():
                 return True
         else:
             return False
