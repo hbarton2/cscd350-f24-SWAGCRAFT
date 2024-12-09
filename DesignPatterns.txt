@@ -1,0 +1,25 @@
+Total Design Patterns: 12
+
+MVC: 
+    model.py line all for Model in Model-View-Controller
+    menu.py and GUI.py line all for View in Model-View-Controller
+    controller.py line all for Controller in Model-View-Controller
+
+Singleton: 
+    resources.py line 4 for class "Model"
+
+Momento:
+    undo/redo 
+
+Bridge: 
+    relationship.py
+    methods.py
+    parameters.py
+    fields.py
+
+Factory: 
+    classes.py line 10 for class "Class"
+    factory_classes.py line 6 for class "Method"
+    factory_classes.py line 11 for class "Parameter"
+    factory_classes.py line 16 for class "Field"
+    factory_classes.py line 21 for class "Relationship"
