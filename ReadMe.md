@@ -11,6 +11,7 @@ Dependencies required to be installed before the application will function are c
 pip(3) install tk
 pip(3) install customtkinter 
 pip(3) install colorama
+pip(3) install Pillow
 ```
 
 1) navigate to the github (https://github.com/hbarton2/cscd350-f24-SWAGCRAFT) and use the git clone feature by selecting the green "Code" tab and selecting the HTTPS option then selecting "Copy URL to Clipboard"
@@ -63,7 +64,11 @@ pip(3) install colorama
 
 - Show Relationships | : Show the relationships between all classes.
 
-- Change Relation Type| : Change a relationship type between two classes.
+- Change Relation Type | : Change a relationship type between two classes.
+
+- Undo | : Undo action taken to diagram
+
+- Redo | : Redo undone operation
 
 - Save | : Save the diagram.
 
@@ -74,3 +79,9 @@ pip(3) install colorama
 - Exit | : Exit the program gracefully.
 -------------------------------------------------------------------
 ```
+
+## UML Render Example of Our Project
+
+Below is an example render of the UML diagram generated using this project
+
+![Example UML Diagram](UMLception_the_diagram_of_madness.png)
