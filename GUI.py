@@ -331,15 +331,6 @@ class UMLApp(ctk.CTk):
         width1, height1 = self.calculateClassDimensions(className1, self.diagram[className1])
         width2, height2 = self.calculateClassDimensions(className2, self.diagram[className2])
 
-
-        classARect = (x1, y1, x1 + width1, y1 + height1)
-        classBRect = (x2, y2, x2 + width2, y2 + height2)
-
-        overlap = not (classARect[2] <= classBRect[0] or classARect[0] >= classBRect[2] or classARect[3] <= classBRect[1] or classARect[1] >= classBRect[3])
-
-        if overlap:
-            return
-
         centerX1 = x1 + width1 / 2
         centerY1 = y1 + height1 / 2
         centerX2 = x2 + width2 / 2
@@ -371,10 +362,6 @@ class UMLApp(ctk.CTk):
                 primaryDirection = 'vertical'
                 direction = -1
 
-        currX, currY = startPoint
-        endX, endY = endPoint
-
-
         lineColor = {
             "aggregation": "blue",
             "composition": "green",
@@ -385,78 +372,196 @@ class UMLApp(ctk.CTk):
         }.get(relType, "black")  #adding this to default to black in case something errors out (soft error)
 
 
-        linePoints = [(currX, currY)]
+        def intersectsAnyClass(xA, yA, xB, yB, skipChk=False):
+            if skipChk:
+                return False
+            for otherClass in self.diagram:
+                if otherClass in (className1, className2):
+                    continue
+                otherX, otherY = self.classPos[otherClass]
+                oWidth, oHeight = self.calculateClassDimensions(otherClass, self.diagram[otherClass])
+                oLeft = otherX
+                oRight = otherX + oWidth
+                oTop = otherY
+                oBottom = otherY + oHeight
+
+                if yA == yB: #horizontal check
+                    minX = min(xA, xB)
+                    maxX = max(xA, xB)
+                    if oTop <= yA <= oBottom and not (oRight < minX or oLeft > maxX):
+                        return True
+
+
+                if xA == xB: #vertical line check
+                    minY = min(yA, yB)
+                    maxY = max(yA, yB)
+                    if oLeft <= xA <= oRight and not (oBottom < minY or oTop > maxY):
+                        return True
+            return False
+
+        startX, startY = startPoint #after init offst, never go back into frame
         edgeOffST = 20
+        linePoints = [startPoint]
 
-
+        #move off the class edge by edgeOffset in the primary direction first outward
+        currX, currY = startPoint
         if primaryDirection == 'horizontal':
-            currX += direction * edgeOffST
+            currX = currX + direction * edgeOffST
         else:
-            currY += direction * edgeOffST
+            currY = currY + direction * edgeOffST
         linePoints.append((currX, currY))
 
 
-        if primaryDirection == 'horizontal':
-            preEndX = endX - direction * edgeOffST
-            preEndY = currY
-        else:
-            preEndX = currX
-            preEndY = endY - direction * edgeOffST
-
-
-        collision = False
-        for otherClass in self.diagram:
-            if otherClass in (className1, className2):
-                continue
-            otherX, otherY = self.classPos[otherClass]
-            otherWidth, otherHeight = self.calculateClassDimensions(otherClass, self.diagram[otherClass])
-
-            otherLeft = otherX
-            otherRight = otherX + otherWidth
-            otherTop = otherY
-            otherBottom = otherY + otherHeight
-
-
+        def isBackIntoFrame(newX, newY): #no going back into frame and breaking things
             if primaryDirection == 'horizontal':
-
-                minX = min(currX, preEndX)
-                maxX = max(currX, preEndX)
-                if otherTop <= currY <= otherBottom and not (otherRight < minX or otherLeft > maxX):
-                    collision = True
-                    break
+                if direction == 1 and newX < startX:
+                    return True
+                if direction == -1 and newX > startX:
+                    return True
             else:
+                if direction == 1 and newY < startY:
+                    return True
+                if direction == -1 and newY > startY:
+                    return True
+            return False
 
-                minY = min(currY, preEndY)
-                maxY = max(currY, preEndY)
-                if otherLeft <= currX <= otherRight and not (otherBottom < minY or otherTop > maxY):
-                    collision = True
-                    break
 
-        if collision:
+        def safeToLine(xA, yA, xB, yB, skipCheck=False): #to check obth frame/class intersect
+            if isBackIntoFrame(xB, yB):
+                return False
+            return not intersectsAnyClass(xA, yA, xB, yB, skipChk=skipCheck)
 
+
+        def tryDirectRoute():
             if primaryDirection == 'horizontal':
-                adjustY = -50 if currY > centerY2 else 50
-                currY += adjustY
-                linePoints.append((currX, currY))
+                preEndX = endPoint[0] - direction * edgeOffST
+
+
+                if not safeToLine(currX, currY, preEndX, currY):
+                    return False, []
+                route = [(preEndX, currY)]
+
+
+                if currY != endPoint[1]:
+                    if not safeToLine(preEndX, currY, preEndX, endPoint[1]):
+                        return False, []
+                    route.append((preEndX, endPoint[1]))
+
+
+                if preEndX != endPoint[0]:
+                    if isBackIntoFrame(endPoint[0], endPoint[1]):
+                        return False, []
+                    route.append((endPoint[0], endPoint[1]))
+                return True, route
             else:
-                adjustX = -50 if currX > centerX2 else 50
-                currX += adjustX
-                linePoints.append((currX, currY))
+                preEndY = endPoint[1] - direction * edgeOffST
 
-        if primaryDirection == 'horizontal':
-            currX = preEndX
-            linePoints.append((currX, currY))
-            if currY != endY:
-                currY = endY
-                linePoints.append((currX, currY))
-        else:
-            currY = preEndY
-            linePoints.append((currX, currY))
-            if currX != endX:
-                currX = endX
-                linePoints.append((currX, currY))
+                if not safeToLine(currX, currY, currX, preEndY):
+                    return False, []
+                route = [(currX, preEndY)]
 
-        linePoints.append((endX, endY))
+
+                if currX != endPoint[0]:
+                    if not safeToLine(currX, preEndY, endPoint[0], preEndY):
+                        return False, []
+                    route.append((endPoint[0], preEndY))
+
+
+                if preEndY != endPoint[1]:
+                    if isBackIntoFrame(endPoint[0], endPoint[1]):
+                        return False, []
+                    route.append((endPoint[0], endPoint[1]))
+                return True, route
+
+        success, route = tryDirectRoute()
+        if not success: #if route fail detour
+
+            step = 50
+            foundPath = False
+            detourRoute = []
+
+            if primaryDirection == 'horizontal': #up first then down try
+                for dirY in (-1, 1):
+                    offsetVal = step
+                    while abs(offsetVal) < 1000:
+                        tempY = currY + dirY * offsetVal
+
+                        if safeToLine(currX, currY, currX, tempY):
+                            saveY = currY
+                            currY = tempY
+
+                            success2, route2 = tryDirectRoute()
+
+                            if success2:
+                                detourRoute = [(currX, tempY)] + route2
+                                foundPath = True
+                                break
+                            currY = saveY
+                        offsetVal += step * dirY
+                    if foundPath:
+                        break
+            else: #left first then right
+                for dirX in (-1, 1):
+                    offsetVal = step
+
+                    while abs(offsetVal) < 1000:
+                        tempX = currX + dirX * offsetVal
+
+                        if safeToLine(currX, currY, tempX, currY):
+                            saveX = currX
+                            currX = tempX
+                            success2, route2 = tryDirectRoute()
+
+
+                            if success2:
+                                detourRoute = [(tempX, currY)] + route2
+                                foundPath = True
+                                break
+
+                            currX = saveX
+                        offsetVal += step * dirX
+
+
+                    if foundPath:
+                        break
+
+            if foundPath:
+                linePoints.extend(detourRoute)
+            else:
+                sX, sY = linePoints[-1]
+                eX, eY = endPoint
+                if primaryDirection == 'horizontal':
+
+                    if not safeToLine(sX, sY, eX, sY): #vertical then horizontal
+                        if safeToLine(sX, sY, sX, eY) and safeToLine(sX, eY, eX, eY, skipCheck=True):
+                            linePoints.append((sX, eY))
+                            linePoints.append((eX, eY))
+
+                        else:
+                            return
+                    else:
+                        linePoints.append((eX, sY))
+
+                        if not safeToLine(eX, sY, eX, eY, skipCheck=True):
+                            return
+                        linePoints.append((eX, eY))
+
+                else:
+                    if not safeToLine(sX, sY, sX, eY):
+
+                        #horizontal then vertical
+                        if safeToLine(sX, sY, eX, sY) and safeToLine(eX, sY, eX, eY, skipCheck=True):
+                            linePoints.append((eX, sY))
+                            linePoints.append((eX, eY))
+                        else:
+                            return
+                    else:
+                        linePoints.append((sX, eY))
+                        if not safeToLine(sX, eY, eX, eY, skipCheck=True):
+                            return
+                        linePoints.append((eX, eY))
+        else:#the direct route worked wahoo
+            linePoints.extend(route)
 
         lineCoords = [coord for point in linePoints for coord in point]
 
@@ -1102,5 +1207,5 @@ def exportDiagramImage(filename=None):
     app.withdraw()
     app.update()
     app.drawDiagram()
-    app.exportCanvas(filename=filename)
+    app.exportCanvas(fileName=filename)
     app.destroy()
